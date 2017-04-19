@@ -28,6 +28,7 @@ defmodule API.Mixfile do
       {:plug, "~> 1.3"},
       {:httpoison, "~> 0.11.1"},
       {:db, in_umbrella: true},
+      {:poison, "~> 3.1"}
     ]
   end
 end
