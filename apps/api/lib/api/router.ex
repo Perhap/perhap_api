@@ -5,9 +5,10 @@ defmodule API.Router do
   plug :match
   plug :dispatch
 
-  post ":realm/challenges/:entity_id/:event_type/:event_id" do
+  post ":realm/:domain/:entity_id/:event_type/:event_id" do
     send_resp(conn, 200, Poison.encode!(%{
-      host: host,
+      realm: realm,
+      domain: domain,
       entity_id: entity_id,
       event_type: event_type,
       event_id: event_id
