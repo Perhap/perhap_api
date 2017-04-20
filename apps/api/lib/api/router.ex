@@ -5,7 +5,7 @@ defmodule API.Router do
   plug :match
   plug :dispatch
 
-  post "host/:host/challenges/:entity_id/:event_type/:event_id" do
+  post ":realm/challenges/:entity_id/:event_type/:event_id" do
     send_resp(conn, 200, Poison.encode!(%{
       host: host,
       entity_id: entity_id,
@@ -14,7 +14,7 @@ defmodule API.Router do
     }))
   end
 
-  post "host/:host/bulk" do
+  post ":realm/bulk" do
     send_resp(conn, 200, Poison.encode!(%{
       count: 0
     }))
