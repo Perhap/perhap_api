@@ -17,7 +17,7 @@ defmodule APITest do
     |> put_req_header("content-type", "application/json")
     conn = API.Router.call(conn, @api_router_opts)
     assert conn.state == :sent
-    assert conn.status == 200
+    assert conn.status == 204
   end
 
 end
