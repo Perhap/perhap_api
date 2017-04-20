@@ -20,7 +20,7 @@ defmodule DB.Mixfile do
       {:geocalc, "~> 0.5.4"},
       {:riak, "~> 1.1"},
       {:timex, "~> 3.1"},
-      {:uuid, "~> 1.1"}
+      {:uuid, github: "okeuday/uuid"}
     ]
   end
 end
