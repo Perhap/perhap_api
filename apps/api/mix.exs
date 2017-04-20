@@ -18,7 +18,7 @@ defmodule API.Mixfile do
     [applications: [
       :logger,
       :cowboy,
-      :kafka_ex,
+      #      :kafka_ex,
       :snappy],
       mod: {API, []}
     ]

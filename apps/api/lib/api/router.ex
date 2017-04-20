@@ -5,23 +5,23 @@ defmodule API.Router do
   plug :match
   plug :dispatch
 
-  post ":realm/:domain/:entity_id/:event_type/:event_id" do
+  post "/v1/event/realm/:realm/:domain/:entity_id/:event_type/:event_id" do
     send_resp(conn, 200, Poison.encode!(%{
-      realm: realm,
-      domain: domain,
-      entity_id: entity_id,
+      realm: realm,  # "nike"
+      domain: domain,  # "challenge"
+      entity_id: entity_id,  # group by these
       event_type: event_type,
       event_id: event_id
     }))
   end
 
-  post ":realm/bulk" do
+  post "/v1/event/bulk/realm/:realm" do
     send_resp(conn, 200, Poison.encode!(%{
       count: 0
     }))
   end
 
   match _ do
-    send_resp(conn, 404, "Oops! You've touched upon a bad route, Dirty Finger")
+    send_resp(conn, 404, "Invalid Route")
   end
 end
