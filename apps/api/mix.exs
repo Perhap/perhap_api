@@ -17,7 +17,9 @@ defmodule API.Mixfile do
   def application do
     [applications: [
       :logger,
-      :cowboy],
+      :cowboy,
+      :kafka_ex,
+      :snappy],
       mod: {API, []}
     ]
   end
@@ -28,7 +30,9 @@ defmodule API.Mixfile do
       {:plug, "~> 1.3"},
       {:httpoison, "~> 0.11.1"},
       {:db, in_umbrella: true},
-      {:poison, "~> 3.1"}
+      {:poison, "~> 3.1"},
+      {:kafka_ex, "~> 0.6.5"},
+      {:snappy, git: "https://github.com/fdmanana/snappy-erlang-nif"}
     ]
   end
 end

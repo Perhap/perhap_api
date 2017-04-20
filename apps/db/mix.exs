@@ -27,6 +27,12 @@ defmodule DB.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:tzdata, "~> 0.5.12"},
+      {:geocalc, "~> 0.5.4"},
+      {:riak, "~> 1.1"},
+      {:timex, "~> 3.1"},
+      {:uuid, "~> 1.1"}
+    ]
   end
 end
