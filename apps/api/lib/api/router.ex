@@ -2,25 +2,29 @@ defmodule API.Router do
   import Plug.Conn
   use Plug.Router
 
+  plug Plug.Logger
+  plug Plug.Parsers,
+    parsers: [Plug.Parsers.JSON,
+              Plug.Parsers.URLENCODED,
+              Plug.Parsers.MULTIPART],
+   json_decoder: Poison
+
+  # ensure SSL is enforced if configured
+  case Application.get_env(:api, :use_ssl) do
+    true -> plug Plug.SSL
+    _ -> nil
+  end
+
   plug :match
   plug :dispatch
 
   post "/v1/event/:realm/:domain/:entity_id/:event_type/:event_id" do
+    json = conn.body_params
     send_resp(conn, 204, "")
-    # send_resp(conn, 200, Poison.encode!(%{
-    #   realm: realm,  # "nike"
-    #   domain: domain,  # "challenge"
-    #   entity_id: entity_id,  # group by these
-    #   event_type: event_type,  # FSM?  start, stop, edit, delete, actual goal
-    #   event_id: event_id
-    # }))
   end
 
   post "/v1/events/:realm" do
     send_resp(conn, 204, "")
-    # send_resp(conn, 200, Poison.encode!(%{
-    #   count: 0
-    # }))
   end
 
   match _ do

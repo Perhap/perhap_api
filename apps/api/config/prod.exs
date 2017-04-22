@@ -1,6 +1,10 @@
 use Mix.Config
 
 config :api,
-  port: 8080,
-  sync_transactions: true,
-  some_key: System.get_env("SOME_KEY")
+  port: 443,
+  use_ssl: true,
+  ssl_options: [
+    keyfile: System.cwd <> "/priv/ssl/__bigsquidapp_com.key",
+    certfile: System.cwd <>"/priv/ssl/__bigsquidapp_com.crt",
+    cacertfile: System.cwd <> "/priv/ssl/__bigsquidapp_com.ca-bundle",
+  ]

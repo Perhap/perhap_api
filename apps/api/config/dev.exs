@@ -2,8 +2,7 @@ use Mix.Config
 
 config :api,
   port: 4500,
-  sync_transactions: true,
-  some_key: "there is a world beyond our own, that is where the jedi live"
+  use_ssl: false
 
 # See:  https://github.com/kafkaex/kafka_ex/blob/master/config/config.exs
 config :kafka_ex,

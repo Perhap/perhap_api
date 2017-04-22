@@ -1,6 +1,9 @@
 use Mix.Config
 
 config :api,
-  port: 4001,
-  sync_transactions: true,
-  some_key: "there is a world beyond our own, that is where the jedi live"
+  port: 8443,
+  use_ssl: true,
+  ssl_options: [
+    keyfile: System.cwd <> "/priv/ssl/localhost.key",
+    certfile: System.cwd <> "/priv/ssl/localhost.crt"
+  ]
