@@ -7,9 +7,10 @@ defmodule API.Router do
     parsers: [Plug.Parsers.JSON,
               Plug.Parsers.URLENCODED,
               Plug.Parsers.MULTIPART],
-   json_decoder: Poison
+    json_decoder: Poison
 
-  # ensure SSL is enforced if configured
+  alias API.Event
+
   case Application.get_env(:api, :use_ssl) do
     true -> plug Plug.SSL
     _ -> nil
@@ -18,14 +19,11 @@ defmodule API.Router do
   plug :match
   plug :dispatch
 
-  post "/v1/event/:realm/:domain/:entity_id/:event_type/:event_id" do
-    json = conn.body_params
-    send_resp(conn, 204, "")
-  end
+  post "/v1/event/:realm/:domain/:entity_id/:event_type/:event_id",
+       do: Event.post(conn)
 
-  post "/v1/events/:realm" do
-    send_resp(conn, 204, "")
-  end
+  post "/v1/events/:realm",
+       do: Event.bulk(conn)
 
   match _ do
     send_resp(conn, 404, "Invalid Route")

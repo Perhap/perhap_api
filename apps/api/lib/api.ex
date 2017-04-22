@@ -17,7 +17,7 @@ defmodule API do
             certfile: ssl_options[:certfile],
           ]
           cowboy_options = case Keyword.has_key?(ssl_options, :cacertfile) do
-            true -> cowboy_options ++ ssl_options[:cacertfile]
+            true -> Keyword.put_new(cowboy_options, :cacertfile, ssl_options[:cacertfile])
             false -> cowboy_options
           end
           Plug.Adapters.Cowboy.child_spec(:https, API.Router, [], cowboy_options)
