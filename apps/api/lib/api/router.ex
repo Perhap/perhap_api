@@ -19,6 +19,10 @@ defmodule API.Router do
   plug :match
   plug :dispatch
 
+  get "/v1/ping", do
+    send_resp(conn, 200, "OK")
+  end
+
   post "/v1/event/:realm/:domain/:entity_id/:event_type/:event_id",
        do: Event.post(conn)
 
