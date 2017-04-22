@@ -19,7 +19,7 @@ defmodule API.Router do
   plug :match
   plug :dispatch
 
-  get "/v1/ping", do
+  get "/v1/ping" do
     send_resp(conn, 200, "OK")
   end
 
