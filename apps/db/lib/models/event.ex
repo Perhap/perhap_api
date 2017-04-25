@@ -30,20 +30,20 @@ defmodule DB.Event do
   end
 
   @spec find(String.t, boolean()) :: DB.Common.r_event_t | :not_found
-  def find(key, include_meta \\ false) do
+  def find(key, include_db_attrs \\ false) do
     result = Riak.find(namespace(@bucket), key)
     case result do
       nil -> :not_found
       _ ->
-        case include_meta do
-          true -> fetch_metadata(result)
+        case include_db_attrs do
+          true -> add_db_attrs(result)
           false -> %{model: Poison.decode!(result.data, as: %DB.Event{})}
         end
     end
   end
 
-  @spec fetch_metadata(%Riak.Object{}) :: DB.Common.r_event_t
-  defp fetch_metadata(%Riak.Object{} = r_object) do
+  @spec add_db_attrs(%Riak.Object{}) :: DB.Common.r_event_t
+  defp add_db_attrs(%Riak.Object{} = r_object) do
     meta = r_object.metadata
     {_, vtag} = :dict.find("X-Riak-VTag", meta)
     {_, {mega,seconds,micro}} = :dict.find("X-Riak-Last-Modified", meta)
