@@ -8,7 +8,7 @@ defmodule API.Router do
               Plug.Parsers.URLENCODED,
               Plug.Parsers.MULTIPART],
     json_decoder: Poison
-  plug Plug.Monitoring
+  # plug Plug.Monitoring
 
   alias DB.Event
 
