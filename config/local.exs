@@ -1,3 +1,4 @@
 use Mix.Config
 
-config :db, url: 'localhost'
+config :db,
+  url: 'localhost'

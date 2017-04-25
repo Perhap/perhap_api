@@ -15,7 +15,12 @@ defmodule DB.Mixfile do
   end
 
   def application do
-    [applications: [:logger]]
+    [
+      applications: [
+        :logger,
+        :riak
+      ]
+    ]
   end
 
   defp deps do
