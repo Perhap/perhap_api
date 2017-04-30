@@ -6,10 +6,10 @@ defmodule Stats do
 
   def get(conn) do
     stats = (c_stat(Exometer.get_value(["event", "GET", :counter], :value), E_Get) |||
-             c_stat(Exometer.get_value(["event", "GET", :spiral]), E_Get) |||
+             c_stat(Exometer.get_value(["event", "GET", :spiral], :one), E_Get) |||
              c_stat(Exometer.get_value(["event", "GET", :histogram]), E_Get) |||
              c_stat(Exometer.get_value(["event", "POST", :counter], :value), E_Post) |||
-             c_stat(Exometer.get_value(["event", "POST", :spiral]), E_Post) |||
+             c_stat(Exometer.get_value(["event", "POST", :spiral], :one), E_Post) |||
              c_stat(Exometer.get_value(["event", "POST", :histogram]), E_Post))
 
     Response.send(conn, 200, stats)
