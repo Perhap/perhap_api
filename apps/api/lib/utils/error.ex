@@ -20,35 +20,30 @@ defmodule API.Error do
         "V1 UUID Required")
   end
 
-  @spec make(atom) :: API.Error.t
   def make(:validation) do
     build_error(400,
         "ValidationError",
         "One or more required parameter values were missing.")
   end
 
-  @spec make(atom) :: API.Error.t
   def make(:not_found) do
     build_error(404,
         "NotFound",
         "Resource Not Found")
   end
 
-  @spec make(atom) :: API.Error.t
   def make(:model_not_implemented) do
     build_error(500,
         "InternalServerError",
         "Model Not Implemented.")
   end
 
-  @spec make(atom) :: API.Error.t
   def make(:operation_not_implemented) do
     build_error(500,
         "InternalServerError",
         "Operation Not Implemented.")
   end
 
-  @spec make(atom) :: API.Error.t
   def make(:service_unavailable) do
     build_error(503,
         "ServiceUnavailable",
