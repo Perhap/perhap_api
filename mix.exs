@@ -11,6 +11,7 @@ defmodule PerhapAPI.Mixfile do
   end
 
   defp deps do
-    [{:ex_doc, "~> 0.15.0", only: :dev, runtime: false}]
+    [{:dialyxir, "~> 0.5", only: [:dev], runtime: false},
+     {:ex_doc, "~> 0.15.0", only: :dev, runtime: false}]
   end
 end

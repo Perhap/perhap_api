@@ -6,13 +6,20 @@ defmodule APITest do
 
   @api_router_opts API.Router.init([])
 
-  test "create challenge event" do
-    realm = "company"
-    domain = "challenge"
-    entity_id = "uuid_v4"
-    event_type = "state"
-    event_id = "uuid_v1"
-    fixture = load_fixture("challenge.json")
+  setup do
+    {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))
+    event_id = :uuid.uuid_to_string(uuid_v1)
+    on_exit fn ->
+      :ok
+    end
+    [event_id: event_id]
+  end
+
+  test "create challenge event", context do
+    {realm, domain, entity_id, event_type} = {
+      "company", "challenge", "uuid_v4", "start"}
+    event_id = context[:event_id]
+    fixture = load_fixture("challenge_start.json")
     conn = conn(:post, "https://example.com/v1/event/#{realm}/#{domain}/#{entity_id}/#{event_type}/#{event_id}", fixture)
     |> put_req_header("content-type", "application/json")
     conn = API.Router.call(conn, @api_router_opts)
@@ -20,6 +27,7 @@ defmodule APITest do
     assert conn.status == 204
   end
 
+  @spec load_fixture(String.t) :: binary()
   def load_fixture(fixture_file) do
     {:ok, binary} = File.read "test/fixtures/" <> fixture_file
     binary

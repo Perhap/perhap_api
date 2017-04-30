@@ -15,7 +15,13 @@ defmodule DB.Mixfile do
   end
 
   def application do
-    [applications: [:logger]]
+    [
+      applications: [
+        :logger,
+        :riak],
+        #:phoenix_pubsub],
+        # mod: {DB, []}
+    ]
   end
 
   defp deps do
@@ -24,6 +30,7 @@ defmodule DB.Mixfile do
       {:geocalc, "~> 0.5.4"},
       {:riak, "~> 1.1"},
       {:timex, "~> 3.1"},
+      # {:phoenix_pubsub, "~> 1.0"},
       {:uuid, github: "okeuday/uuid"}
     ]
   end
