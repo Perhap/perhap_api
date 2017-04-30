@@ -6,12 +6,19 @@ defmodule APITest do
 
   @api_router_opts API.Router.init([])
 
-  test "create challenge event" do
-    realm = "company"
-    domain = "challenge"
-    entity_id = "uuid_v4"
-    event_type = "state"
-    event_id = "uuid_v1"
+  setup do
+    {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))
+    event_id = :uuid.uuid_to_string(uuid_v1)
+    on_exit fn ->
+      :ok
+    end
+    [event_id: event_id]
+  end
+
+  test "create challenge event", context do
+    {realm, domain, entity_id, event_type} = {
+      "company", "challenge", "uuid_v4", "start"}
+    event_id = context[:event_id]
     fixture = load_fixture("challenge_start.json")
     conn = conn(:post, "https://example.com/v1/event/#{realm}/#{domain}/#{entity_id}/#{event_type}/#{event_id}", fixture)
     |> put_req_header("content-type", "application/json")

@@ -8,7 +8,7 @@ defmodule FileLoggerBackend do
   @type level     :: Logger.level
   @type metadata  :: [atom]
 
-  @default_format "[$date,$time] [$node|#{Mix.env}] [$level] $levelpad$message\n"
+  @default_format "[$date,$time] [$node|#{Mix.env}],$metadata[$level] $levelpad$message\n"
 
   def init({__MODULE__, name}) do
     {:ok, configure(name, [])}

@@ -18,7 +18,8 @@ defmodule API.Mixfile do
     [applications: [
       :logger,
       :cowboy,
-      #      :kafka_ex,
+      :exometer_core,
+      # :kafka_ex,
       :snappy],
       mod: {API, []}
     ]
@@ -32,7 +33,10 @@ defmodule API.Mixfile do
       {:db, in_umbrella: true},
       {:poison, "~> 3.1"},
       {:kafka_ex, "~> 0.6.5"},
-      {:snappy, git: "https://github.com/fdmanana/snappy-erlang-nif"}
+      {:snappy, github: "fdmanana/snappy-erlang-nif"},
+      {:exometer_core, github: "Feuerlabs/exometer_core"},
+      {:faker, "~> 0.7.0", only: [:dev,:test], runtime: false},
+      {:meck, "~> 0.8.4", runtime: false, override: true}
     ]
   end
 end

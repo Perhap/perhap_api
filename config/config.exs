@@ -15,8 +15,18 @@ config :logger,
 
 config :logger, :access_log,
   path: System.cwd <> "/log/access.log",
+  metadata: [:function, :module],
   level: :info
 
 config :logger, :error_log,
   path: System.cwd <> "/log/error.log",
+  metadata: [:function, :module],
   level: :error
+
+# if a process decides to have a uuid cache
+config :quickrand,
+  cache_size: 65536
+
+# prevent exometer from creating spurious directories
+config :setup,
+  verify_directories: false
