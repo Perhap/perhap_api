@@ -3,7 +3,7 @@ defmodule Reducer.Mixfile do
 
   def project do
     [app: :reducers,
-     version: "0.0.1",
+     version: PerhapAPI.Mixfile.version,
      elixir: "~> 1.4",
      build_path: "../../_build",
      config_path: "../../config/config.exs",

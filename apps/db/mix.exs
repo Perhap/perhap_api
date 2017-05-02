@@ -3,7 +3,7 @@ defmodule DB.Mixfile do
 
   def project do
     [app: :db,
-     version: "0.0.1",
+     version: PerhapAPI.Mixfile.version,
      elixir: "~> 1.4",
      build_path: "../../_build",
      config_path: "../../config/config.exs",
@@ -28,7 +28,7 @@ defmodule DB.Mixfile do
     [
       {:tzdata, "~> 0.5.12"},
       {:geocalc, "~> 0.5.4"},
-      {:riak, "~> 1.1"},
+      {:riak, "~> 1.1.2"},
       {:timex, "~> 3.1"},
       # {:phoenix_pubsub, "~> 1.0"},
       {:uuid, github: "okeuday/uuid"}

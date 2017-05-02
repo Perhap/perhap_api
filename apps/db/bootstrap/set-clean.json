@@ -1,0 +1,1 @@
+{"props":{"allow_mult":true,"big_vclock":50,"chash_keyfun":{"fun":"chash_std_keyfun","mod":"riak_core_util"},"datatype":"set","dvv_enabled":true,"last_write_wins":false,"linkfun":{"fun":"mapreduce_linkfun","mod":"riak_kv_wm_link_walker"},"n_val":3,"notfound_ok":true,"old_vclock":86400,"postcommit":[],"pr":0,"precommit":[],"pw":0,"small_vclock":50,"young_vclock":20}}

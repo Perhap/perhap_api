@@ -3,7 +3,7 @@ defmodule API.Mixfile do
 
   def project do
     [app: :api,
-     version: "0.0.1",
+     version: PerhapAPI.Mixfile.version,
      elixir: "~> 1.4",
      build_path: "../../_build",
      config_path: "../../config/config.exs",
@@ -36,7 +36,7 @@ defmodule API.Mixfile do
       {:snappy, github: "fdmanana/snappy-erlang-nif"},
       {:exometer_core, github: "Feuerlabs/exometer_core"},
       {:setup, github: "uwiger/setup", manager: :rebar, override: true},
-      #{:exometer_core, "~> 1.4"},
+      {:gen_stage, "~> 0.11.0"},
       {:faker, "~> 0.7.0", only: [:dev,:test], runtime: false},
       {:meck, "~> 0.8.4", runtime: false, override: true}
     ]

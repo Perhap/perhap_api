@@ -15,7 +15,7 @@ defmodule Stats do
     Response.send(conn, 200, stats)
   end
 
-  defp c_stat({:error, :not_found}, stat_key), do: %{}
+  defp c_stat({:error, :not_found}, _), do: %{}
   defp c_stat({:ok, list}, stat_key) do
     Enum.into(Enum.map(list, fn({k,v}) ->
       new_k = case is_atom(k) do
