@@ -25,8 +25,8 @@ defmodule ValidationTest do
 
   test "can extract time from v1 uuid" do
     uuid = 'e1c3029a-2a96-11e7-93ae-92361f002671'
-    assert '2017-04-26T15:41:57.920425Z' == V.extract_datetime("#{uuid}")
-    assert '2017-04-26T15:41:57.920425Z' == V.extract_datetime(uuid)
+    assert "2017-04-26T15:41:57.920425Z" == V.extract_datetime("#{uuid}")
+    assert "2017-04-26T15:41:57.920425Z" == V.extract_datetime(uuid)
   end
 
 end

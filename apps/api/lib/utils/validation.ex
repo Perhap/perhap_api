@@ -24,7 +24,7 @@ defmodule API.Validation do
   @spec extract_datetime(charlist()|binary()) :: String.t
   def extract_datetime(uuid_v1) when is_binary(uuid_v1), do: extract_datetime(to_charlist(uuid_v1))
   def extract_datetime(uuid_v1) when is_list(uuid_v1) do
-    :uuid.string_to_uuid(uuid_v1) |> :uuid.get_v1_datetime
+    :uuid.string_to_uuid(uuid_v1) |> :uuid.get_v1_datetime |> to_string()
   end
 
   @spec is_flipped?(charlist()|binary()) :: true|false

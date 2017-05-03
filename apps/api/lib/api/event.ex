@@ -4,7 +4,7 @@ defmodule API.Event do
 
   @spec get(Plug.Conn, String.t) :: Plug.Conn
   def get(conn, event_id) do
-    case DB.Event.find(event_id) do
+    case DB.Event.find(event_id, false) do
       :not_found -> Response.send(conn, E.make(:not_found))
       :error -> Response.send(conn, E.make(:service_unavailable))
       %{model: %DB.Event{} = event} ->

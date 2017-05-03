@@ -29,9 +29,10 @@ defmodule API.Router do
   post "/v1/event/:realm/:domain/:entity_id/:event_type/:event_id" do
     case V.is_uuid_v1(event_id) do
       true ->
+        kv_time = V.extract_datetime(event_id)
         Event.post(conn, %DB.Event{
           realm: realm, domain: domain, entity_id: entity_id,
-          type: event_type, event_id: event_id})
+          type: event_type, event_id: event_id, kv_time: kv_time})
       false ->
         Response.send(conn, E.make(:invalid_event_id))
     end

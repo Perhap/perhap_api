@@ -37,6 +37,16 @@ defmodule DB.Event do
     end
   end
 
+  @spec delete(String.t) :: :ok | :error
+  def delete(event_id) do
+    case Riak.delete(namespace(@bucket), event_id) do
+      :ok -> :ok
+      error ->
+        Logger.error("Problem deleting event: #{inspect(error)}")
+        :error
+    end
+  end
+
   @spec find(String.t, boolean()) :: DB.Common.r_event_t | :not_found | :error
   def find(key, include_db_attrs \\ false) do
     result = try do
@@ -65,8 +75,8 @@ defmodule DB.Event do
     unix = (mega * 1000000 + seconds) * 1000000 + micro
     {:ok, time} = DateTime.from_unix(unix, :microseconds)
     %{model: Poison.decode!(r_object.data, as: %DB.Event{}),
-      vtag: vtag,
+      vtag: to_string(vtag),
       last_modify_time: time,
-      vclock: r_object.vclock}
+      vclock: Base.encode64(r_object.vclock)}
   end
 end
