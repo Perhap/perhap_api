@@ -34,7 +34,7 @@ defmodule API.Router do
           realm: realm, domain: domain, entity_id: entity_id,
           type: event_type, event_id: event_id, kv_time: kv_time})
       false ->
-        Response.send(conn, E.make(:invalid_event_id))
+        Response.send(conn, E.make(:invalid_id))
     end
   end
 

@@ -14,10 +14,10 @@ defmodule API.Error do
   end
 
   @spec make(atom) :: API.Error.t
-  def make(:invalid_event_id) do
+  def make(:invalid_id) do
     build_error(400,
-        "InvalidEventId",
-        "V1 UUID Required")
+        "InvalidId",
+        "V1(event)/V4(entity) UUID Required")
   end
 
   def make(:validation) do
