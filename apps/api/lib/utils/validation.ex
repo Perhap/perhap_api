@@ -1,5 +1,5 @@
 defmodule API.Validation do
-  @uuid_regex "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+  @uuid_v1_regex "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
   @flipped_regex "[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{12}"
 
   @spec is_uuid_v1(charlist()|binary()) :: true|false
@@ -7,6 +7,16 @@ defmodule API.Validation do
   def is_uuid_v1(input) when is_binary(input) do
     try do
       :uuid.is_v1(:uuid.string_to_uuid(input))
+    catch
+      :exit, _ -> false
+    end
+  end
+
+  @spec is_uuid_v4(charlist()|binary()) :: true|false
+  def is_uuid_v4(input) when is_list(input), do: is_uuid_v4(to_string(input))
+  def is_uuid_v4(input) when is_binary(input) do
+    try do
+      :uuid.is_v4(:uuid.string_to_uuid(input))
     catch
       :exit, _ -> false
     end
