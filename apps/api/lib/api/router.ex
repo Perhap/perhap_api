@@ -27,7 +27,7 @@ defmodule API.Router do
 
   get "/v1/event/:event_id", do: Event.get(conn, event_id)
   post "/v1/event/:realm/:domain/:entity_id/:event_type/:event_id" do
-    case V.is_uuid_v1(event_id) do
+    case V.is_uuid_v1(event_id) and V.is_uuid_v4(entity_id) do
       true ->
         kv_time = V.extract_datetime(event_id)
         Event.post(conn, %DB.Event{
