@@ -9,15 +9,16 @@ defmodule APITest do
   setup do
     {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))
     event_id = :uuid.uuid_to_string(uuid_v1)
+    entity_id = :uuid.uuid_to_string(:uuid.get_v4(:strong))
     on_exit fn ->
       :ok
     end
-    [event_id: event_id]
+    [event_id: event_id, entity_id: entity_id]
   end
 
   test "create challenge event", context do
     {realm, domain, entity_id, event_type} = {
-      "company", "challenge", "uuid_v4", "start"}
+      "company", "challenge", context[:entity_id], "start"}
     event_id = context[:event_id]
     fixture = load_fixture("challenge_start.json")
     conn = conn(:post, "https://example.com/v1/event/#{realm}/#{domain}/#{entity_id}/#{event_type}/#{event_id}", fixture)
