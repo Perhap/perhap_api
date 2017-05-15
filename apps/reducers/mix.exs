@@ -15,10 +15,17 @@ defmodule Reducer.Mixfile do
   end
 
   def application do
-    [applications: [:logger]]
+    [applications: [
+      # :kafka_ex,
+      :logger],
+      mod: {Reducers, []}
+    ]
   end
 
   defp deps do
-    []
+    [
+      {:db, in_umbrella: true},
+      {:kafka_ex, "~> 0.6.5"}
+    ]
   end
 end

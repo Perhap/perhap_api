@@ -16,12 +16,14 @@ config :logger,
 config :logger, :access_log,
   path: System.cwd <> "/log/access.log",
   metadata: [:function, :module],
-  level: :info
+  level: :info,
+  metadata_filter: [perhap_only: 1]
 
 config :logger, :error_log,
   path: System.cwd <> "/log/error.log",
   metadata: [:function, :module],
   level: :error
+  # metadata_filter: [perhap_only: 1]
 
 # if a process decides to have a uuid cache
 config :quickrand,

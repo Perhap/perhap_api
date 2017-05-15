@@ -1,5 +1,5 @@
 defmodule ReducerTest do
   use ExUnit.Case
-  doctest Reducer
+  doctest Reducers
 
 end

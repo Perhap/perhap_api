@@ -11,9 +11,9 @@ defmodule API.Router do
   plug Plug.Monitoring
 
   alias API.Event
-  alias API.Validation, as: V
   alias API.Error, as: E
   alias API.Response
+  alias DB.Validation, as: V
 
   case Application.get_env(:api, :use_ssl) do
     true -> plug Plug.SSL

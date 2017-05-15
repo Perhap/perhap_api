@@ -67,6 +67,21 @@ defmodule DB.Event do
     end
   end
 
+  @spec domains(list(DB.Event.t)) :: list(atom())
+  def domains(events) when is_list(events) do
+    (Enum.map events, &String.to_atom(&1.domain)) |> Enum.uniq
+  end
+
+  @spec entities(list(DB.Event.t)) :: list(String.t)
+  def entities(events) when is_list(events) do
+    (Enum.map events, &(&1.entity_id)) |> Enum.uniq
+  end
+
+  @spec reducer_context(list(DB.Event.t)) :: %{required(String.t) => list(DB.Event.t)}
+  def reducer_context(events) when is_list(events) do
+    Enum.group_by(events, &DB.Common.event_context(&1))
+  end
+
   @spec add_db_attrs(%Riak.Object{}) :: DB.Common.r_event_t
   defp add_db_attrs(%Riak.Object{} = r_object) do
     meta = r_object.metadata

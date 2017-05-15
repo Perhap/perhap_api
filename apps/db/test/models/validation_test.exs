@@ -1,6 +1,6 @@
 defmodule ValidationTest do
   use ExUnit.Case, async: true
-  alias API.Validation, as: V
+  alias DB.Validation, as: V
 
   setup do
     {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))

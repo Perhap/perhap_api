@@ -15,7 +15,7 @@ defmodule API.Event do
   end
 
   @spec get_by_entity(Plug.Conn, String.t) :: Plug.Conn
-  def get_by_entity(conn, entity_id) do
+  def get_by_entity(conn, _entity_id) do
     Response.send(conn, E.make(:operation_not_implemented))
   end
 
@@ -24,6 +24,7 @@ defmodule API.Event do
     ip_addr = conn.remote_ip |> Tuple.to_list |> Enum.join(".")
     case DB.Event.save(%{event | meta: conn.body_params, remote_ip: ip_addr}) do
       %DB.Event{} = event ->
+        EventBroadcaster.async_notify(event)
         Response.send(conn, 204)
       :error ->
         Response.send(conn, E.make(:service_unavailable))
@@ -31,7 +32,7 @@ defmodule API.Event do
   end
 
   @spec bulk(Plug.Conn, String.t) :: Plug.Conn
-  def bulk(conn, realm) do
+  def bulk(conn, _realm) do
     Response.send(conn, 204)
   end
 

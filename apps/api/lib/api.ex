@@ -20,6 +20,9 @@ defmodule API do
         ssl_options = Application.get_env(:api, :ssl_options)
         cowboy_options = [
           port: Application.get_env(:api, :port),
+          acceptors: 256,
+          max_connections: 16_384,
+          timeout: 5000,
           otp_app: :api,
           keyfile: ssl_options[:keyfile],
           certfile: ssl_options[:certfile],

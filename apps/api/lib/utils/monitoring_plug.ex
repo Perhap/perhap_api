@@ -4,17 +4,22 @@ defmodule Plug.Monitoring do
 
   alias :exometer, as: Exometer
 
+  require Logger
+
   def init(opts), do: opts
 
   def call(conn, _config) do
-    metric_name = [Enum.at(conn.path_info, 1), conn.method]
+    path_info = Enum.at(conn.path_info, 1)
+    method = conn.method
+    metric_name = [path_info, method]
     before_time = System.monotonic_time()
     register_before_send(conn, fn conn ->
       after_time = System.monotonic_time()
-      diff = System.convert_time_unit(after_time - before_time, :native, :microseconds)
+      diff = System.convert_time_unit(after_time - before_time, :native, :microseconds) / 1000
       update_stat(metric_name ++ [:counter], 1, :counter)
       update_stat(metric_name ++ [:spiral], 1, :spiral)
-      update_stat(metric_name ++ [:histogram], diff/1000, :histogram)
+      update_stat(metric_name ++ [:histogram], diff, :histogram)
+      Logger.info("#{path_info},#{method}/#{diff}ms", perhap_only: 1)
       conn
     end)
   end

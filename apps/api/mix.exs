@@ -19,7 +19,6 @@ defmodule API.Mixfile do
       :logger,
       :cowboy,
       :exometer_core,
-      # :kafka_ex,
       :snappy],
       mod: {API, []}
     ]
@@ -27,12 +26,11 @@ defmodule API.Mixfile do
 
   defp deps do
     [
-      {:cowboy, "~> 1.0"},
+      {:cowboy, "~> 1.1.2"},
       {:plug, "~> 1.3"},
       {:httpoison, "~> 0.11.1"},
-      {:db, in_umbrella: true},
+      {:reducers, in_umbrella: true},
       {:poison, "~> 3.1"},
-      {:kafka_ex, "~> 0.6.5"},
       {:snappy, github: "fdmanana/snappy-erlang-nif"},
       {:exometer_core, github: "Feuerlabs/exometer_core"},
       {:setup, github: "uwiger/setup", manager: :rebar, override: true},
