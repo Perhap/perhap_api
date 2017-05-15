@@ -4,8 +4,7 @@ defmodule DB.Reducer.State do
 
   defstruct state_id: "",
             data: %{},
-            kv: "",
-            kv_time: ""
+            kv: ""
 
   @type t :: %DB.Reducer.State{state_id: String.t}
 
@@ -18,11 +17,16 @@ defmodule DB.Reducer.State do
     kv_info = "#{bucket}/#{key}"
     state = %{state | kv: kv_info}
     try do
+      json = case Poison.encode(state, strict_keys: true) do
+        # this happens if reducers use atoms for keys in state
+        # https://github.com/devinus/poison#key-validation
+        {:error, {:invalid, term}} -> raise "Invalid JSON Term: #{term}"
+        {_, json} -> json
+      end
       r_object = Riak.Object.create(
         bucket: bucket,
         key: key,
-        data: Poison.encode!(state))
-      |> Riak.put
+        data: json) |> Riak.put
       Logger.debug("Saved: #{r_object.bucket}/#{r_object.key}")
       state
     rescue
@@ -57,7 +61,7 @@ defmodule DB.Reducer.State do
       _ ->
         case include_db_attrs do
           true -> DB.Common.add_db_attrs(result, %DB.Reducer.State{})
-          false -> %{model: Poison.decode!(result.data, as: %DB.Reducer.State{})}
+          false -> %{model: Poison.decode!(result.data, [as: %DB.Reducer.State{}])}
         end
     end
   end

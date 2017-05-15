@@ -20,10 +20,10 @@ defmodule DB.EventTest do
   end
 
   test "can determine reducer context from events", context do
-    assert DB.Event.reducer_context(context[:events]) == %{"test_challenge_123" => [
+    assert DB.Event.reducer_context(context[:events]) == %{"challenge_123" => [
         %DB.Event{domain: "challenge", entity_id: "123", event_id: "def"},
         %DB.Event{domain: "challenge", entity_id: "123", event_id: "abc"}],
-      "test_stats_xyz" => [
+      "stats_xyz" => [
         %DB.Event{domain: "stats", entity_id: "xyz", event_id: "890"}]}
   end
 end

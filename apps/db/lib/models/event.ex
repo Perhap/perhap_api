@@ -23,11 +23,11 @@ defmodule DB.Event do
     kv_info = "#{bucket}/#{key}"
     event = %{event | kv: kv_info}
     try do
+      {_, json} = Poison.encode(event, strict_keys: true)
       r_object = Riak.Object.create(
         bucket: bucket,
         key: key,
-        data: Poison.encode!(event))
-      |> Riak.put
+        data: json) |> Riak.put
       Logger.debug("Saved: #{r_object.bucket}/#{r_object.key}")
       event
     rescue
