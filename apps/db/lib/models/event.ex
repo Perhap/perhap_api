@@ -47,7 +47,7 @@ defmodule DB.Event do
     end
   end
 
-  @spec find(String.t, boolean()) :: DB.Common.r_event_t | :not_found | :error
+  @spec find(String.t, boolean()) :: DB.Common.r_json_t | :not_found | :error
   def find(key, include_db_attrs \\ false) do
     result = try do
       Riak.find(namespace(@bucket), key)
@@ -61,7 +61,7 @@ defmodule DB.Event do
       :error -> :error
       _ ->
         case include_db_attrs do
-          true -> add_db_attrs(result)
+          true -> DB.Common.add_db_attrs(result, %DB.Event{})
           false -> %{model: Poison.decode!(result.data, as: %DB.Event{})}
         end
     end
@@ -80,18 +80,5 @@ defmodule DB.Event do
   @spec reducer_context(list(DB.Event.t)) :: %{required(String.t) => list(DB.Event.t)}
   def reducer_context(events) when is_list(events) do
     Enum.group_by(events, &DB.Common.event_context(&1))
-  end
-
-  @spec add_db_attrs(%Riak.Object{}) :: DB.Common.r_event_t
-  defp add_db_attrs(%Riak.Object{} = r_object) do
-    meta = r_object.metadata
-    {_, vtag} = :dict.find("X-Riak-VTag", meta)
-    {_, {mega,seconds,micro}} = :dict.find("X-Riak-Last-Modified", meta)
-    unix = (mega * 1000000 + seconds) * 1000000 + micro
-    {:ok, time} = DateTime.from_unix(unix, :microseconds)
-    %{model: Poison.decode!(r_object.data, as: %DB.Event{}),
-      vtag: to_string(vtag),
-      last_modify_time: time,
-      vclock: Base.encode64(r_object.vclock)}
   end
 end
