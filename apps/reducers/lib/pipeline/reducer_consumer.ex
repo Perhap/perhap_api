@@ -17,22 +17,32 @@ defmodule Reducer.Consumer do
 
   # time to reticulate splines
   def handle_events(events, _from, state) do
-    pipeline = Keyword.get(state, :reducers)
+    all_reducers = Keyword.get(state, :reducers)
 
     all_context = Event.reducer_context(events)
     run_results = Enum.map(all_context, fn({reducer_context, reducer_events}) ->
-      reducer_states = Enum.reduce(pipeline, Map.new(), fn(reducer, acc) ->
+      reducer_states = Enum.reduce(all_reducers, Map.new(), fn(reducer, acc) ->
         [_|rest] = String.split(Atom.to_string(reducer), ".")
         reducer_name = rest |> Enum.map(&String.downcase(&1)) |> Enum.join(".")
         reducer_state_key = reducer_context <> unit_separator() <> reducer_name
+
+        # Load Model TODO Handle DB Errors
         reducer_state = case RS.find(reducer_state_key) do
           :not_found -> %Reducer.State{}
           db_state -> %Reducer.State{model: db_state.model.data["model"]}
         end
-        # could save reducer state in consumer state temp, as long as cleanup happens
+
+        # Run Reducers
         result = Map.put(acc, reducer_state_key, apply(reducer, :call, [reducer_events, reducer_state]))
-        model = (result |> Map.fetch!(reducer_state_key)).model
-        %RS{state_id: reducer_state_key, data: model} |> RS.save
+
+        # Save Model
+        reducer_state = (result |> Map.fetch!(reducer_state_key))
+        %RS{state_id: reducer_state_key, data: reducer_state.model} |> RS.save
+
+        # Process New Events
+        Logger.info("New Events: #{inspect(reducer_state.new_events)}", perhap_only: 1)
+
+        # Aggregate Reducer Results
         result
       end)
     end)
