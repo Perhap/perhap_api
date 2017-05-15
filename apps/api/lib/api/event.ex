@@ -24,7 +24,7 @@ defmodule API.Event do
     ip_addr = conn.remote_ip |> Tuple.to_list |> Enum.join(".")
     case DB.Event.save(%{event | meta: conn.body_params, remote_ip: ip_addr}) do
       %DB.Event{} = event ->
-        EventBroadcaster.async_notify(event)
+        EventDispatcher.async_notify(event)
         Response.send(conn, 204)
       :error ->
         Response.send(conn, E.make(:service_unavailable))

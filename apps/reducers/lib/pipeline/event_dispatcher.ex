@@ -1,4 +1,4 @@
-defmodule EventBroadcaster do
+defmodule EventDispatcher do
   use GenStage
 
   @max_buffer_size 10
@@ -19,7 +19,7 @@ defmodule EventBroadcaster do
     {
       :producer,
       %{queue: :queue.new, demand: 0, count: 0},
-      dispatcher: GenStage.BroadcastDispatcher,
+      dispatcher: GenStage.DemandDispatcher,
       buffer_size: @max_buffer_size
     }
   end

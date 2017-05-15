@@ -12,7 +12,7 @@ defmodule Reducer.Consumer do
 
   def init(_) do
     reducers = Reducer.Loader.load_all()
-    {:consumer, [reducers: reducers], subscribe_to: [EventBroadcaster]}
+    {:consumer, [reducers: reducers], subscribe_to: [EventDispatcher]}
   end
 
   # time to reticulate splines
@@ -29,7 +29,7 @@ defmodule Reducer.Consumer do
         # Load Model TODO Handle DB Errors
         reducer_state = case RS.find(reducer_state_key) do
           :not_found -> %Reducer.State{}
-          db_state -> %Reducer.State{model: db_state.model.data["model"]}
+          db_state -> %Reducer.State{model: db_state.model.data}
         end
 
         # Run Reducers
@@ -37,10 +37,17 @@ defmodule Reducer.Consumer do
 
         # Save Model
         reducer_state = (result |> Map.fetch!(reducer_state_key))
-        %RS{state_id: reducer_state_key, data: reducer_state.model} |> RS.save
+        # %RS{state_id: reducer_state_key, data: reducer_state.model} |> RS.save
 
         # Process New Events
-        Logger.info("New Events: #{inspect(reducer_state.new_events)}", perhap_only: 1)
+        case reducer_name == "service.challenge" do
+          true ->
+            Logger.info("New Model: #{inspect(reducer_state.model)}", perhap_only: 1)
+            Logger.info("New Events: #{inspect(reducer_state.new_events)}", perhap_only: 1)
+          false ->
+            :ok
+        end
+        process_new_events(reducer_state.new_events)
 
         # Aggregate Reducer Results
         result
@@ -49,6 +56,18 @@ defmodule Reducer.Consumer do
     # or save reducer state here
     Logger.info("Reducer Results: #{inspect(run_results)}", perhap_only: 1)
     {:noreply, [], state}
+  end
+
+  defp process_new_events(events) when is_list(events) do
+    Enum.each(events, fn(event) ->
+      case DB.Event.save(event) do
+        %DB.Event{} = event ->
+          EventDispatcher.async_notify(event)
+          :ok
+        _ ->
+          :error
+      end
+    end)
   end
 
 end

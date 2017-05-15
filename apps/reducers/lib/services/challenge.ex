@@ -20,7 +20,7 @@ defmodule Service.Challenge do
 
   def gen_uuidv1()do
     {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))
-    :uuid.uuid_to_string(uuid_v1)
+    to_string(:uuid.uuid_to_string(uuid_v1))
   end
 
   def validate(event_list) do
