@@ -37,7 +37,7 @@ defmodule Reducer.Consumer do
 
         # Save Model
         reducer_state = (result |> Map.fetch!(reducer_state_key))
-        # %RS{state_id: reducer_state_key, data: reducer_state.model} |> RS.save
+        %RS{state_id: reducer_state_key, data: reducer_state.model} |> RS.save
 
         # Process New Events
         case reducer_name == "service.challenge" do

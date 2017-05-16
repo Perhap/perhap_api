@@ -31,9 +31,4 @@ defmodule API.Event do
     end
   end
 
-  @spec bulk(Plug.Conn, String.t) :: Plug.Conn
-  def bulk(conn, _realm) do
-    Response.send(conn, 204)
-  end
-
 end

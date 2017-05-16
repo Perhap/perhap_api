@@ -12,6 +12,7 @@ defmodule API.Router do
 
   alias API.Event
   alias API.Error, as: E
+  alias API.Model
   alias API.Response
   alias DB.Validation, as: V
 
@@ -39,7 +40,8 @@ defmodule API.Router do
   end
 
   get "/v1/events/:entity_id", do: Event.get_by_entity(conn, entity_id)
-  post "/v1/events/:realm", do: Event.bulk(conn, realm)
+
+  get "/v1/model/:domain/:entity_id", do: Model.get(conn, domain, entity_id)
 
   get "/v1/stats", do: Stats.get(conn)
 
