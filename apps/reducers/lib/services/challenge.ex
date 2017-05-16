@@ -70,77 +70,88 @@ defmodule Service.Challenge do
     apply(__MODULE__, type, [{type, event}, model, new_events])
   end
 
-  def start_user(user, event, %{:status => :stopped} = user_model) do
+  def start_user(user, event, %{"status" => :stopped} = user_model) do
     {user, user_model
-    |> Map.put(:status, :running)
-    |> Map.put(:start_time, event.timestamp)}
+    |> Map.put("status", :running)
+    |> Map.put("start_time", event.timestamp)}
   end
 
-  def start_user(user, event, user_model) when user_model == %{} do
+  def start_user(user, event, user_model) when map_size(user_model) == 0 do
     {user, user_model
-    |> Map.put(:status, :running)
-    |> Map.put(:start_time, event.timestamp)}
+    |> Map.put("status", :running)
+    |> Map.put("start_time", event.timestamp)}
   end
 
   def start_user(user, _event, user_model), do: {user, user_model}
 
   def start({:start, event}, model, new_events) when model == %{} do
-    new_model = Enum.into(Enum.map(event.data["users"], fn(user) -> start_user(user, event, %{}) end), model)
-    |> Map.put(:last_played, event.ordered_id)
-    |> Map.put(:entity_id, event.entity_id)
-    |> Map.put(:domain, event.domain)
-    |> Map.put(:challenge_benchmark, event.data["challenge_benchmark"])
-    |> Map.put(:challenge_type, event.data["challenge_type"])
-    |> Map.put(:store_id, event.data["store_id"])
-    {new_model, new_events}
+    user_models = Enum.map(event.data["users"], fn(user) -> start_user(user, event, %{}) end)
+    |> Enum.into(%{})
+
+    {model
+    |> Map.put("last_played", event.ordered_id)
+    |> Map.put("users", user_models)
+    |> Map.put("entity_id", event.entity_id)
+    |> Map.put("domain", event.domain)
+    |> Map.put("challenge_benchmark", event.data["challenge_benchmark"])
+    |> Map.put("challenge_type", event.data["challenge_type"])
+    |> Map.put("store_id", event.data["store_id"]),
+    new_events}
   end
 
   def start({:start, event}, model, new_events)  do
-    {Enum.into(Enum.map(event.data["users"], fn(user) -> start_user(user, event, model[user]) end), model)
-    |> Map.put(:last_played, event.ordered_id), new_events}
+    user_models = Enum.map(event.data["users"], fn(user) -> start_user(to_string(user), event, model["users"][to_string(user)]) end)
+    |> Enum.into(model["users"])
+    {model
+    |> Map.put("users", user_models)
+    |> Map.put("last_played", event.ordered_id), new_events}
   end
 
-  def stop_user(user, event, %{:status => :running, :active_seconds => active_seconds} = user_model) do
+  def stop_user(user, event, %{"status" => :running, "active_seconds" => active_seconds} = user_model) do
     {user, user_model
-    |> Map.put(:status, :stopped)
-    |> Map.put(:active_seconds, ((event.timestamp - user_model.start_time)/1000) + active_seconds)}
+    |> Map.put("status", :stopped)
+    |> Map.put("active_seconds", ((event.timestamp - user_model["start_time"])/1000) + active_seconds)}
   end
 
-  def stop_user(user, event, %{:status => :running} = user_model) do
+  def stop_user(user, event, %{"status" => :running} = user_model) do
     {user, user_model
-    |> Map.put(:status, :stopped)
-    |> Map.put(:active_seconds, ((event.timestamp - user_model.start_time)/1000))}
+    |> Map.put("status", :stopped)
+    |> Map.put("active_seconds", ((event.timestamp - user_model["start_time"])/1000))}
   end
 
   def stop_user(user, _event, user_model), do: {user, user_model}
 
   def stop({:stop, event}, model, new_events) do
-    {Enum.map(event.data["users"], fn(user) -> stop_user(user, event, model[user]) end)
-    |> Enum.into(model)
-    |> Map.put(:last_played, event.ordered_id), new_events}
+    user_models = Enum.map(event.data["users"], fn(user) -> stop_user(to_string(user), event, model["users"][to_string(user)]) end)
+    |> Enum.into(model["users"])
+    {model
+    |> Map.put("users", user_models)
+    |> Map.put("last_played", event.ordered_id), new_events}
   end
 
-  def actual_units_user(user, event, %{:status => :stopped} = user_model, benchmark) do
+  def actual_units_user(user, event, %{"status" => :stopped} = user_model, benchmark) do
     actual_units = event.data["units"] / length(event.data["users"])
-    uph = actual_units / (user_model.active_seconds / 3600)
+    uph = actual_units / (user_model["active_seconds"] / 3600)
     percentage = uph/ benchmark
 
-    {user, user_model
-        |> Map.put(:status, :completed)
-        |> Map.put(:actual_units, actual_units)
-        |> Map.put(:uph, uph)
-        |> Map.put(:percentage, percentage)
-      }
+    new_model = user_model
+        |> Map.put("status", :completed)
+        |> Map.put("actual_units", actual_units)
+        |> Map.put("uph", uph)
+        |> Map.put("percentage", percentage)
+      {user, new_model}
   end
 
   def actual_units_user(user, _event, user_model, _benchmark), do: {user, user_model}
 
   def actual_units({:actual_units, event}, model, new_events ) do
-    new_model = Enum.map(event.data["users"], fn(user) -> actual_units_user(user, event, model[user], model.challenge_benchmark) end)
-    |> Enum.into(model)
-    |> Map.put(:last_played, event.ordered_id)
-    {new_model, create_stats_event(stats_type(new_model.challenge_type), new_model, new_events)}
+    user_models = Enum.map(event.data["users"], fn(user) -> actual_units_user(to_string(user), event, model["users"][to_string(user)], model["challenge_benchmark"]) end)
+    |> Enum.into(model["users"])
 
+    new_model = model
+    |> Map.put("users", user_models)
+    |> Map.put("last_played", event.ordered_id)
+    {new_model, create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
   end
 
   def edit_user(user, _event, %{:status => :deleted} = user_model, _benchmark), do: {user, user_model}
@@ -150,19 +161,21 @@ defmodule Service.Challenge do
     percentage = uph/ benchmark
 
     {user, user_model
-        |> Map.put(:status, :editted)
-        |> Map.put(:active_seconds, event.data["mins"] * 60)
-        |> Map.put(:actual_units, actual_units)
-        |> Map.put(:uph, uph)
-        |> Map.put(:percentage, percentage)
+        |> Map.put("status", :editted)
+        |> Map.put("active_seconds", event.data["mins"] * 60)
+        |> Map.put("actual_units", actual_units)
+        |> Map.put("uph", uph)
+        |> Map.put("percentage", percentage)
       }
   end
 
   def edit({:edit, event}, model, new_events ) do
-    new_model = Enum.map(event.data["users"], fn(user) -> edit_user(user, event, model[user], model.challenge_benchmark) end)
-    |> Enum.into(model)
-    |> Map.put(:last_played, event.ordered_id)
-    {new_model, create_stats_event(stats_type(new_model.challenge_type), new_model, new_events)}
+    user_models = Enum.map(event.data["users"], fn(user) -> edit_user(to_string(user), event, model["users"][to_string(user)], model["challenge_benchmark"]) end)
+    |> Enum.into(model["users"])
+    new_model = model
+    |> Map.put("users", user_models)
+    |> Map.put("last_played", event.ordered_id)
+    {new_model, create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
   end
 
   def stats_type(challenge_type)do
@@ -189,21 +202,19 @@ defmodule Service.Challenge do
   end
 
   def delete_user(user, _event, user_model) do
-    {user, user_model
-        |> Map.put(:status, :deleted)
-        |> Map.drop([:active_seconds, :actual_units, :uph, :percentage])
-        # |> Map.put(:active_seconds, 0)
-        # |> Map.put(:actual_units, 0)
-        # |> Map.put(:uph, 0)
-        # |> Map.put(:percentage, 0)
-      }
+    new_model = user_model
+        |> Map.put("status", :deleted)
+        |> Map.drop(["active_seconds", "actual_units", "uph", "percentage"])
+    {user, new_model}
   end
 
   def delete({:delete, event}, model, new_events) do
-    new_model = Enum.map(event.data["users"], fn(user) -> delete_user(user, event, model[user]) end)
-    |> Enum.into(model)
-    |> Map.put(:last_played, event.ordered_id)
-    {new_model, create_stats_event(stats_type(new_model.challenge_type), new_model, new_events)}
+    user_models = Enum.map(event.data["users"], fn(user) -> delete_user(to_string(user), event, model["users"][to_string(user)]) end)
+    |> Enum.into(model["users"])
+    new_model = model
+    |> Map.put("users", user_models)
+    |> Map.put("last_played", event.ordered_id)
+    {new_model, create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
   end
 
 end
