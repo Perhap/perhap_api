@@ -4,7 +4,6 @@ defmodule Reducer.Consumer do
   import DB.Common, only: [unit_separator: 0]
   alias DB.Event
   alias DB.Reducer.State, as: RS
-  require Logger
 
   def start_link() do
     GenStage.start_link(__MODULE__, :ok)
@@ -40,13 +39,6 @@ defmodule Reducer.Consumer do
         %RS{state_id: reducer_state_key, data: reducer_state.model} |> RS.save
 
         # Process New Events
-        case reducer_name == "service.challenge" do
-          true ->
-            Logger.info("New Model: #{inspect(reducer_state.model)}", perhap_only: 1)
-            Logger.info("New Events: #{inspect(reducer_state.new_events)}", perhap_only: 1)
-          false ->
-            :ok
-        end
         process_new_events(reducer_state.new_events)
 
         # Aggregate Reducer Results
@@ -54,7 +46,7 @@ defmodule Reducer.Consumer do
       end)
     end)
     # or save reducer state here
-    Logger.info("Reducer Results: #{inspect(run_results)}", perhap_only: 1)
+    # Logger.debug("Reducer Results: #{inspect(run_results)}")
     {:noreply, [], state}
   end
 

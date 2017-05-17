@@ -12,6 +12,7 @@ defmodule EventTest do
     event_id = :uuid.uuid_to_string(uuid_v1)
     entity_id = :uuid.uuid_to_string(:uuid.get_v4(:strong))
     on_exit fn ->
+      DB.Event.delete(event_id)
       :ok
     end
     [event_id: event_id, entity_id: entity_id]

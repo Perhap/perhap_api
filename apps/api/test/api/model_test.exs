@@ -22,6 +22,10 @@ defmodule ModelTest do
 
     reducer_state_key = "#{domain}_#{entity_id}_service.#{domain}"
     %RS{state_id: reducer_state_key, data: state.model} |> RS.save
+    on_exit fn ->
+      RS.delete(reducer_state_key)
+      :ok
+    end
     [domain: domain, entity_id: entity_id]
   end
 
