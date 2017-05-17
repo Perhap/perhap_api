@@ -13,8 +13,8 @@ defmodule Service.Challenge do
 
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, %State{} = state) when is_list(events) do
-    {model, new_events} = events |> validate()
-      |> challenge_reducer_recursive({state.model, []})
+    %{model: model, new_events: new_events} = events |> validate()
+      |> challenge_reducer_recursive(%{model: state.model, new_events: []})
     %State{state | model: model, new_events: new_events}
   end
 
@@ -61,12 +61,12 @@ defmodule Service.Challenge do
     {type, data}
   end
 
-  def challenge_reducer_recursive([], {model, new_events}), do: {model, new_events}
-  def challenge_reducer_recursive([event | remaining_events], {model, new_events}) do
-    challenge_reducer_recursive(remaining_events, play(event, {model, new_events}))
+  def challenge_reducer_recursive([], %{model: model, new_events: new_events}), do: %{model: model, new_events: new_events}
+  def challenge_reducer_recursive([event | remaining_events], %{model: model, new_events: new_events}) do
+    challenge_reducer_recursive(remaining_events, play(event, %{model: model, new_events: new_events}))
   end
 
-  def play({type, event}, {model, new_events}) do
+  def play({type, event}, %{model: model, new_events: new_events}) do
     apply(__MODULE__, type, [{type, event}, model, new_events])
   end
 
@@ -85,10 +85,10 @@ defmodule Service.Challenge do
   def start_user(user, _event, user_model), do: {user, user_model}
 
   def start({:start, event}, model, new_events) when model == %{} do
-    user_models = Enum.map(event.data["users"], fn(user) -> start_user(user, event, %{}) end)
+    user_models = Enum.map(event.data["users"], fn(user) -> start_user(to_string(user), event, %{}) end)
     |> Enum.into(%{})
 
-    {model
+    %{model: model
     |> Map.put("last_played", event.ordered_id)
     |> Map.put("users", user_models)
     |> Map.put("entity_id", event.entity_id)
@@ -96,15 +96,15 @@ defmodule Service.Challenge do
     |> Map.put("challenge_benchmark", event.data["challenge_benchmark"])
     |> Map.put("challenge_type", event.data["challenge_type"])
     |> Map.put("store_id", event.data["store_id"]),
-    new_events}
+    new_events: new_events}
   end
 
   def start({:start, event}, model, new_events)  do
     user_models = Enum.map(event.data["users"], fn(user) -> start_user(to_string(user), event, model["users"][to_string(user)]) end)
     |> Enum.into(model["users"])
-    {model
+    %{model: model
     |> Map.put("users", user_models)
-    |> Map.put("last_played", event.ordered_id), new_events}
+    |> Map.put("last_played", event.ordered_id), new_events: new_events}
   end
 
   def stop_user(user, event, %{"status" => :running, "active_seconds" => active_seconds} = user_model) do
@@ -124,9 +124,9 @@ defmodule Service.Challenge do
   def stop({:stop, event}, model, new_events) do
     user_models = Enum.map(event.data["users"], fn(user) -> stop_user(to_string(user), event, model["users"][to_string(user)]) end)
     |> Enum.into(model["users"])
-    {model
+    %{model: model
     |> Map.put("users", user_models)
-    |> Map.put("last_played", event.ordered_id), new_events}
+    |> Map.put("last_played", event.ordered_id), new_events: new_events}
   end
 
   def actual_units_user(user, event, %{"status" => :stopped} = user_model, benchmark) do
@@ -151,7 +151,7 @@ defmodule Service.Challenge do
     new_model = model
     |> Map.put("users", user_models)
     |> Map.put("last_played", event.ordered_id)
-    {new_model, create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
+    %{model: new_model, new_events: create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
   end
 
   def edit_user(user, _event, %{"status" => :deleted} = user_model, _benchmark), do: {user, user_model}
@@ -175,7 +175,7 @@ defmodule Service.Challenge do
     new_model = model
     |> Map.put("users", user_models)
     |> Map.put("last_played", event.ordered_id)
-    {new_model, create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
+    %{model: new_model, new_events: create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
   end
 
   def stats_type(challenge_type)do
@@ -194,7 +194,7 @@ defmodule Service.Challenge do
       type: type,
       domain: "transformer",
       realm: "nike",
-      entity_id: model.entity_id,
+      entity_id: model["entity_id"],
       meta: Map.drop(model, ["last_played", "domain", "entity_id"]),
       event_id: gen_uuidv1()
     } | new_events]
@@ -214,7 +214,7 @@ defmodule Service.Challenge do
     new_model = model
     |> Map.put("users", user_models)
     |> Map.put("last_played", event.ordered_id)
-    {new_model, create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
+    %{model: new_model, new_events: create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
   end
 
 end
