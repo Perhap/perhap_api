@@ -3,6 +3,7 @@ defmodule Stats do
   alias :exometer, as: Exometer
   alias :event_get, as: E_Get
   alias :event_post, as: E_Post
+  alias :model_get, as: M_Get
 
   def get(conn) do
     stats = (c_stat(Exometer.get_value(["event", "GET", :counter], :value), E_Get) |||
@@ -10,7 +11,11 @@ defmodule Stats do
              c_stat(Exometer.get_value(["event", "GET", :histogram]), E_Get) |||
              c_stat(Exometer.get_value(["event", "POST", :counter], :value), E_Post) |||
              c_stat(Exometer.get_value(["event", "POST", :spiral], :one), E_Post) |||
-             c_stat(Exometer.get_value(["event", "POST", :histogram]), E_Post))
+             c_stat(Exometer.get_value(["event", "POST", :histogram]), E_Post) |||
+             c_stat(Exometer.get_value(["model", "GET", :counter], :value), M_Get) |||
+             c_stat(Exometer.get_value(["model", "GET", :spiral], :one), M_Get) |||
+             c_stat(Exometer.get_value(["model", "GET", :histogram]), M_Get))
+
 
     Response.send(conn, 200, stats)
   end
