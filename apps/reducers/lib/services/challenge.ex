@@ -154,7 +154,7 @@ defmodule Service.Challenge do
     {new_model, create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
   end
 
-  def edit_user(user, _event, %{:status => :deleted} = user_model, _benchmark), do: {user, user_model}
+  def edit_user(user, _event, %{"status" => :deleted} = user_model, _benchmark), do: {user, user_model}
   def edit_user(user, event, user_model, benchmark) do
     actual_units = event.data["units"] / length(event.data["users"])
     uph = actual_units / (event.data["mins"] / 60)
@@ -195,7 +195,7 @@ defmodule Service.Challenge do
       domain: "transformer",
       realm: "nike",
       entity_id: model.entity_id,
-      meta: Map.drop(model, [:last_played, :domain, :entity_id]),
+      meta: Map.drop(model, ["last_played", "domain", "entity_id"]),
       event_id: gen_uuidv1()
     } | new_events]
 
