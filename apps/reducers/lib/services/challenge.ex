@@ -70,15 +70,15 @@ defmodule Service.Challenge do
     apply(__MODULE__, type, [{type, event}, model, new_events])
   end
 
-  def start_user(user, event, %{"status" => :stopped} = user_model) do
+  def start_user(user, event, %{"status" => "stopped"} = user_model) do
     {user, user_model
-    |> Map.put("status", :running)
+    |> Map.put("status", "running")
     |> Map.put("start_time", event.timestamp)}
   end
 
   def start_user(user, event, user_model) when map_size(user_model) == 0 do
     {user, user_model
-    |> Map.put("status", :running)
+    |> Map.put("status", "running")
     |> Map.put("start_time", event.timestamp)}
   end
 
@@ -107,15 +107,15 @@ defmodule Service.Challenge do
     |> Map.put("last_played", event.ordered_id), new_events}
   end
 
-  def stop_user(user, event, %{"status" => :running, "active_seconds" => active_seconds} = user_model) do
+  def stop_user(user, event, %{"status" => "running", "active_seconds" => active_seconds} = user_model) do
     {user, user_model
-    |> Map.put("status", :stopped)
+    |> Map.put("status", "stopped")
     |> Map.put("active_seconds", ((event.timestamp - user_model["start_time"])/1000) + active_seconds)}
   end
 
-  def stop_user(user, event, %{"status" => :running} = user_model) do
+  def stop_user(user, event, %{"status" => "running"} = user_model) do
     {user, user_model
-    |> Map.put("status", :stopped)
+    |> Map.put("status", "stopped")
     |> Map.put("active_seconds", ((event.timestamp - user_model["start_time"])/1000))}
   end
 
@@ -129,13 +129,13 @@ defmodule Service.Challenge do
     |> Map.put("last_played", event.ordered_id), new_events}
   end
 
-  def actual_units_user(user, event, %{"status" => :stopped} = user_model, benchmark) do
+  def actual_units_user(user, event, %{"status" => "stopped"} = user_model, benchmark) do
     actual_units = event.data["units"] / length(event.data["users"])
     uph = actual_units / (user_model["active_seconds"] / 3600)
     percentage = uph/ benchmark
 
     new_model = user_model
-        |> Map.put("status", :completed)
+        |> Map.put("status", "completed")
         |> Map.put("actual_units", actual_units)
         |> Map.put("uph", uph)
         |> Map.put("percentage", percentage)
@@ -154,14 +154,14 @@ defmodule Service.Challenge do
     {new_model, create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
   end
 
-  def edit_user(user, _event, %{"status" => :deleted} = user_model, _benchmark), do: {user, user_model}
+  def edit_user(user, _event, %{"status" => "deleted"} = user_model, _benchmark), do: {user, user_model}
   def edit_user(user, event, user_model, benchmark) do
     actual_units = event.data["units"] / length(event.data["users"])
     uph = actual_units / (event.data["mins"] / 60)
     percentage = uph/ benchmark
 
     {user, user_model
-        |> Map.put("status", :editted)
+        |> Map.put("status", "editted")
         |> Map.put("active_seconds", event.data["mins"] * 60)
         |> Map.put("actual_units", actual_units)
         |> Map.put("uph", uph)
@@ -202,7 +202,7 @@ defmodule Service.Challenge do
 
   def delete_user(user, _event, user_model) do
     new_model = user_model
-        |> Map.put("status", :deleted)
+        |> Map.put("status", "deleted")
         |> Map.drop(["active_seconds", "actual_units", "uph", "percentage"])
     {user, new_model}
   end
