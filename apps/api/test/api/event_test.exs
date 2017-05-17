@@ -1,4 +1,4 @@
-defmodule APITest do
+defmodule EventTest do
   use ExUnit.Case, async: true
   use Plug.Test
   import API.Test.Helper
