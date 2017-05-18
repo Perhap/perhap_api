@@ -31,6 +31,7 @@ defmodule API.Mixfile do
       {:httpoison, "~> 0.11.1"},
       {:reducers, in_umbrella: true},
       {:poison, "~> 3.1"},
+      {:json, "~> 1.0"}, # needed for keyword list sorting
       {:snappy, github: "fdmanana/snappy-erlang-nif"},
       {:exometer_core, github: "Feuerlabs/exometer_core"},
       {:setup, github: "uwiger/setup", manager: :rebar, override: true},

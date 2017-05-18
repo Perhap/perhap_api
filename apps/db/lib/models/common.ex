@@ -9,6 +9,7 @@ defmodule DB.Common do
     optional(vclock: atom) => String.t
   }
 
+  @spec unit_separator() :: String.t
   def unit_separator do
     @unit_separator
   end

@@ -18,11 +18,24 @@ defmodule API.Response do
       put_resp_header("x-bigsquid-crc32", Integer.to_string(crc32)) |>
     send_resp(status, json)
   end
-
-  defp make(data) do
-    json = Poison.encode!(data)
-    crc32 = :erlang.crc32(json)
-    {:ok, json, crc32}
+  
+  defp make(map) when is_map(map) do
+    json = Poison.encode!(map)
+    makeCRC(json)
+  end
+  defp make(list) when is_list(list) do
+    json = case Keyword.keyword?(list) do
+      true -> JSON.encode!(list)
+      false -> Poison.encode!(list)
+    end
+    makeCRC(json)
+  end
+  defp make(json) when is_binary(json) do
+    makeCRC(json)
+  end
+  defp makeCRC(data) when is_binary(data) do
+    crc32 = :erlang.crc32(data)
+    {:ok, data, crc32}
   end
 
 end

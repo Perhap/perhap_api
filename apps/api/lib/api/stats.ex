@@ -6,18 +6,23 @@ defmodule Stats do
   alias :model_get, as: M_Get
 
   def get(conn) do
-    stats = (c_stat(Exometer.get_value(["event", "GET", :counter], :value), E_Get) |||
-             c_stat(Exometer.get_value(["event", "GET", :spiral], :one), E_Get) |||
-             c_stat(Exometer.get_value(["event", "GET", :histogram]), E_Get) |||
-             c_stat(Exometer.get_value(["event", "POST", :counter], :value), E_Post) |||
-             c_stat(Exometer.get_value(["event", "POST", :spiral], :one), E_Post) |||
-             c_stat(Exometer.get_value(["event", "POST", :histogram]), E_Post) |||
-             c_stat(Exometer.get_value(["model", "GET", :counter], :value), M_Get) |||
-             c_stat(Exometer.get_value(["model", "GET", :spiral], :one), M_Get) |||
-             c_stat(Exometer.get_value(["model", "GET", :histogram]), M_Get))
-
-
+    stats = collect_stats() |> Enum.sort |> Enum.flat_map(fn({k,v}) -> ["#{k}": v] end)
     Response.send(conn, 200, stats)
+  end
+
+  def collect_stats() do
+    (c_stat(Exometer.get_value(["event", "GET", :counter], :value), E_Get) |||
+     c_stat(Exometer.get_value(["event", "GET", :spiral], :one), E_Get) |||
+     c_stat(Exometer.get_value(["event", "GET", :histogram]), E_Get) |||
+     c_stat(Exometer.get_value(["event", "POST", :counter], :value), E_Post) |||
+     c_stat(Exometer.get_value(["event", "POST", :spiral], :one), E_Post) |||
+     c_stat(Exometer.get_value(["event", "POST", :histogram]), E_Post) |||
+     c_stat(Exometer.get_value(["model", "GET", :counter], :value), M_Get) |||
+     c_stat(Exometer.get_value(["model", "GET", :spiral], :one), M_Get) |||
+     c_stat(Exometer.get_value(["model", "GET", :histogram]), M_Get) |||
+     %{"total_events" => DB.Event.hll_stat("events")} |||
+     %{"total_entities" => DB.Event.hll_stat("entities")} |||
+     %{"total_domains" => DB.Event.hll_stat("domains")})
   end
 
   defp c_stat({:error, :not_found}, _), do: %{}

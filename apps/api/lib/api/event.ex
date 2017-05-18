@@ -14,9 +14,13 @@ defmodule API.Event do
     end
   end
 
-  @spec get_by_entity(Plug.Conn, String.t) :: Plug.Conn
-  def get_by_entity(conn, _entity_id) do
-    Response.send(conn, E.make(:operation_not_implemented))
+  @spec get_by_entity(Plug.Conn, String.t, String.t) :: Plug.Conn
+  def get_by_entity(conn, entity_id, domain) do
+    case DB.Event.find_by_entity_domain(entity_id, domain) do
+      :not_found -> Response.send(conn, E.make(:not_found))
+      :error -> Response.send(conn, E.make(:service_unavailable))
+      results -> Response.send(conn, 200, results)
+    end
   end
 
   @spec post(Plug.Conn, DB.Event.t) :: Plug.Conn

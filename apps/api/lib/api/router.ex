@@ -39,10 +39,8 @@ defmodule API.Router do
     end
   end
 
-  get "/v1/events/:entity_id", do: Event.get_by_entity(conn, entity_id)
-
+  get "/v1/events/:domain/:entity_id", do: Event.get_by_entity(conn, entity_id, domain)
   get "/v1/model/:domain/:entity_id", do: Model.get(conn, domain, entity_id)
-
   get "/v1/stats", do: Stats.get(conn)
 
   match _ do
