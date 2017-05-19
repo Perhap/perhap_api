@@ -78,11 +78,6 @@ defmodule DB.Event do
     (Enum.map events, &(&1.entity_id)) |> Enum.uniq
   end
 
-  @spec reducer_context(list(Event.t)) :: %{required(String.t) => list(Event.t)}
-  def reducer_context(events) when is_list(events) do
-    Enum.group_by(events, &Common.event_context(&1))
-  end
-
   @spec find_by_entity_domain(String.t, String.t) :: list(String.t) | :not_found | :error
   def find_by_entity_domain(entity_id, domain) do
     result = try do
@@ -97,6 +92,12 @@ defmodule DB.Event do
       :error -> :error
       _ -> result
     end
+  end
+
+  # this should be used for admin purposes only
+  @spec delete_entity_domain_index(String.t, String.t) :: :ok
+  def delete_entity_domain_index(entity_id, domain) do
+    Riak.delete("sets", namespace_index(:bucket), namespace_index(:key, entity_id, domain))
   end
 
   @spec hll_stat(String.t) :: integer() | :not_found | :error

@@ -19,7 +19,7 @@ defmodule Reducer.Consumer do
   def handle_events(events, _from, state) do
     all_reducers = Keyword.get(state, :reducers)
 
-    all_context = Event.reducer_context(events)
+    all_context = RS.reducer_context(events)
     run_results = Enum.map(all_context, fn({reducer_context, reducer_events}) ->
       reducer_states = Enum.reduce(all_reducers, Map.new(), fn(reducer, acc) ->
         [_|rest] = String.split(Atom.to_string(reducer), ".")
@@ -31,9 +31,13 @@ defmodule Reducer.Consumer do
           db_state -> %State{model: db_state.model.data}
         end
 
-        reducer_state = case State.stale?(reducer_events, reducer_state) do
-          true -> %State{}
-          false -> reducer_state
+        {reducer_events, reducer_state} = case State.stale?(reducer_events, reducer_state) do
+          true ->
+            {domain, entity_id, _} = RS.split_key(reducer_state_key)
+            reducer_events_all = Event.find_by_entity_domain(entity_id, domain) |> Event.find() |> Enum.map(&(&1.model))
+            {reducer_events_all, %State{}}
+          false ->
+            {reducer_events, reducer_state}
         end
 
         # Run Reducers

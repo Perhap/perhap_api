@@ -19,11 +19,8 @@ defmodule DB.EventTest do
     assert ["123", "xyz"] == DB.Event.entities(context[:events])
   end
 
-  test "can determine reducer context from events", context do
-    assert DB.Event.reducer_context(context[:events]) == %{"challenge_123" => [
-        %DB.Event{domain: "challenge", entity_id: "123", event_id: "def"},
-        %DB.Event{domain: "challenge", entity_id: "123", event_id: "abc"}],
-      "stats_xyz" => [
-        %DB.Event{domain: "stats", entity_id: "xyz", event_id: "890"}]}
+  test "event uniq", context do
+    events = context[:events] ++ [%DB.Event{domain: "challenge", entity_id: "123", event_id: "def"}]
+    assert 3 == length(events |> Enum.uniq)
   end
 end

@@ -15,10 +15,7 @@ defmodule Reducer.State do
       nil -> false
       _ ->
         events = Enum.sort(events, &(V.flip_v1_uuid(&1.event_id) <= V.flip_v1_uuid(&2.event_id)))
-        case V.flip_v1_uuid(List.first(events).event_id) <= last_played do
-          true -> true
-          false -> false
-        end
+        V.flip_v1_uuid(List.first(events).event_id) < last_played
     end
   end
 end

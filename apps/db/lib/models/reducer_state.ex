@@ -1,17 +1,22 @@
 defmodule DB.Reducer.State do
   import DB.Common
+
+  alias DB.Common
+  alias DB.Reducer.State
+  alias DB.Event
+
   require Logger
 
   defstruct state_id: "",
             data: %{},
             kv: ""
 
-  @type t :: %DB.Reducer.State{state_id: String.t}
+  @type t :: %State{state_id: String.t}
 
   @bucket "reducer_state"
 
-  @spec save(DB.Reducer.State.t) :: DB.Reducer.State.t | :error
-  def save(%DB.Reducer.State{state_id: state_id} = state) do
+  @spec save(State.t) :: State.t | :error
+  def save(%State{state_id: state_id} = state) do
     bucket = namespace(@bucket)
     key = state_id
     kv_info = "#{bucket}/#{key}"
@@ -60,10 +65,21 @@ defmodule DB.Reducer.State do
       :error -> :error
       _ ->
         case include_db_attrs do
-          true -> DB.Common.add_db_attrs(result, %DB.Reducer.State{})
-          false -> %{model: Poison.decode!(result.data, [as: %DB.Reducer.State{}])}
+          true -> DB.Common.add_db_attrs(result, %State{})
+          false -> %{model: Poison.decode!(result.data, [as: %State{}])}
         end
     end
+  end
+
+  @spec reducer_context(list(Event.t)) :: %{required(String.t) => list(Event.t)}
+  def reducer_context(events) when is_list(events) do
+    Enum.group_by(events, &Common.event_context(&1))
+  end
+
+  @spec split_key(String.t) :: {String.t, String.t, String.t}
+  def split_key(reducer_state_key) do
+    [domain, entity_id, service] = String.split(reducer_state_key, Common.unit_separator)
+    {domain, entity_id, service}
   end
 
 end
