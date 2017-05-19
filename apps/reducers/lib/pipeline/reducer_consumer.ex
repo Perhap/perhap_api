@@ -6,6 +6,8 @@ defmodule Reducer.Consumer do
   alias DB.Reducer.State, as: RS
   alias Reducer.State
 
+  require Logger
+
   def start_link() do
     GenStage.start_link(__MODULE__, :ok)
   end
@@ -26,15 +28,18 @@ defmodule Reducer.Consumer do
         reducer_name = rest |> Enum.map(&String.downcase(&1)) |> Enum.join(".")
         reducer_state_key = reducer_context <> unit_separator() <> reducer_name
 
+        # Load State
         reducer_state = case RS.find(reducer_state_key) do
           :not_found -> %State{}
           db_state -> %State{model: db_state.model.data}
         end
 
+        # Ensure not Stale
         {reducer_events, reducer_state} = case State.stale?(reducer_events, reducer_state) do
           true ->
             {domain, entity_id, _} = RS.split_key(reducer_state_key)
-            reducer_events_all = Event.find_by_entity_domain(entity_id, domain) |> Event.find() |> Enum.map(&(&1.model))
+            indexed_events = Event.find_by_entity_domain(entity_id, domain) |> Event.find() |> Enum.map(&(&1.model))
+            reducer_events_all = (reducer_events ++ indexed_events) |> Enum.uniq
             {reducer_events_all, %State{}}
           false ->
             {reducer_events, reducer_state}
@@ -47,18 +52,25 @@ defmodule Reducer.Consumer do
         reducer_state = (result |> Map.fetch!(reducer_state_key))
         %RS{state_id: reducer_state_key, data: reducer_state.model} |> RS.save
 
-        # Process New Events
         process_new_events(reducer_state.new_events)
 
         # Aggregate Reducer Results
         result
       end)
     end)
-    # or save reducer state here
-    # Logger.debug("Reducer Results: #{inspect(run_results)}")
+    Logger.debug("Reducer Results: #{inspect(run_results)}")
     {:noreply, [], state}
   end
 
+  # there isn't really anything to do with these yet
+  def handle_info({:DOWN, ref, :process, _pid, _reason}, state) do
+    {:noreply, [], state}
+  end
+  def handle_info(ref, state) do
+    {:noreply, [], state}
+  end
+
+  # Save and dispatch new events
   defp process_new_events(events) when is_list(events) do
     Enum.each(events, fn(event) ->
       case Event.save(event) do
