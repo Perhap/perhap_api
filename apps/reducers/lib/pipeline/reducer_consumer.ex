@@ -4,6 +4,7 @@ defmodule Reducer.Consumer do
   import DB.Common, only: [unit_separator: 0]
   alias DB.Event
   alias DB.Reducer.State, as: RS
+  alias Reducer.State
 
   def start_link() do
     GenStage.start_link(__MODULE__, :ok)
@@ -25,10 +26,14 @@ defmodule Reducer.Consumer do
         reducer_name = rest |> Enum.map(&String.downcase(&1)) |> Enum.join(".")
         reducer_state_key = reducer_context <> unit_separator() <> reducer_name
 
-        # Load Model TODO Handle DB Errors
         reducer_state = case RS.find(reducer_state_key) do
-          :not_found -> %Reducer.State{}
-          db_state -> %Reducer.State{model: db_state.model.data}
+          :not_found -> %State{}
+          db_state -> %State{model: db_state.model.data}
+        end
+
+        reducer_state = case State.stale?(reducer_events, reducer_state) do
+          true -> %State{}
+          false -> reducer_state
         end
 
         # Run Reducers
@@ -52,8 +57,8 @@ defmodule Reducer.Consumer do
 
   defp process_new_events(events) when is_list(events) do
     Enum.each(events, fn(event) ->
-      case DB.Event.save(event) do
-        %DB.Event{} = event ->
+      case Event.save(event) do
+        %Event{} = event ->
           EventDispatcher.async_notify(event)
           :ok
         _ ->

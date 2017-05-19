@@ -53,7 +53,7 @@ defmodule API.Error do
   @spec format(atom) :: iodata
   def format(atom) when is_atom(atom) do
     error = make(atom)
-    Poison.encode!(%{
+    JSON.encode!(%{
       type: error.code,
       message: error.message})
   end

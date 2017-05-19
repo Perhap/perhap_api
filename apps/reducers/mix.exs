@@ -25,6 +25,7 @@ defmodule Reducer.Mixfile do
   defp deps do
     [
       {:db, in_umbrella: true},
+      {:poison, "~> 3.1"},
       {:kafka_ex, "~> 0.6.5"}
     ]
   end

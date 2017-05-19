@@ -20,14 +20,11 @@ defmodule API.Response do
   end
   
   defp make(map) when is_map(map) do
-    json = Poison.encode!(map)
+    json = JSON.encode!(map)
     makeCRC(json)
   end
   defp make(list) when is_list(list) do
-    json = case Keyword.keyword?(list) do
-      true -> JSON.encode!(list)
-      false -> Poison.encode!(list)
-    end
+    json = JSON.encode!(list)
     makeCRC(json)
   end
   defp make(json) when is_binary(json) do

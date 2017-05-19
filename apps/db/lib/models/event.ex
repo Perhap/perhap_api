@@ -4,7 +4,6 @@ defmodule DB.Event do
   alias DB.Common
   alias DB.Event
   alias Riak.CRDT.Set, as: RS
-  alias Riak.CRDT.Register, as: RR
   alias Riak.CRDT.HyperLogLog, as: HLL
 
   require Logger
@@ -146,7 +145,7 @@ defmodule DB.Event do
   end
 
   @spec find_event(String.t, boolean()) :: Common.r_json_t | :not_found | :error
-  defp find_event(key, include_db_attrs \\ false) do
+  defp find_event(key, include_db_attrs) do
     result = try do
       Riak.find(namespace(@bucket), key)
     rescue

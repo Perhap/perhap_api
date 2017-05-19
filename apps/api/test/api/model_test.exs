@@ -1,7 +1,6 @@
 defmodule ModelTest do
   use ExUnit.Case, async: true
   use Plug.Test
-  import API.Test.Helper
 
   alias DB.Reducer.State, as: RS
 
