@@ -378,8 +378,8 @@ end
   end
 
   test "call", context do
-    assert(Service.Stats.call([context[:unformated_complete], context[:unformated_pre_actuals]], %{})
-    == %{model: %{
+    assert(Service.Stats.call([context[:unformated_complete], context[:unformated_pre_actuals]], %State{})
+    == %State{model: %{
       "last_played" => "11e7-3b3c-fb2eb7f4-a919-92ebcb67fe33",
       "season" => Season1,
       "stats" => %{

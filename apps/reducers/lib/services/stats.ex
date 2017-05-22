@@ -81,7 +81,7 @@ defmodule Service.Stats do
   end
 
   def find_period(timestamp, season_periods) do
-    {period, data} = Application.get_env(:stats_service, season_periods)
+    {period, data} = Application.get_env(:reducers, season_periods)
     |>  Enum.find(fn {period, %{:start_time => start_time, :end_time => end_time}} -> timestamp >= start_time and timestamp <= end_time end)
     to_string(period)
   end
@@ -96,16 +96,15 @@ defmodule Service.Stats do
   end
 
   def play({type, event}, {model, new_events}) do
-    IO.inspect(event.ordered_id)
     period = get_timestamp({type, event})
-    |> find_period(Application.get_env(:stats_service, :current_periods))
+    |> find_period(Application.get_env(:reducers, :current_periods))
     period_model = get_period_model(period, model)
 
     {new_period_model, additional_events} = apply(Service.Stats, type, [{type, event}, {period_model, new_events}])
     {model
     |> Map.put("stats", model["stats"] || %{})
     |> put_in(["stats", period], new_period_model)
-    |> Map.put("season", Application.get_env(:stats_service, :current_season))
+    |> Map.put("season", Application.get_env(:reducers, :current_season))
     |> Map.put("last_played", event.ordered_id), Enum.into(additional_events, new_events)}
   end
 
