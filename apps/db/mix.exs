@@ -27,10 +27,11 @@ defmodule DB.Mixfile do
 
   defp deps do
     [
-      {:tzdata, "~> 0.5.12"},
+      # {:tzdata, "~> 0.5.12"},
       {:geocalc, "~> 0.5.4"},
       {:riak, "~> 1.1.2"},
       {:timex, "~> 3.1"},
+      {:tzdata, "== 0.1.8", override: true},
       # {:phoenix_pubsub, "~> 1.0"},
       {:uuid, github: "okeuday/uuid"}
     ]
