@@ -18,6 +18,7 @@ defmodule DB.Mixfile do
     [
       applications: [
         :logger,
+        :tzdata,
         :riak],
         #:phoenix_pubsub],
         # mod: {DB, []}
