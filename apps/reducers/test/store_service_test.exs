@@ -1,140 +1,155 @@
 defmodule InitStoreTest do
   use ExUnit.Case
-  # doctest Mix.Tasks.InitStores
-  #
-  # alias Mix.Tasks.InitStores
-  #
-  # defp ctx do
-  #   %{lastHashes: %{1 => "fakehash1", 2 => "fakehash2"},
-  #     lastEIds: %{1 => "uuidv4-1", 2 => "uuidv4-2"},
-  #     emptyAcc: %{oldMaps: %{}, newHashes: %{}, newEntIds: %{}},
-  #     skipAcc: %{oldMaps: %{28 => %{hash: "fakehash1", entity_id: "uuidv4-1"}},
-  #                newHashes: %{}, newEntIds: %{}}
-  #    }
-  # end
-  #
-  # test "makeIdMaps returns list of maps" do
-  #   assert InitStores.makeIdMaps(ctx().lastHashes, ctx().lastEIds) ==
-  #     %{1 => %{hash: "fakehash1", entity_id: "uuidv4-1"},
-  #       2 => %{hash: "fakehash2", entity_id: "uuidv4-2"}}
-  # end
-  #
-  # test "makeIdMaps handles hash with no eid" do
-  #   assert InitStores.makeIdMaps(ctx().lastHashes, Map.delete(ctx().lastEIds, 2)) ==
-  #     %{1 => %{hash: "fakehash1", entity_id: "uuidv4-1"},
-  #       2 => %{hash: "fakehash2", entity_id: nil}}
-  # end
-  #
-  # test "makeIdMaps handles eid with no hash" do
-  #   assert InitStores.makeIdMaps(Map.delete(ctx().lastHashes, 1), ctx().lastEIds) ==
-  #     %{1 => %{hash: nil, entity_id: "uuidv4-1"},
-  #       2 => %{hash: "fakehash2", entity_id: "uuidv4-2"}}
-  # end
-  #
-  # test "parse a basic row" do
-  #   parsed = InitStores.hashParse("335,,Reno,NFS,Factory Store,West,3,Nor Cal")
-  #
-  #   assert parsed.storenum == 335
-  #   assert is_nil(parsed.id_storenum)
-  #   assert parsed.name == "Reno"
-  #   assert parsed.concept == "NFS"
-  #   assert parsed.subconcept == "Factory Store"
-  #   assert parsed.terr == "West"
-  #   assert parsed.distnum == 3
-  #   assert parsed.distname == "Nor Cal"
-  #   assert is_bitstring(parsed.hash) && String.length(parsed.hash) == 64
-  # end
-  #
-  # test "parse an offsite service center" do
-  #   parsed = InitStores.hashParse("298,59,Woodbury SC,NFS,Offsite Service Center,Northeast,20,NY/S Jersey")
-  #
-  #   assert parsed.storenum == 298
-  #   assert parsed.id_storenum == 59
-  #   assert parsed.name == "Woodbury SC"
-  #   assert is_bitstring(parsed.hash) && String.length(parsed.hash) == 64
-  # end
-  #
-  # test "fold from blank" do
-  #   parsed_line =
-  #     InitStores.hashParse("28,,Nikelab,NSO,NikeLab,Northeast,22,NYC NSO")
-  #
-  #   state = InitStores.diffFold(&IO.inspect/1, parsed_line, ctx().emptyAcc)
-  #
-  #   assert state.oldMaps == %{}
-  #   assert state.newHashes[28] == parsed_line.hash
-  #   assert UUID.info!(state.newEntIds[28])[:version] == 4
-  # end
-  #
-  # test "fold an unchanged event" do
-  #   parsed_line =
-  #     InitStores.hashParse("28,,Nikelab,NSO,NikeLab,Northeast,22,NYC NSO")
-  #     |> Map.put(:hash, "fakehash1")
-  #
-  #   state = InitStores.diffFold(fn x -> x end, parsed_line, ctx().skipAcc)
-  #
-  #   assert state.oldMaps == %{}
-  #   assert state.newHashes[28] == "fakehash1"
-  #   assert state.newEntIds[28] == "uuidv4-1"
-  # end
-  #
-  # test "merged a store to an existing store" do
-  #   parsed_line1 =
-  #     InitStores.hashParse("28,,Nikelab,NSO,NikeLab,Northeast,22,NYC NSO")
-  #     |> Map.put(:hash, "fakehash1")
-  #
-  #   parsed_line2 =
-  #     InitStores.hashParse("88,28,Nikelab,NSO,NikeLab,Northeast,22,NYC NSO")
-  #     |> Map.put(:hash, "fakehash2")
-  #
-  #   state = Enum.reduce([parsed_line1, parsed_line2], ctx().skipAcc,
-  #     fn item, acc -> InitStores.diffFold(&IO.inspect/1, item, acc) end
-  #     )
-  #
-  #   assert state.oldMaps == %{}
-  #   assert state.newHashes[28] == "fakehash1"
-  #   assert state.newHashes[88] == "fakehash2"
-  #   assert state.newEntIds[28] == "uuidv4-1"
-  #   assert state.newEntIds[88] == "uuidv4-1"
-  # end
-  #
-  # test "handle a new merged store" do
-  #   parsed_line1 =
-  #     InitStores.hashParse("28,,Nikelab,NSO,NikeLab,Northeast,22,NYC NSO")
-  #     |> Map.put(:hash, "fakehash1")
-  #
-  #   parsed_line2 =
-  #     InitStores.hashParse("88,28,Nikelab,NSO,NikeLab,Northeast,22,NYC NSO")
-  #     |> Map.put(:hash, "fakehash2")
-  #
-  #   state = Enum.reduce([parsed_line1, parsed_line2], ctx().emptyAcc,
-  #     fn item, acc -> InitStores.diffFold(&IO.inspect/1, item, acc) end
-  #     )
-  #
-  #   assert state.oldMaps == %{}
-  #   assert state.newHashes[28] == "fakehash1"
-  #   assert state.newHashes[88] == "fakehash2"
-  #   assert state.newEntIds[28] == state.newEntIds[88]
-  # end
-  #
-  # # currently not implemented
-  # # test "handle a new merged store out of order" do
-  # #   parsed_assoc_store =
-  # #     InitStores.hashParse("88,28,Nikelab,NSO,NikeLab,Northeast,22,NYC NSO")
-  # #     |> Map.put(:hash, "fakehash2")
-  #
-  # #   parsed_main_store =
-  # #     InitStores.hashParse("28,,Nikelab,NSO,NikeLab,Northeast,22,NYC NSO")
-  # #     |> Map.put(:hash, "fakehash1")
-  #
-  #
-  # #   state = Enum.reduce([parsed_assoc_store, parsed_main_store], ctx().emptyAcc,
-  # #     fn item, acc -> InitStores.diffFold(&IO.inspect/1, item, acc) end
-  # #     )
-  #
-  # #   assert state.oldMaps == %{}
-  # #   assert state.newHashes[28] == "fakehash1"
-  # #   assert state.newHashes[88] == "fakehash2"
-  # #   assert state.newEntIds[28] == state.newEntIds[88]
-  # # end
 
+  alias DB.Event
+  alias Reducer.State
+
+  test "the truth" do
+    assert 1 + 1 == 2
+  end
+
+  setup_all _context do
+    {:ok, [
+      add_event: { "add", %{
+        ordered_id: "1-v1-uuid-0-0",
+        domain: "store",
+        entity_id: "uuid-v4",
+        data: %{
+          "display_name" => "Store 1",
+          "store_number" => 1,
+          "district" => "OC",
+          "district_id" => 42,
+          "territory" => "Southeast",
+          "concept" => "NFS",
+          "subconcept" => "Clearance"
+        }}
+      },
+      delete_event: {"delete", %{
+        ordered_id: "2-v1-uuid-0-0",
+        domain: "store",
+        entity_id: "uuid-v4",
+        data: %{}}
+      },
+      state_after_add:
+        %State{model:
+          %{"last_played" => "1-v1-uuid-0-0",
+            "name" => "Store 1",
+            "number" => 1,
+            "district" => "OC",
+            "district_id" => 42,
+            "territory" => "Southeast",
+            "concept" => "NFS",
+            "subconcept" => "Clearance",
+            "active" => :true},
+          new_events: []},
+
+      state_after_delete:
+        %State{model:
+          %{"last_played" => "2-v1-uuid-0-0",
+            "name" => "Store 1",
+            "number" => 1,
+            "district" => "OC",
+            "district_id" => 42,
+            "territory" => "Southeast",
+            "concept" => "NFS",
+            "subconcept" => "Clearance",
+            "active" => :false},
+          new_events: []}
+    ]}
+  end
+
+  def strip(event)do
+     Map.put(event, :event_id, "")
+  end
+
+  test "validate function" do
+    assert(Service.Store.validate([%{
+      domain: "store",
+      entity_id: "uuid-v4",
+      event_id: "uuid-v1-1-0-0",
+      kv: "dev_events/uuid-v1",
+      meta:
+        %{"display_name" => "Store 1",
+          "store_number" => 1,
+          "district" => "OC",
+          "district_id" => 42,
+          "territory" => "Southeast",
+          "concept" => "NFS",
+          "subconcept" => "Clearance"},
+      realm: "nike",
+      type: "add",
+    },%{
+      domain: "store",
+      entity_id: "uuid-v4",
+      event_id: "uuid-v1-1-0-0",
+      kv: "dev_events/uuid-v1",
+      meta:
+        %{"display_name" => "Store 1",
+          "store_number" => 1,
+          "district" => "OC",
+          "district_id" => 42,
+          "territory" => "Southeast",
+          "concept" => "NFS",
+          "subconcept" => "Clearance"},
+      realm: "nike",
+      type: "add",
+    }])==
+      [{"add", %{
+        ordered_id: "1-v1-uuid-0-0",
+        domain: "store",
+        entity_id: "uuid-v4",
+        data:
+          %{"display_name" => "Store 1",
+            "store_number" => 1,
+            "district" => "OC",
+            "district_id" => 42,
+            "territory" => "Southeast",
+            "concept" => "NFS",
+            "subconcept" => "Clearance"}
+        }}
+      ])
+  end
+
+
+
+  test "event_structure", context do
+    assert(Service.Store.event_structure(%{
+      domain: "store",
+      entity_id: "uuid-v4",
+      event_id: "uuid-v1-1-0-0",
+      kv: "dev_events/uuid-v1",
+      meta:
+        %{"display_name" => "Store 1",
+          "store_number" => 1,
+          "district" => "OC",
+          "district_id" => 42,
+          "territory" => "Southeast",
+          "concept" => "NFS",
+          "subconcept" => "Clearance"},
+      realm: "nike",
+      type: "add",
+    }) == context[:add_event])
+  end
+
+  test "event when accumulator is empty", context do
+    assert(Service.Store.store_reducer_recursive([context[:add_event]], %State{model: %{}, new_events: []})==
+      context[:state_after_add])
+  end
+
+  test "delete after add", context do
+    assert(Service.Store.call([%{
+      domain: "store",
+      entity_id: "uuid-v4",
+      event_id: "uuid-v1-2-0-0",
+      kv: "dev_events/uuid-v1",
+      meta: %{},
+      realm: "nike",
+      type: "delete"
+    }], context[:state_after_add])==context[:state_after_delete])
+  end
+
+  test "is idempotent", context do
+    assert(Service.Store.store_reducer_recursive([context[:add_event], context[:add_event]],
+      %State{model: %{}, new_events: []}) == context[:state_after_add])
+  end
 end

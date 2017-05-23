@@ -68,9 +68,9 @@ defmodule Service.Store do
     state
   end
 
-  def play(event, state) do
+  def play({type, event}, state) do
     {new_model, newer_events} =
-      case event.type do
+      case type do
         "add" -> add_store(event, state.model)
         "delete" -> delete(event, state.model)
       end
@@ -87,7 +87,6 @@ defmodule Service.Store do
         "territory" => event.data["territory"],
         "concept" => event.data["concept"],
         "subconcept" => event.data["subconcept"],
-        "last_modified" => event.timestamp,
         "active" => true
        }
 
@@ -107,7 +106,8 @@ defmodule Service.Store do
 
   def delete(event, model) do
     { model
-        |> Map.put(:active, false),
+        |> Map.put("last_played", event.ordered_id)
+        |> Map.put("active", false),
       []
     }
   end

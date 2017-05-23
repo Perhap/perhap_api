@@ -16,9 +16,14 @@ defmodule Service.StoreIndexTest do
         domain: "store_index",
         entity_id: "uuid-v4",
         data: %{"stores" =>
-              %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
-                2 => "81bc429d-d055-4002-a64f-59e1af501236",
-                3 => "d3bc808a-6078-454b-a606-4538d50fc978"}
+                %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
+                  2 => "81bc429d-d055-4002-a64f-59e1af501236",
+                  3 => "d3bc808a-6078-454b-a606-4538d50fc978"},
+              "hashes" =>
+                %{1 => "one",
+                  2 => "two",
+                  3 => "three",
+                  4 => "merge-three"}
               }
         }
       },
@@ -27,23 +32,38 @@ defmodule Service.StoreIndexTest do
         domain: "store_index",
         entity_id: "uuid-v4",
         data: %{"stores" =>
-              %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
-                3 => "d3bc808a-6078-454b-a606-4538d50fc978",
-                4 => "11dec905-a28c-46c9-8572-f68dc6975c91"}
+                %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
+                  3 => "d3bc808a-6078-454b-a606-4538d50fc978",
+                  4 => "11dec905-a28c-46c9-8572-f68dc6975c91"},
+              "hashes" =>
+                %{1 => "one",
+                  3 => "three-changes",
+                  4 => "merge-three"}
               }
         }
       },
       state_after_replace:
-        %State{model: %{"last_played" => "1-v1-uuid-0-0", "stores" =>
-              %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
-                2 => "81bc429d-d055-4002-a64f-59e1af501236",
-                3 => "d3bc808a-6078-454b-a606-4538d50fc978"}},
+        %State{model: %{"last_played" => "1-v1-uuid-0-0",
+          "stores" =>
+            %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
+              2 => "81bc429d-d055-4002-a64f-59e1af501236",
+              3 => "d3bc808a-6078-454b-a606-4538d50fc978"},
+          "hashes" =>
+            %{1 => "one",
+              2 => "two",
+              3 => "three",
+              4 => "merge-three"}},
           new_events: []},
       state_after_replace2:
-        %State{model: %{"last_played" => "2-v1-uuid-0-0", "stores" =>
+        %State{model: %{"last_played" => "2-v1-uuid-0-0",
+          "stores" =>
               %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
                 3 => "d3bc808a-6078-454b-a606-4538d50fc978",
-                4 => "11dec905-a28c-46c9-8572-f68dc6975c91"}},
+                4 => "11dec905-a28c-46c9-8572-f68dc6975c91"},
+          "hashes" =>
+              %{1 => "one",
+                3 => "three-changes",
+                4 => "merge-three"}},
           new_events: []}
     ]}
   end
@@ -60,7 +80,11 @@ defmodule Service.StoreIndexTest do
       kv: "dev_events/uuid-v1-1-0-0",
       meta: %{"stores" =>
               %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
-                3 => "d3bc808a-6078-454b-a606-4538d50fc978"}
+                3 => "d3bc808a-6078-454b-a606-4538d50fc978"},
+              "hashes" =>
+                %{1 => "one",
+                  3 => "three",
+                  4 => "merge-three"}
              },
       realm: "nike",
       type: "replace",
@@ -71,7 +95,11 @@ defmodule Service.StoreIndexTest do
       kv: "dev_events/uuid-v1-1-0-0",
       meta: %{"stores" =>
               %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
-                3 => "d3bc808a-6078-454b-a606-4538d50fc978"}
+                3 => "d3bc808a-6078-454b-a606-4538d50fc978"},
+              "hashes" =>
+                %{1 => "one",
+                  3 => "three",
+                  4 => "merge-three"}
              },
       realm: "nike",
       type: "replace",
@@ -80,10 +108,14 @@ defmodule Service.StoreIndexTest do
         ordered_id: "1-v1-uuid-0-0",
         domain: "store_index",
         entity_id: "uuid-v4",
-        data: %{"stores" =>
+        data:
+          %{"stores" =>
               %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
-                3 => "d3bc808a-6078-454b-a606-4538d50fc978"}
-              }
+                3 => "d3bc808a-6078-454b-a606-4538d50fc978"},
+            "hashes" =>
+              %{1 => "one",
+                3 => "three",
+                4 => "merge-three"}}
         }}
       ])
   end
@@ -96,7 +128,11 @@ defmodule Service.StoreIndexTest do
         kv: "dev_events/uuid-v1-0-0",
         meta: %{"stores" =>
                 %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
-                  3 => "d3bc808a-6078-454b-a606-4538d50fc978"}},
+                  3 => "d3bc808a-6078-454b-a606-4538d50fc978"},
+              "hashes" =>
+                %{1 => "one",
+                  3 => "three",
+                  4 => "merge-three"}},
         realm: "nike",
         type: "replace",
       }) ==
@@ -106,7 +142,11 @@ defmodule Service.StoreIndexTest do
           entity_id: "uuid-v4",
           data: %{"stores" =>
                 %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
-                  3 => "d3bc808a-6078-454b-a606-4538d50fc978"}}
+                  3 => "d3bc808a-6078-454b-a606-4538d50fc978"},
+              "hashes" =>
+                %{1 => "one",
+                  3 => "three",
+                  4 => "merge-three"}}
           }
       }
     )
@@ -126,7 +166,11 @@ defmodule Service.StoreIndexTest do
       meta: %{"stores" =>
               %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
                 3 => "d3bc808a-6078-454b-a606-4538d50fc978",
-                4 => "11dec905-a28c-46c9-8572-f68dc6975c91"}
+                4 => "11dec905-a28c-46c9-8572-f68dc6975c91"},
+            "hashes" =>
+              %{1 => "one",
+                3 => "three-changes",
+                4 => "merge-three"}
               },
       realm: "nike",
       type: "replace",
