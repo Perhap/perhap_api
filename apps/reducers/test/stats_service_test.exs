@@ -7,7 +7,7 @@ defmodule Service.StatsTest do
 
   setup_all _context do
     {:ok, [
-      unformated_complete: %{
+      unformated_complete: %Event{
         domain: "stats",
         entity_id: "uuid-v4",
         meta: %{
@@ -17,12 +17,12 @@ defmodule Service.StatsTest do
               "338998" => %{"start_time" => 1495279607000, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72}},
           "challenge_benchmark" => 250,
           "challenge_type" => "equipment",
+          "challenge_id" => "uuid-v4-challenge-complete",
           "store_id" => 93242},
         event_id: "fb2eb18c-3b3c-11e7-a919-92ebcb67fe33",
         realm: "nike",
-        challenge_id: "uuid-v4-challenge-complete",
         type: "pre_challenge"},
-    unformated_pre_actuals: %{
+    unformated_pre_actuals: %Event{
       domain: "stats",
       entity_id: "uuid-v4",
       meta: %{
@@ -32,7 +32,6 @@ defmodule Service.StatsTest do
         "Count"=> 1968},
       event_id: "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33",
       realm: "nike",
-      challenge_id: "uuid-v4-challenge",
       type: "actuals"},
     stats_complete_event: %{
       domain: "stats",
@@ -44,11 +43,11 @@ defmodule Service.StatsTest do
             "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72}},
         "challenge_benchmark" => 250,
         "challenge_type" => "equipment",
+        "challenge_id" => "uuid-v4-challenge-complete",
         "store_id" => 93242},
       event_id: "fb2eb18c-3b3c-11e7-a919-92ebcb67fe33",
       ordered_id: "11e7-3b3c-fb2eb18c-a919-92ebcb67fe33",
       realm: "nike",
-      challenge_id: "uuid-v4-challenge-complete",
       type: "pre_challenge"},
     stats_complete_event_partial: %{
       domain: "stats",
@@ -60,11 +59,11 @@ defmodule Service.StatsTest do
         "338904" => %{"start_time" => 1492712720633, "status" => "running"}},
         "challenge_benchmark" => 250,
         "challenge_type" => "equipment",
+        "challenge_id" => "uuid-v4-challenge-partial",
         "store_id" => 93242},
       event_id: "fb2eb3f8-3b3c-11e7-a919-92ebcb67fe33",
       ordered_id: "11e7-3b3c-fb2eb3f8-a919-92ebcb67fe33",
       realm: "nike",
-      challenge_id: "uuid-v4-challenge-partial",
       type: "pre_challenge"},
     stats_edit_event: %{
       domain: "stats",
@@ -77,11 +76,11 @@ defmodule Service.StatsTest do
         "338904" => %{"start_time" => 1492712720633, "status" => "editted", "active_seconds" => 120, "actual_units" => 15.0, "uph" => 450.0, "percentage" => 1.8}},
         "challenge_benchmark" => 250,
         "challenge_type" => "equipment",
+        "challenge_id" => "uuid-v4-challenge-edit",
         "store_id" => 93242},
       event_id: "fb2eb574-3b3c-11e7-a919-92ebcb67fe33",
       ordered_id: "11e7-3b3c-fb2eb574-a919-92ebcb67fe33",
       realm: "nike",
-      challenge_id: "uuid-v4-challenge-edit",
       type: "pre_challenge"},
     stats_delete_event: %{
       domain: "stats",
@@ -94,11 +93,11 @@ defmodule Service.StatsTest do
         "338904" => %{"start_time" => 1492712720633, "status" => "deleted"}},
         "challenge_benchmark" => 250,
         "challenge_type" => "equipment",
+        "challenge_id" => "uuid-v4-challenge-delete",
         "store_id" => 93242},
       event_id: "fb2eb650-3b3c-11e7-a919-92ebcb67fe33",
       ordered_id: "11e7-3b3c-fb2eb650-a919-92ebcb67fe33",
       realm: "nike",
-      challenge_id: "uuid-v4-challenge-delete",
       type: "pre_challenge"},
     stats_bin_audit_event: %{
       domain: "stats",
@@ -120,7 +119,6 @@ defmodule Service.StatsTest do
       event_id: "fb2eb722-3b3c-11e7-a919-92ebcb67fe33",
       ordered_id: "11e7-3b3c-fb2eb722-a919-92ebcb67fe33",
       realm: "nike",
-      challenge_id: "uuid-v4-challenge",
       type: "bin_audit"},
     stats_pre_actual_event: %{
       domain: "stats",
@@ -134,7 +132,6 @@ defmodule Service.StatsTest do
       event_id: "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33",
       ordered_id: "11e7-3b3c-fb2eb7f4-a919-92ebcb67fe33",
       realm: "nike",
-      challenge_id: "uuid-v4-challenge",
       type: "actuals"},
     stats_refill_actual_event: %{
       domain: "stats",
@@ -148,7 +145,6 @@ defmodule Service.StatsTest do
       event_id: "fb2ebbdc-3b3c-11e7-a919-92ebcb67fe33",
       ordered_id: "11e7-3b3c-fb2ebbdc-a919-92ebcb67fe33",
       realm: "nike",
-      challenge_id: "uuid-v4-challenge",
       type: "actuals"},
     state_after_complete: %{
       "pre" => %{

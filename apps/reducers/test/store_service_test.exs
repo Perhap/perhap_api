@@ -63,7 +63,7 @@ defmodule InitStoreTest do
   end
 
   test "validate function" do
-    assert(Service.Store.validate([%{
+    assert(Service.Store.validate([%Event{
       domain: "store",
       entity_id: "uuid-v4",
       event_id: "uuid-v1-1-0-0",
@@ -78,7 +78,7 @@ defmodule InitStoreTest do
           "subconcept" => "Clearance"},
       realm: "nike",
       type: "add",
-    },%{
+    },%Event{
       domain: "store",
       entity_id: "uuid-v4",
       event_id: "uuid-v1-1-0-0",
@@ -113,7 +113,7 @@ defmodule InitStoreTest do
 
 
   test "event_structure", context do
-    assert(Service.Store.event_structure(%{
+    assert(Service.Store.event_structure(%Event{
       domain: "store",
       entity_id: "uuid-v4",
       event_id: "uuid-v1-1-0-0",
@@ -137,7 +137,7 @@ defmodule InitStoreTest do
   end
 
   test "delete after add", context do
-    assert(Service.Store.call([%{
+    assert(Service.Store.call([%Event{
       domain: "store",
       entity_id: "uuid-v4",
       event_id: "uuid-v1-2-0-0",

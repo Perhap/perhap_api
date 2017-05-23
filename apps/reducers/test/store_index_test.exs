@@ -120,7 +120,7 @@ defmodule Service.StoreIndexTest do
       ])
   end
 
-  test "event_structure", context do
+  test "event_structure" do
     assert(Service.StoreIndex.event_structure(%{
         domain: "store_index",
         entity_id: "uuid-v4",

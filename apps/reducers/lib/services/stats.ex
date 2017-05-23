@@ -50,7 +50,6 @@ defmodule Service.Stats do
         event_id: event.event_id,
         domain: event.domain,
         ordered_id: flip_v1_uuid(event.event_id), #change this to Randy's function
-        challenge_id: event.challenge_id,
         data: event.meta
       }
     {type, data}
@@ -110,7 +109,7 @@ defmodule Service.Stats do
 
 
   def add_meta(event, meta)do
-    Enum.map(event.data["users"], fn ({k, v}) -> {event.challenge_id <> "-" <> k, v} end)
+    Enum.map(event.data["users"], fn ({k, v}) -> {event.data["challenge_id"] <> "-" <> k, v} end)
     |> Enum.into(meta)
   end
 
