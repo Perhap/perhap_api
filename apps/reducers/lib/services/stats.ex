@@ -49,7 +49,7 @@ defmodule Service.Stats do
         entity_id: event.entity_id,
         event_id: event.event_id,
         domain: event.domain,
-        ordered_id: flip_v1_uuid(event.event_id), #change this to Randy's function
+        ordered_id: flip_v1_uuid(event.event_id),
         challenge_id: event.challenge_id,
         data: event.meta
       }
