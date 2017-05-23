@@ -80,7 +80,8 @@ defmodule Service.StoreIndex do
   defp replace_all(event, model) do
     {model
         |> Map.put("last_played", event.ordered_id)
-        |> Map.put("stores", event.data["stores"]),
+        |> Map.put("stores", event.data["stores"])
+        |> Map.put("hashes", event.data["hashes"]),
       []
     }
   end
