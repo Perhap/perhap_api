@@ -1,4 +1,20 @@
 defmodule TransformerService do
+  @behaviour Reducer
+
+  @types [:pre_challenge_transform, :refill_challenge_transform]
+  def types do
+    @types
+  end
+
+  alias DB.Event
+  alias Reducer.State
+
+
+  def correct_type?(event) do
+    Enum.member?([
+      "pre_challenge_transform", "refill_challenge_transform"], event.type)
+  end
+
 
   # API CALL TO STORE INDEX HERE
   def stores do
@@ -12,14 +28,15 @@ defmodule TransformerService do
     stores[store_number]
   end
 
-  def transform_events(events, model)do
-     {:ok, model, Enum.map(events, fn(event)-> transform_event(event) end)}
+  @spec call(list(Event.t), State.t) :: State.t
+  def call(events, model)do
+    Enum.filter(events, fn(event) -> correct_type?(event) end)
+    %State{model: model, new_events: Enum.map(events, fn(event)-> transform_event(event) end)}
   end
 
   def transform_event(event)do
     event
     |> Map.put(:domain, "stats")
-    |> Map.put(:challenge_id, event[:entity_id])
     |> Map.put(:entity_id, get_entity_id(stores(), event.meta["store_id"]) )
   end
 

@@ -2,6 +2,10 @@ defmodule TransformerServiceTest do
   use ExUnit.Case
   doctest TransformerService
 
+
+    alias DB.Event
+
+
   setup_all _context do
     {:ok, [
       stores: %{
@@ -15,7 +19,7 @@ defmodule TransformerServiceTest do
         363 => "d9a3bf8c-23f5-46c9-bb6a-2c7ac7b8932f",
         364 => "cad583e8-cd49-4fd4-a86f-115d7110271b",
       },
-      stats_complete_event: %{
+      stats_complete_event: %Event{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
@@ -24,15 +28,16 @@ defmodule TransformerServiceTest do
           "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
           "challenge_benchmark" => 250,
           "challenge_type" => "equipment",
-          "store_id" => 93242},
+          "store_id" => 93242,
+          "challenge_id" => "uuid-v4-old"},
         event_id: "",
         realm: "nike",
         type: "pre_challenge"},
-      transformed_event: %{
+      transformed_event: %Event{
         domain: "stats",
-        challenge_id: "uuid-v4",
         entity_id: "8222fa94-8e1f-42a7-b1db-b8ad7b535545",
         meta: %{
+          "challenge_id" => "uuid-v4-old",
           "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
           "338904" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
           "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},

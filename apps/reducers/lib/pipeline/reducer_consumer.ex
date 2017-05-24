@@ -10,6 +10,7 @@ defmodule Reducer.Consumer do
 
   def start_link(partition) do
     reducers = Reducer.Loader.load_all()
+    # reducers = [Service.Challenge]
     initial_state = %{partition: partition, reducers: reducers}
     GenStage.start_link(__MODULE__, initial_state)
   end
