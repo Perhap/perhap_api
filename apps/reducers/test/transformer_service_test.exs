@@ -1,6 +1,6 @@
-defmodule TransformerServiceTest do
+defmodule ServiceTransformerTest do
   use ExUnit.Case
-  doctest TransformerService
+  doctest Service.Transformer
 
 
     alias DB.Event
@@ -51,10 +51,10 @@ defmodule TransformerServiceTest do
     end
 
   test "gets uuid from fake api", context do
-    assert(TransformerService.get_entity_id(context[:stores], 360)== "d68e938f-c597-4ada-9f7a-5bcad3dbbaaf")
+    assert(Service.Transformer.get_entity_id(context[:stores], 360)== "d68e938f-c597-4ada-9f7a-5bcad3dbbaaf")
   end
 
   test "transformer", context do
-    assert(TransformerService.transform_event(context[:stats_complete_event])== context[:transformed_event])
+    assert(Service.Transformer.transform_event(context[:stats_complete_event])== context[:transformed_event])
   end
 end

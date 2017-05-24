@@ -1,4 +1,4 @@
-defmodule TransformerService do
+defmodule Service.Transformer do
   @behaviour Reducer
 
   @types [:pre_challenge_transform, :refill_challenge_transform]
