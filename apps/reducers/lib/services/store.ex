@@ -79,7 +79,7 @@ defmodule Service.Store do
   end
 
   def add_store(event, model) do
-    new_store =
+    _new_store =
       %{"name" => event.data["display_name"],
         "number" => event.data["store_number"],
         "district" => event.data["district"],

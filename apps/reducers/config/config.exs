@@ -16,6 +16,28 @@ config :kafka_ex,
     keyfile: System.cwd <> "/ssl/key.pem"
   ]
 
+config :quantum,
+global?: true
+
+config :quantum, :reducers,
+  cron: [
+    # Every hour
+    "*/60 * * * *": {Service.Cron, :bin_audit_event},
+    "*/60 * * * *": {Service.Cron, :actuals_event},
+    "* * * * *": {Service.Cron, :test}
+  ]
+
+
+config :cron_service, :domo_creds,
+  client_secret: "secret to be filled in",
+  client_id: "id to be filled in",
+  bin_audit_dataset: "39367e6a-fb49-4e98-8547-2645eb58140d",
+  actuals_dataset: "cd0192e1-078f-49b4-9116-6a7f36c4b6e2",
+  out_going_domain: "stats",
+  bin_audit_type: "bin_audit",
+  actuals_type: "actuals"
+
+
 config :reducers,
   current_season: Season1,
   current_periods: Season1periods

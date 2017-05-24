@@ -16,8 +16,8 @@ config :logger,
 config :logger, :access_log,
   path: System.cwd <> "/log/access.log",
   metadata: [:function, :module],
-  level: :info,
-  metadata_filter: [perhap_only: 1]
+  level: :debug
+  # metadata_filter: [perhap_only: 1]
 
 config :logger, :error_log,
   path: System.cwd <> "/log/error.log",

@@ -180,10 +180,10 @@ defmodule Service.Challenge do
 
   def stats_type(challenge_type)do
     case challenge_type do
-      "equipment" -> "pre_challenge"
-      "apparel" -> "pre_challenge"
-      "footwear" -> "pre_challenge"
-      "product_refill" -> "refill_challenge"
+      "equipment" -> "pre_challenge_transform"
+      "apparel" -> "pre_challenge_transform"
+      "footwear" -> "pre_challenge_transform"
+      "product_refill" -> "refill_challenge_transform"
       _ -> :reject
     end
   end

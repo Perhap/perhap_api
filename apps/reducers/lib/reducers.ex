@@ -7,7 +7,8 @@ defmodule Reducers do
     partitions = Application.get_env(:reducers, :partitions)
 
     children = [
-      worker(EventCoordinator, [partitions: partitions])
+      worker(EventCoordinator, [partitions: partitions]),
+      worker(Perhap.Scheduler, [])
     ]
     children = children ++ Enum.map(0..partitions-1, &worker(Reducer.Consumer, [&1], [id: &1]))
 
