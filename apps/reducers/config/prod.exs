@@ -1,4 +1,4 @@
 use Mix.Config
 
 config :reducers,
-  consumers: 10
+  partitions: 8

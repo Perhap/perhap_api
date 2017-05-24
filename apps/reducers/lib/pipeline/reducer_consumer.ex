@@ -8,13 +8,14 @@ defmodule Reducer.Consumer do
 
   require Logger
 
-  def start_link() do
-    GenStage.start_link(__MODULE__, :ok)
+  def start_link(partition) do
+    reducers = Reducer.Loader.load_all()
+    initial_state = %{partition: partition, reducers: reducers}
+    GenStage.start_link(__MODULE__, initial_state)
   end
 
-  def init(_) do
-    reducers = Reducer.Loader.load_all()
-    {:consumer, [reducers: reducers], subscribe_to: [EventDispatcher]}
+  def init(initial_state = %{partition: partition, reducers: reducers}) do
+    {:consumer, [reducers: reducers], subscribe_to: [{EventCoordinator, partition: partition}]}
   end
 
   # time to reticulate splines
@@ -75,7 +76,7 @@ defmodule Reducer.Consumer do
     Enum.each(events, fn(event) ->
       case Event.save(event) do
         %Event{} = event ->
-          EventDispatcher.async_notify(event)
+          EventCoordinator.async_notify(event)
           :ok
         _ ->
           :error

@@ -1,10 +1,12 @@
-defmodule EventDispatcher do
+defmodule EventCoordinator do
   use GenStage
+
+  alias DB.Event
 
   @max_buffer_size 10
 
-  def start_link() do
-    GenStage.start_link(__MODULE__, :ok, name: __MODULE__)
+  def start_link(state) do
+    GenStage.start_link(__MODULE__, state, name: __MODULE__)
   end
 
   def sync_notify(event, timeout \\ 5000) do
@@ -15,13 +17,20 @@ defmodule EventDispatcher do
     GenStage.cast(__MODULE__, {:notify, event})
   end
 
-  def init(:ok) do
+  def init({:partitions, partitions}) do
     {
       :producer,
       %{queue: :queue.new, demand: 0, count: 0},
-      dispatcher: GenStage.DemandDispatcher,
+      dispatcher: {GenStage.PartitionDispatcher,
+        partitions: 0..partitions-1,
+        hash: &partition_by_event/1},
       buffer_size: @max_buffer_size
     }
+  end
+
+  def partition_by_event(%Event{domain: domain, entity_id: entity_id} = event) do
+    partitions = Application.get_env(:reducers, :partitions)
+    {event, :erlang.phash2({domain, entity_id}, partitions)}
   end
 
   def handle_call({:notify, event}, from, state) do
