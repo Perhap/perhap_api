@@ -58,7 +58,7 @@ defmodule ServiceChallengeTest do
           "users" => ["338897", "338998", "338904"]}
         }
       },
-      stats_complete_event: %DB.Event{
+      stats_complete_event: %{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
@@ -72,9 +72,10 @@ defmodule ServiceChallengeTest do
           "challenge_type" => "equipment",
           "store_id" => 93242},
         event_id: "",
+        remote_ip: "127.0.0.1",
         realm: "nike",
         type: "pre_challenge_transform"},
-      stats_complete_event_partial: %DB.Event{
+      stats_complete_event_partial: %{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
@@ -88,9 +89,10 @@ defmodule ServiceChallengeTest do
           "challenge_type" => "equipment",
           "store_id" => 93242},
         event_id: "",
+        remote_ip: "127.0.0.1",
         realm: "nike",
         type: "pre_challenge_transform"},
-      stats_edit_event: %DB.Event{
+      stats_edit_event: %{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
@@ -105,8 +107,9 @@ defmodule ServiceChallengeTest do
           "store_id" => 93242},
         event_id: "",
         realm: "nike",
+        remote_ip: "127.0.0.1",
         type: "pre_challenge_transform"},
-      stats_delete_event: %DB.Event{
+      stats_delete_event: %{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
@@ -121,6 +124,7 @@ defmodule ServiceChallengeTest do
           "store_id" => 93242},
         event_id: "",
         realm: "nike",
+        remote_ip: "127.0.0.1",
         type: "pre_challenge_transform"},
 
       state_after_start: %{
