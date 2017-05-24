@@ -190,12 +190,14 @@ defmodule Service.Challenge do
 
   def create_stats_event(:reject, _, new_events), do: new_events
   def create_stats_event(type, model, new_events) do
+    meta = Map.drop(model, ["last_played", "domain", "entity_id"])
+    |> Map.put("challenge_id", model["entity_id"])
     [%Event{
       type: type,
       domain: "transformer",
       realm: "nike",
       entity_id: model["entity_id"],
-      meta: Map.drop(model, ["last_played", "domain", "entity_id"]),
+      meta: meta,
       event_id: gen_uuidv1()
     } | new_events]
   end

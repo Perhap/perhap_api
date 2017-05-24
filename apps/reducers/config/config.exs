@@ -28,7 +28,7 @@ config :quantum, :reducers,
   ]
 
 
-config :cron_service, :domo_creds,
+config :reducers, :domo_creds,
   client_secret: "secret to be filled in",
   client_id: "id to be filled in",
   bin_audit_dataset: "39367e6a-fb49-4e98-8547-2645eb58140d",

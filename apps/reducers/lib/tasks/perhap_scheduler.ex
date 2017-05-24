@@ -1,4 +1,4 @@
-defmodule Perhap.Scheduler do
-  use Quantum.Scheduler,
-    otp_app: :reducers
-end
+# defmodule Perhap.Scheduler do
+#   use Quantum.Scheduler,
+#     otp_app: :reducers
+# end

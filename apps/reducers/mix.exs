@@ -28,7 +28,8 @@ defmodule Reducer.Mixfile do
       {:poison, "~> 3.1"},
       {:kafka_ex, "~> 0.6.5"},
       {:quantum, ">= 1.9.2"},
-      {:httpoison, "~> 0.11.1"}
+      {:httpoison, "~> 0.11.1"},
+      {:csv, "~> 1.4.2"},
     ]
   end
 end

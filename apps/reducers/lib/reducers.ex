@@ -5,8 +5,8 @@ defmodule Reducers do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(EventDispatcher, []),
-      worker(Perhap.Scheduler, [])
+      worker(EventDispatcher, [])
+      # worker(Perhap.Scheduler, [])
     ]
     max_consumers = Application.get_env(:reducers, :consumers)
     children = children ++ Enum.map(1..max_consumers, &worker(Reducer.Consumer, [], [id: &1]))
