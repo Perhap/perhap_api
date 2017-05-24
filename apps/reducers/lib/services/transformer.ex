@@ -28,10 +28,15 @@ defmodule Service.Transformer do
     stores[store_number]
   end
 
+  # @spec call(list(Event.t), State.t) :: State.t
+  # def call(events, model)do
+  #   Enum.filter(events, fn(event) -> correct_type?(event) end)
+  #   %State{model: model, new_events: Enum.map(events, fn(event)-> transform_event(event) end)}
+  # end
+
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, model)do
-    Enum.filter(events, fn(event) -> correct_type?(event) end)
-    %State{model: model, new_events: Enum.map(events, fn(event)-> transform_event(event) end)}
+    model
   end
 
   def transform_event(event)do
