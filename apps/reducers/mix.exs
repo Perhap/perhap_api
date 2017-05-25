@@ -16,6 +16,8 @@ defmodule Reducer.Mixfile do
 
   def application do
     [applications: [
+      :quantum,
+      :timex,
       :logger],
       mod: {Reducers, []}
     ]
@@ -25,7 +27,7 @@ defmodule Reducer.Mixfile do
     [
       {:db, in_umbrella: true},
       {:poison, "~> 3.1"},
-      {:quantum, ">= 1.9.2"},
+      {:quantum, github: "c-rack/quantum-elixir"},
       {:httpoison, "~> 0.11.1"},
       {:csv, "~> 1.4.2"},
     ]
