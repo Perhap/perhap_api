@@ -12,7 +12,7 @@ defmodule Mix.Tasks.InitStores do
       HTTPoison.get!(perhap_base_url <> "/v1/model/" <>
         "store_index/100077bd-5b34-41ac-b37b-62adbf86c1a5")
 
-    makeIdMaps(data["stores"], data["hashes"])
+    makeIdMaps(data["stores"] || %{}, data["hashes"] || %{})
   end
 
   defp sendEvent(%{url: url, data: data}) do
@@ -61,7 +61,7 @@ defmodule Mix.Tasks.InitStores do
   def hashParse(row_string) do
     [[storenum, associated_storenum, name, concept, subconcept, terr, distnum, distname] | _] =
       CSV.decode([row_string]) |> Enum.to_list
-    %{storenum: String.to_integer(storenum),
+    %{storenum: storenum,
       id_storenum:
         if associated_storenum == "" do nil
           else String.to_integer(associated_storenum)
@@ -128,7 +128,7 @@ defmodule Mix.Tasks.InitStores do
           "/add/" <> gen_uuidv1(),
       data:
       %{display_name: row_data.name,
-        store_number: row_data.id_storenum,
+        store_number: String.to_integer(row_data.storenum),
         territory: row_data.terr,
         district: row_data.distname,
         district_id: row_data.distnum,
