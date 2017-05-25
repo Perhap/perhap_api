@@ -9,8 +9,9 @@ defmodule Reducer.Consumer do
   require Logger
 
   def start_link(partition) do
-    reducers = Reducer.Loader.load_all()
-    # reducers = [Service.Challenge]
+    # reducers = Reducer.Loader.load_all()
+    # reducers = [Service.Transformer, Service.StoreIndex, Service.Store, Service.Stats, Service.PerhapStats, Service.PerhapLog, Service.Domo, Service.Challenge]
+    reducers = [Service.Stats, Service.PerhapStats, Service.PerhapLog, Service.Challenge]
     initial_state = %{partition: partition, reducers: reducers}
     GenStage.start_link(__MODULE__, initial_state)
   end

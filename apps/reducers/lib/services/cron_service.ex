@@ -1,8 +1,5 @@
 defmodule Service.Cron do
-
-  def gen_uuidv1()do
-    UUID.uuid1()
-  end
+  import Reducer.Utils, only: [gen_uuidv1: 0]
 
   def bin_audit_event() do
     env = Application.get_env(:reducers, :domo_creds)

@@ -1,6 +1,8 @@
 defmodule Mix.Tasks.InitStores do
   use Mix.Task
 
+  import Reducer.Utils, only: [gen_uuidv1: 0, gen_uuidv4: 0]
+
   defp getLastHashes() do
     #API call to get last hash set
 
@@ -95,10 +97,10 @@ defmodule Mix.Tasks.InitStores do
       case old_maps[row_data.storenum] do
         nil ->
             %{type: :new,
-              entity_id: UUID.uuid4()}
+              entity_id: gen_uuidv4()}
         %{hash: _, entity_id: nil} ->
             %{type: :new,
-              entity_id: UUID.uuid4()}
+              entity_id: gen_uuidv4()}
         %{hash: ^current_hash, entity_id: uuid} ->
             %{type: :skip,
               entity_id: uuid}
@@ -113,14 +115,14 @@ defmodule Mix.Tasks.InitStores do
   defp genDeleteStoreEvent(entity_id) do
     %{ url: "event/v1/nike/store/" <>
            "100077bd-5b34-41ac-b37b-62adbf86c1a5" <>
-           "/delete/" <> UUID.uuid1(),
+           "/delete/" <> gen_uuidv1(),
         data: %{entity_id: entity_id}
      }
   end
 
   defp genAddStoreEvent(entity_id, row_data) do
     %{url: "event/v1/nike/store/" <> entity_id <>
-          "/add/" <> UUID.uuid1(),
+          "/add/" <> gen_uuidv1(),
       data:
       %{display_name: row_data.name,
         store_number: row_data.id_storenum,
@@ -136,7 +138,7 @@ defmodule Mix.Tasks.InitStores do
   defp genStoreIndexEvent(index_map, hash_map) do
      %{ url: "event/v1/nike/store_index/" <>
          "100077bd-5b34-41ac-b37b-62adbf86c1a5" <>
-         "/replace/" <> UUID.uuid1(),
+         "/replace/" <> gen_uuidv1(),
         data: %{stores: index_map, hashes: hash_map}
       }
   end
