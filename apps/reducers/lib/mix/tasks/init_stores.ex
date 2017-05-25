@@ -7,17 +7,18 @@ defmodule Mix.Tasks.InitStores do
 
   defp getLastHashes() do
     #API call to get last hash set
-
+    perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
     %HTTPoison.Response{status_code: 200, body: data} =
-      HTTPoison.get!("https://perhap.bigsquidapp.com/v1/model/" <>
+      HTTPoison.get!(perhap_base_url <> "/v1/model/" <>
         "store_index/100077bd-5b34-41ac-b37b-62adbf86c1a5")
 
     makeIdMaps(data["stores"], data["hashes"])
   end
 
   defp sendEvent(%{url: url, data: data}) do
+    perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
     %HTTPoison.Response{status_code: 204} =
-      HTTPoison.post "https://perhap.bigsquidapp.com/v1/" <> url,
+      HTTPoison.post perhap_base_url <> "/v1/" <> url,
         Poison.encode(%{body: data}),
         [{"Content-Type", "application/json"}]
   end
