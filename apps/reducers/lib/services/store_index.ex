@@ -9,6 +9,8 @@ defmodule Service.StoreIndex do
   alias DB.Event
   alias Reducer.State
 
+  require Logger
+
   import DB.Validation, only: [flip_v1_uuid: 1]
 
   @spec call(list(Event.t), State.t) :: State.t

@@ -15,7 +15,7 @@ config :quantum, :reducers,
 
 config :reducers,
   # services: :all,
-  services: [Service.Stats, Service.PerhapStats, Service.PerhapLog, Service.Challenge],
+  services: [Service.Stats, Service.PerhapStats, Service.PerhapLog, Service.Challenge, Service.StoreIndex],
   current_season: Season1,
   current_periods: Season1periods
 

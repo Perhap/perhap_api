@@ -1,6 +1,8 @@
 defmodule Service.Cron do
   import Reducer.Utils, only: [gen_uuidv1: 0]
 
+    alias DB.Event
+
   def bin_audit_event() do
     env = Application.get_env(:reducers, :domo_creds)
     entity_id = "ea43de77-366f-4758-a8cc-f27bf9f622b9"

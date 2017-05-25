@@ -192,7 +192,7 @@ defmodule Service.Challenge do
   def create_stats_event(type, model, new_events) do
     meta = Map.drop(model, ["last_played", "domain", "entity_id"])
     |> Map.put("challenge_id", model["entity_id"])
-    [%{
+    [%Event{
       type: type,
       domain: "transformer",
       realm: "nike",

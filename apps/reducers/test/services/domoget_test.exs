@@ -2,7 +2,7 @@ defmodule ServiceDomoTest do
   use ExUnit.Case
   doctest Service.Domo
 
-
+  alias DB.Event
 
   def strip(event)do
      Map.put(event, :event_id, "")
@@ -19,8 +19,8 @@ defmodule ServiceDomoTest do
     type = "bin_audits"
     body = "STORE,DATE,NO_OF_AUDITS_PERFORMED,PASSED_BIN_COUNT,BIN_COUNT_TOTAL,BIN_PERCENTAGE,_BATCH_ID_,_BATCH_LAST_RUN_\n\"3\",\"12/30/2016\",\"1\",\"20\",\"20\",\"100\",\"1\",\"2017-01-18T22:21:04\"\n\"8\",\"12/30/2016\",\"1\",\"13\",\"20\",\"65\",\"1\",\"2017-01-18T22:21:04\"\n"
     expected = {[
-      %{domain: "stats", event_id: "", realm: "nike", type: "bin_audits", entity_id: "8", meta: %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "65", "DATE" => "12/30/2016", "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "13", "STORE" => "8", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04"}},
-      %{domain: "stats", event_id: "", realm: "nike", type: "bin_audits", entity_id: "3", meta: %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "100", "DATE" => "12/30/2016", "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "20", "STORE" => "3", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04"}}
+      %Event{domain: "stats", remote_ip: "127.0.0.1", event_id: "", realm: "nike", type: "bin_audits", entity_id: "8", meta: %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "65", "DATE" => "12/30/2016", "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "13", "STORE" => "8", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04"}},
+      %Event{domain: "stats", remote_ip: "127.0.0.1", event_id: "", realm: "nike", type: "bin_audits", entity_id: "3", meta: %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "100", "DATE" => "12/30/2016", "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "20", "STORE" => "3", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04"}}
       ],
       "STORE,DATE,NO_OF_AUDITS_PERFORMED,PASSED_BIN_COUNT,BIN_COUNT_TOTAL,BIN_PERCENTAGE,_BATCH_ID_,_BATCH_LAST_RUN_",
       "bin_audits",
@@ -38,7 +38,7 @@ defmodule ServiceDomoTest do
                                                           lines: ["w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []}}
     type = "actuals"
     body = "\"Store\",2,3,4\na,b,c,d\nd,c,b,a\nw,x,y,z\nz,y,x,w"
-    expected = {[%{domain: "stats", entity_id: "z", event_id: "",
+    expected = {[%Event{domain: "stats", entity_id: "z", event_id: "", remote_ip: "127.0.0.1",
                meta: %{"Store" => "z", "2" => "y", "3" => "x", "4" => "w"},
                realm: "nike", type: "actuals"}],
               "\"Store\",2,3,4",

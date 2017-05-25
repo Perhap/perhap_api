@@ -14,7 +14,6 @@ defmodule Service.Domo do
     @types
   end
 
-
   def correct_type?(event) do
     Enum.member?([
       "pull"], event.type)
@@ -112,11 +111,12 @@ defmodule Service.Domo do
   def make_event(col_heads, type, row) do
     [store | _t] = String.split(row, ",", parts: 2)
     meta = build_meta_map(col_heads, row)
-    event = %{domain: "stats",
+    event = %Event{domain: "stats",
                       meta: meta,
                       entity_id: get_entity_id(meta["STORE"] || meta["Store"]),
                       event_id: gen_event_id(),
                       realm: "nike",
+                      remote_ip: "127.0.0.1",
                       type: type}
     event
   end

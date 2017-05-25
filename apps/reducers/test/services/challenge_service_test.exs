@@ -2,6 +2,8 @@ defmodule ServiceChallengeTest do
   use ExUnit.Case
   doctest Service.Challenge
 
+  alias DB.Event
+
   setup_all _context do
     {:ok, [
       start_event: {:start, %{
@@ -58,7 +60,7 @@ defmodule ServiceChallengeTest do
           "users" => ["338897", "338998", "338904"]}
         }
       },
-      stats_complete_event: %{
+      stats_complete_event: %Event{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
@@ -75,7 +77,7 @@ defmodule ServiceChallengeTest do
         remote_ip: "127.0.0.1",
         realm: "nike",
         type: "pre_challenge_transform"},
-      stats_complete_event_partial: %{
+      stats_complete_event_partial: %Event{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
@@ -92,7 +94,7 @@ defmodule ServiceChallengeTest do
         remote_ip: "127.0.0.1",
         realm: "nike",
         type: "pre_challenge_transform"},
-      stats_edit_event: %{
+      stats_edit_event: %Event{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
@@ -109,7 +111,7 @@ defmodule ServiceChallengeTest do
         realm: "nike",
         remote_ip: "127.0.0.1",
         type: "pre_challenge_transform"},
-      stats_delete_event: %{
+      stats_delete_event: %Event{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
