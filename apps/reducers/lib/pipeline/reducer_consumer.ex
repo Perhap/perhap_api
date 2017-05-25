@@ -9,14 +9,19 @@ defmodule Reducer.Consumer do
   require Logger
 
   def start_link(partition) do
-    # reducers = Reducer.Loader.load_all()
-    # reducers = [Service.Transformer, Service.StoreIndex, Service.Store, Service.Stats, Service.PerhapStats, Service.PerhapLog, Service.Domo, Service.Challenge]
-    reducers = [Service.Stats, Service.PerhapStats, Service.PerhapLog, Service.Challenge]
+    reducers = case Application.get_env(:reducers, :services) do
+      :all ->
+        Reducer.Loader.load_all()
+      reducers when is_list(reducers) ->
+        reducers
+      _ ->
+        []
+    end
     initial_state = %{partition: partition, reducers: reducers}
     GenStage.start_link(__MODULE__, initial_state)
   end
 
-  def init(initial_state = %{partition: partition, reducers: reducers}) do
+  def init(%{partition: partition, reducers: reducers}) do
     {:consumer, [reducers: reducers], subscribe_to: [{EventCoordinator, partition: partition}]}
   end
 
@@ -26,7 +31,7 @@ defmodule Reducer.Consumer do
 
     all_context = RS.reducer_context(events)
     run_results = Enum.map(all_context, fn({reducer_context, reducer_events}) ->
-      reducer_states = Enum.reduce(all_reducers, Map.new(), fn(reducer, acc) ->
+      _reducer_states = Enum.reduce(all_reducers, Map.new(), fn(reducer, acc) ->
         [_|rest] = String.split(Atom.to_string(reducer), ".")
         reducer_name = rest |> Enum.map(&String.downcase(&1)) |> Enum.join(".")
         reducer_state_key = reducer_context <> unit_separator() <> reducer_name
@@ -66,10 +71,10 @@ defmodule Reducer.Consumer do
   end
 
   # there isn't really anything to do with these yet
-  def handle_info({:DOWN, ref, :process, _pid, _reason}, state) do
+  def handle_info({:DOWN, _ref, :process, _pid, _reason}, state) do
     {:noreply, [], state}
   end
-  def handle_info(ref, state) do
+  def handle_info(_ref, state) do
     {:noreply, [], state}
   end
 
