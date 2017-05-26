@@ -453,4 +453,13 @@ test "out of season event", context do
     }, new_events: []})
 end
 
+test "get_period_model out of season" do
+  assert(Service.Stats.get_period_model("out_of_season", %{})== "out_of_season")
+end
+
+
+test " get new model", context do
+  assert(Service.Stats.get_new_model({:pre_challenge, context[:out_of_season]}, {"out_of_season", []}, %{}, "out_of_season") == {%{}, []})
+
+end
 end

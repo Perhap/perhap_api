@@ -89,13 +89,13 @@ defmodule Service.Stats do
     to_string(period)
   end
 
+  def get_period_model(period, model) when period == "out_of_season" do
+    "out_of_season"
+  end
+
   def get_period_model(_period, model) when map_size(model) == 0 do
     model = %{}
     model
-  end
-
-  def get_period_model(period, model) when period == "out_of_season" do
-    "out_of_season"
   end
 
   def get_period_model(period, model) do
@@ -112,9 +112,10 @@ defmodule Service.Stats do
     get_new_model({type, event}, {period_model, new_events}, model, period)
   end
 
-  def get_new_model({type, event}, {period_model, new_events}, model, period) when period_model == "out_of_season" do
+  def get_new_model({type, event}, {period_model, new_events}, model, period) when period == "out_of_season" do
     {model, new_events}
   end
+
   def get_new_model({type, event}, {period_model, new_events}, model, period) do
     {new_period_model, additional_events} = apply(Service.Stats, type, [{type, event}, {period_model, new_events}])
     {model
