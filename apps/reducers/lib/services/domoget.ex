@@ -140,7 +140,12 @@ defmodule Service.Domo do
     store = to_string(store_id)
     perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
     url = perhap_base_url <> "/v1/model/storeindex/100077bd-5b34-41ac-b37b-62adbf86c1a5"
-    {:ok, response} = HTTPoison.get(url)
+    {:ok, response} = case Mix.env do
+      :test ->
+        HTTPoison.get(url, [], hackney: [:insecure])
+      _ ->
+        HTTPoison.get(url)
+    end
     {:ok, body} = Poison.decode(response.body)
     body["stores"][store]
     response

@@ -30,6 +30,7 @@ defmodule Reducer.Mixfile do
       {:quantum, github: "c-rack/quantum-elixir"},
       {:httpoison, "~> 0.11.1"},
       {:csv, "~> 1.4.2"},
+      {:poolboy, github: "devinus/poolboy"}
     ]
   end
 end
