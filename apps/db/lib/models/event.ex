@@ -90,6 +90,7 @@ defmodule DB.Event do
     case result do
       nil -> :not_found
       :error -> :error
+      {:error, :nil_object} -> :not_found
       _ -> result
     end
   end
