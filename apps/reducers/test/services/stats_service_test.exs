@@ -430,7 +430,7 @@ test " get timestamp and find period", context do
 end
 
 test "out of season event", context do
-  assert(Service.Stats.call([context[:unformated_complete], context[:unformated_pre_actuals], context[:out_of_season_event]], %State{model: %{
+  assert(Service.Stats.call([context[:unformated_complete], context[:unformated_pre_actuals], context[:out_of_season_event]], %State{model: %{}, new_events: []})== %State{model: %{
     "last_played" => "11e7-3b3c-fb2eb7f4-a919-92ebcb67fe33",
     "season" => Season1,
     "stats" => %{
@@ -450,7 +450,7 @@ test "out of season event", context do
           }
         }
       }
-    }, new_events: []}))
+    }, new_events: []})
 end
 
 end
