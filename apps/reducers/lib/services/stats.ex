@@ -72,8 +72,12 @@ defmodule Service.Stats do
     elem(max, 1)["start_time"]
   end
 
+  def date(datestring) when datestring == "" do
+    1494287000000 #this date will be before season1 starts, so it won't get played
+  end
+
   def date(datestring) do
-    [year, month, day] = String.split(datestring, "-")
+    [month, day, year] = String.split(datestring, "/")
     seconds = Timex.to_datetime({{String.to_integer(year), String.to_integer(month), String.to_integer(day)}, {16, 0, 0}})
     |> Timex.to_unix()
     seconds * 1000
@@ -81,7 +85,7 @@ defmodule Service.Stats do
 
   def find_period(timestamp, season_periods) do
     {period, _data} = Application.get_env(:reducers, season_periods)
-    |>  Enum.find(fn {_period, %{:start_time => start_time, :end_time => end_time}} -> timestamp >= start_time and timestamp <= end_time end)
+    |>  Enum.find({:out_of_season, "data"}, fn {_period, %{:start_time => start_time, :end_time => end_time}} -> timestamp >= start_time and timestamp <= end_time end)
     to_string(period)
   end
 
@@ -90,15 +94,28 @@ defmodule Service.Stats do
     model
   end
 
+  def get_period_model(period, model) when period == "out_of_season" do
+    :out_of_season
+  end
+
   def get_period_model(period, model) do
     model["stats"][period] || %{}
   end
+
+
 
   def play({type, event}, {model, new_events}) do
     period = get_timestamp({type, event})
     |> find_period(Application.get_env(:reducers, :current_periods))
     period_model = get_period_model(period, model)
 
+    get_new_model({type, event}, {period_model, new_events}, model, period)
+  end
+
+  def get_new_model({type, event}, {:out_of_season, new_events}, model, period) do
+    {model, new_events}
+  end
+  def get_new_model({type, event}, {period_model, new_events}, model, period) do
     {new_period_model, additional_events} = apply(Service.Stats, type, [{type, event}, {period_model, new_events}])
     {model
     |> Map.put("stats", model["stats"] || %{})

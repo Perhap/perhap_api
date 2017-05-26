@@ -26,7 +26,7 @@ defmodule Service.StatsTest do
       domain: "stats",
       entity_id: "uuid-v4",
       meta: %{
-        "Metrics" => "2017-05-10",
+        "Metrics" => "05/10/2017",
         "Metrics2" => "Actual Receipts",
         "C5_Store" => 93242,
         "Count"=> 1968},
@@ -104,7 +104,7 @@ defmodule Service.StatsTest do
       entity_id: "uuid-v4",
       data: %{
         "STORE" => 51,
-        "DATE" => "2017-05-09",
+        "DATE" => "05/09/2017",
         "NO_OF_AUDITS_PERFORMED" => 1,
         "PASSED_BIN_COUNT" => 16,
         "BIN_COUNT_TOTAL" => 20,
@@ -125,7 +125,7 @@ defmodule Service.StatsTest do
       entity_id: "uuid-v4",
       data: %{
         "timestamp" => 1493769600000,
-        "Metrics" => "2017-05-10",
+        "Metrics" => "05/10/2017",
         "Metrics2" => "Actual Receipts",
         "C5_Store" => 93242,
         "Count"=> 1968},
@@ -138,7 +138,7 @@ defmodule Service.StatsTest do
       entity_id: "uuid-v4",
       data: %{
         "timestamp" => 1493769600000,
-        "Metrics" => "2017-05-14",
+        "Metrics" => "05/14/2017",
         "Metrics2" => "Actual Units Sold",
         "C5_Store" => 93242,
         "Count"=> 1968},
@@ -251,7 +251,32 @@ defmodule Service.StatsTest do
             },
 
 
-          }
+          },
+
+          event_from_perhap:   {:pre_challenge, %{domain: "stats", entity_id: "f11f119c-fc2e-4638-a3d5-2c36337c971b", event_id: "4a24fd18-4237-11e7-9382-17570000028a", kv: "dev_events/4a24fd18-4237-11e7-9382-17570000028a", kv_time: "",
+            data: %{"challenge_benchmark" => 250, "challenge_id" => "d50c1de9-c34a-4bcc-ae94-85e704e727f1",
+            "challenge_type" => "equipment", "store_id" => 93242,
+            "users" => %{"338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
+            "percentage" => 0.72, "start_time" => 1492712720633, "status" => "completed",
+            "uph" => 180.0}, "338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
+             "percentage" => 0.72, "start_time" => 1492712720633, "status" => "completed",
+             "uph" => 180.0}, "338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
+              "percentage" => 0.72, "start_time" => 1492712720633, "status" => "completed",
+               "uph" => 180.0}}}, realm: "nike", remote_ip: "127.0.0.1", type: "pre_challenge"}},
+       out_of_season_event: %Event{domain: "stats", entity_id: "f11f119c-fc2e-4638-a3d5-2c36337c971b", event_id: "4a24fd18-4237-11e7-9382-17570000028a", kv: "dev_events/4a24fd18-4237-11e7-9382-17570000028a", kv_time: "",
+           meta: %{"challenge_benchmark" => 250, "challenge_id" => "d50c1de9-c34a-4bcc-ae94-85e704e727f1",
+           "challenge_type" => "equipment", "store_id" => 93242,
+           "users" => %{"338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
+           "percentage" => 0.72, "start_time" => 1492712720633, "status" => "completed",
+           "uph" => 180.0}, "338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
+            "percentage" => 0.72, "start_time" => 1492712720633, "status" => "completed",
+            "uph" => 180.0}, "338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
+             "percentage" => 0.72, "start_time" => 1492712720633, "status" => "completed",
+              "uph" => 180.0}}}, realm: "nike", remote_ip: "127.0.0.1", type: "pre_challenge"}
+
+
+
+
         ]}
     end
 
@@ -326,7 +351,7 @@ end
   end
 
   test "date" do
-    assert(Service.Stats.date("2017-5-30") == 1496160000000)
+    assert(Service.Stats.date("5/30/2017") == 1496160000000)
   end
 
   test "get_timestamp", context do
@@ -346,7 +371,7 @@ end
   end
 
   test "find_period" do
-    assert(Service.Stats.find_period(1497855700000, Season1periods)== "season1week5")
+    assert(Service.Stats.find_period(1497855700000, Season1periods)== "season1week3")
   end
 
   test "get_period_model" do
@@ -398,5 +423,34 @@ end
       }, new_events: []})
   end
 
+
+test " get timestamp and find period", context do
+  assert(Service.Stats.get_timestamp(context[:event_from_perhap])
+  |> Service.Stats.find_period(Application.get_env(:reducers, :current_periods))== "out_of_season")
+end
+
+test "out of season event", context do
+  assert(Service.Stats.call([context[:unformated_complete], context[:unformated_pre_actuals], context[:out_of_season_event]], %State{model: %{
+    "last_played" => "11e7-3b3c-fb2eb7f4-a919-92ebcb67fe33",
+    "season" => Season1,
+    "stats" => %{
+      "season1preseason" => %{
+        "pre" => %{
+          "accuracy_percentage" => 0.007621951219512195,
+          "accuracy_score" => 0, "actual_units" => 1968,
+          "actuals_meta" => %{
+            "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968},
+          "pre_meta" => %{
+            "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1495279607000, "status" => "completed", "uph" => 180.0},
+            "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1495279607000, "status" => "completed", "uph" => 180.0},
+            "uuid-v4-challenge-complete-338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1495279607000, "status" => "completed", "uph" => 180.0}},
+          "pre_percentage" => 0.7200000000000001,
+          "pre_score" => 0,
+          "pre_units" => 15.0
+          }
+        }
+      }
+    }, new_events: []}))
+end
 
 end

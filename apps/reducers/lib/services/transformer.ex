@@ -46,9 +46,17 @@ defmodule Service.Transformer do
   end
 
 
-  def transform_event(event, {model, new_events})do
+  def transform_event(%Event{type: "pre_challenge_transform"} = event, {model, new_events})  do
     {model, [event
     |> Map.put(:domain, "stats")
+    |> Map.put(:type, "pre_challenge")
+    |> Map.put(:entity_id, get_entity_id(stores(), event.meta["store_id"])) | new_events]}
+  end
+
+  def transform_event(%Event{type: "refill_challenge_transform"} = event, {model, new_events}) do
+    {model, [event
+    |> Map.put(:domain, "stats")
+      |> Map.put(:type, "refill_challenge")
     |> Map.put(:entity_id, get_entity_id(stores(), event.meta["store_id"])) | new_events]}
   end
 

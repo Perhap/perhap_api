@@ -32,7 +32,7 @@ defmodule ServiceTransformerTest do
           "challenge_id" => "uuid-v4-old"},
         event_id: "",
         realm: "nike",
-        type: "pre_challenge"},
+        type: "pre_challenge_transform"},
       transformed_event: %Event{
         domain: "stats",
         entity_id: "8222fa94-8e1f-42a7-b1db-b8ad7b535545",
