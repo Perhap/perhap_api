@@ -116,6 +116,11 @@ defmodule DB.Event do
     end
   end
 
+  @spec bucket() :: String.t
+  def bucket() do
+    namespace(@bucket)
+  end
+
   defp namespace_index(:bucket) do
     namespace(@bucket) <> Common.unit_separator <> "index"
   end
