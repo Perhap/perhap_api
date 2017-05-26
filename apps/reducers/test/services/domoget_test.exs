@@ -19,38 +19,39 @@ defmodule ServiceDomoTest do
     type = "bin_audits"
     body = "STORE,DATE,NO_OF_AUDITS_PERFORMED,PASSED_BIN_COUNT,BIN_COUNT_TOTAL,BIN_PERCENTAGE,_BATCH_ID_,_BATCH_LAST_RUN_\n\"3\",\"12/30/2016\",\"1\",\"20\",\"20\",\"100\",\"1\",\"2017-01-18T22:21:04\"\n\"93242\",\"12/30/2016\",\"1\",\"13\",\"20\",\"65\",\"1\",\"2017-01-18T22:21:04\"\n"
     expected = {[
-      %Event{domain: "stats", remote_ip: "127.0.0.1", event_id: "", realm: "nike", type: "bin_audits", entity_id: "8", meta: %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "65", "DATE" => "12/30/2016", "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "13", "STORE" => "8", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04"}},
+      %Event{domain: "stats", remote_ip: "127.0.0.1", event_id: "", realm: "nike", type: "bin_audits", entity_id: "8", meta: %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "65", "DATE" => "12/30/2016", "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "13", "STORE" => "93242", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04"}},
       %Event{domain: "stats", remote_ip: "127.0.0.1", event_id: "", realm: "nike", type: "bin_audits", entity_id: "3", meta: %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "100", "DATE" => "12/30/2016", "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "20", "STORE" => "3", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04"}}
       ],
       "STORE,DATE,NO_OF_AUDITS_PERFORMED,PASSED_BIN_COUNT,BIN_COUNT_TOTAL,BIN_PERCENTAGE,_BATCH_ID_,_BATCH_LAST_RUN_",
       "bin_audits",
       %HashState{
         missing: [],
-        hashes: ["F69EE687845AF0BB2EADF790F355C6454BA8C556", "9C9398B1526825551ECA416C24AFFE851E959441"],
-        lines: ["\"8\",\"12/30/2016\",\"1\",\"13\",\"20\",\"65\",\"1\",\"2017-01-18T22:21:04\"", "\"3\",\"12/30/2016\",\"1\",\"20\",\"20\",\"100\",\"1\",\"2017-01-18T22:21:04\""]}}
+        hashes: ["2EDBBE95C4BD4C691856ADE5A5863929CA2E8912", "9C9398B1526825551ECA416C24AFFE851E959441"],
+        lines: ["\"93242\",\"12/30/2016\",\"1\",\"13\",\"20\",\"65\",\"1\",\"2017-01-18T22:21:04\"", "\"3\",\"12/30/2016\",\"1\",\"20\",\"20\",\"100\",\"1\",\"2017-01-18T22:21:04\""]}}
     assert Service.Domo.hash_file(body, state, type) |> uuid_stripper == expected
   end
+
 
   test "hash file and build event with non-empty state" do
-    state = %{last_played: "1234", hash_state: %HashState{hashes: ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
-                                                                   "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
-                                                                   "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                                                          lines: ["w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []}}
-    type = "actuals"
-    body = "\"Store\",2,3,4\n1,b,c,d\n2,c,b,a\n2,x,y,z\n3,y,x,w"
-    expected = {[%Event{domain: "stats", entity_id: "z", event_id: "", remote_ip: "127.0.0.1",
-               meta: %{"Store" => "z", "2" => "y", "3" => "x", "4" => "w"},
-               realm: "nike", type: "actuals"}],
-              "\"Store\",2,3,4",
-              "actuals",
-              %HashState{hashes: ["973534CEA1CB3C8502A5599CCFCBC2A103DC0A21",
-                                  "CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
-                                  "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
-                                  "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                        lines: ["z,y,x,w", "w,x,y,z", "d,c,b,a", "a,b,c,d", "w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []}}
+      state = %{last_played: "1234", hash_state: %HashState{hashes: ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
+                                                                     "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
+                                                                     "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
+                                                            lines: ["w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []}}
+      type = "actuals"
+      body = "1,2,3,4\na,b,c,d\nd,c,b,a\nw,x,y,z\nz,y,x,w"
+      expected = {[%Event{domain: "stats", remote_ip: "127.0.0.1", kv: "", kv_time: "", entity_id: "z", event_id: "",
+                 meta: %{"1" => "z", "2" => "y", "3" => "x", "4" => "w"},
+                 realm: "nike", type: "actuals"}],
+                "1,2,3,4",
+                "actuals",
+                %HashState{hashes: ["973534CEA1CB3C8502A5599CCFCBC2A103DC0A21",
+                                    "CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
+                                    "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
+                                    "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
+                          lines: ["z,y,x,w", "w,x,y,z", "d,c,b,a", "a,b,c,d", "w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []}}
 
-    assert Service.Domo.hash_file(body, state, type) |> uuid_stripper == expected
-  end
+      assert Service.Domo.hash_file(body, state, type) |> uuid_stripper == expected
+    end
 
   test "build a meta map" do
     col_heads = "1,2,3,4"

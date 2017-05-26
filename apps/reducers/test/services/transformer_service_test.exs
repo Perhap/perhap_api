@@ -4,6 +4,7 @@ defmodule ServiceTransformerTest do
 
 
     alias DB.Event
+    alias Reducer.State
 
 
   setup_all _context do
@@ -46,9 +47,26 @@ defmodule ServiceTransformerTest do
           "store_id" => 93242},
         event_id: "",
         realm: "nike",
-        type: "pre_challenge"}
+        type: "pre_challenge"},
+      store_event: %Event{
+        domain: "storeindex",
+        entity_id: "100077bd-5b34-41ac-b37b-62adbf86c1a5",
+        meta: %{
+          "hashes" => "",
+          "last_played" => "11e7-4196-9e88fe46-a919-92ebcb67fe33",
+          "stores" => %{
+            "1" => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
+            "2" => "81bc429d-d055-4002-a64f-59e1af501236",
+            "3" => "d3bc808a-6078-454b-a606-4538d50fc978",
+            "93242" => "f11f119c-fc2e-4638-a3d5-2c36337c971b"
+          }
+        },
+        event_id: "2e428c72-4251-11e7-a919-92ebcb67fe33",
+        realm: "nike",
+        type: "replace"}
       ]}
     end
+
 
   test "gets uuid from fake api", context do
     assert(Service.Transformer.get_entity_id(context[:stores], 360)== "d68e938f-c597-4ada-9f7a-5bcad3dbbaaf")

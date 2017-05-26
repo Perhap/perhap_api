@@ -148,7 +148,6 @@ defmodule Service.Domo do
     end
     {:ok, body} = Poison.decode(response.body)
     body["stores"][store]
-    response
   end
 
   def gen_event_id() do
