@@ -13,7 +13,7 @@ defmodule Service.StoreIndexTest do
     {:ok, [
       replace_event: {"replace", %{
         ordered_id: "1-v1-uuid-0-0",
-        domain: "store_index",
+        domain: "storeindex",
         entity_id: "uuid-v4",
         data: %{"stores" =>
                 %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
@@ -29,7 +29,7 @@ defmodule Service.StoreIndexTest do
       },
       replace_event2: { "replace", %{
         ordered_id: "2-v1-uuid-0-0",
-        domain: "store_index",
+        domain: "storeindex",
         entity_id: "uuid-v4",
         data: %{"stores" =>
                 %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
@@ -74,7 +74,7 @@ defmodule Service.StoreIndexTest do
 
   test "validate function" do
     assert(Service.StoreIndex.validate([%{
-      domain: "store_index",
+      domain: "storeindex",
       entity_id: "uuid-v4",
       event_id: "uuid-v1-1-0-0",
       kv: "dev_events/uuid-v1-1-0-0",
@@ -89,7 +89,7 @@ defmodule Service.StoreIndexTest do
       realm: "nike",
       type: "replace",
     },%{
-      domain: "store_index",
+      domain: "storeindex",
       entity_id: "uuid-v4",
       event_id: "uuid-v1-1-0-0",
       kv: "dev_events/uuid-v1-1-0-0",
@@ -106,7 +106,7 @@ defmodule Service.StoreIndexTest do
     }]) ==
       [{"replace", %{
         ordered_id: "1-v1-uuid-0-0",
-        domain: "store_index",
+        domain: "storeindex",
         entity_id: "uuid-v4",
         data:
           %{"stores" =>
@@ -122,7 +122,7 @@ defmodule Service.StoreIndexTest do
 
   test "event_structure" do
     assert(Service.StoreIndex.event_structure(%{
-        domain: "store_index",
+        domain: "storeindex",
         entity_id: "uuid-v4",
         event_id: "uuid-v1-1-0-0",
         kv: "dev_events/uuid-v1-0-0",
@@ -138,7 +138,7 @@ defmodule Service.StoreIndexTest do
       }) ==
       {"replace", %{
           ordered_id: "1-v1-uuid-0-0",
-          domain: "store_index",
+          domain: "storeindex",
           entity_id: "uuid-v4",
           data: %{"stores" =>
                 %{1 => "90fe1871-b8d2-4a94-baf5-ef7475533f0e",
@@ -153,13 +153,13 @@ defmodule Service.StoreIndexTest do
   end
 
   test "event when accumulator is empty", context do
-    assert(Service.StoreIndex.store_index_reducer_recursive([context[:replace_event]], %{model: %{}, new_events: []})==
+    assert(Service.StoreIndex.storeindex_reducer_recursive([context[:replace_event]], %{model: %{}, new_events: []})==
       context[:state_after_replace])
   end
 
   test "handle replace event with previous state", context do
     assert(Service.StoreIndex.call([%Event{
-      domain: "store_index",
+      domain: "storeindex",
       entity_id: "uuid-v4",
       event_id: "uuid-v1-2-0-0",
       kv: "dev_events/uuid-v1-0-0",
@@ -178,7 +178,7 @@ defmodule Service.StoreIndexTest do
   end
 
   test "is idempotent", context do
-    assert(Service.StoreIndex.store_index_reducer_recursive(
+    assert(Service.StoreIndex.storeindex_reducer_recursive(
         [context[:replace_event], context[:replace_event]],
         %State{model: %{}, new_events: []}
       ) == context[:state_after_replace])

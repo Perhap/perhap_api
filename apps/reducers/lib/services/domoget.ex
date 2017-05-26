@@ -22,13 +22,19 @@ defmodule Service.Domo do
 
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, state)do
-    filtered_events = Enum.filter(events, fn(event) -> correct_type?(event) end)
-    {model, new_events} = domo_service(state, hd(filtered_events))
+    {model, new_events} = Enum.filter(events, fn(event) -> correct_type?(event) end)
+     |> domo_service_recursive({state.model, []})
     %State{model: model, new_events: new_events}
   end
 
 
-  def domo_service(state, event) do
+  def domo_service_recursive([], {model, new_events}), do: {model, new_events}
+  def domo_service_recursive([event | remaining_events], {model, new_events}) do
+    domo_service_recursive(remaining_events, domo_service(event, {model, new_events}))
+  end
+
+
+  def domo_service(event, state) do
     model = state.model
     meta = event.meta
     dataset_id = meta["dataset_id"]
@@ -131,11 +137,13 @@ defmodule Service.Domo do
   end
 
   def get_entity_id(store_id) do
-    #url = "https://perhap.bigsquidapp.com/v1/model/store_index/100077bd-5b34-41ac-b37b-62adbf86c1a5"
-    #entities = HTTPoison.get
-    #entity_id = entities.model["stores"][store_id]
-    #entity_id
-    store_id
+    store = to_string(store_id)
+    perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
+    url = perhap_base_url <> "/v1/model/storeindex/100077bd-5b34-41ac-b37b-62adbf86c1a5"
+    {:ok, response} = HTTPoison.get(url)
+    {:ok, body} = Poison.decode(response.body)
+    body["stores"][store]
+    response
   end
 
   def gen_event_id() do

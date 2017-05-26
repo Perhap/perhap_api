@@ -10,7 +10,7 @@ defmodule Mix.Tasks.InitStores do
     perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
     %HTTPoison.Response{status_code: 200, body: data} =
       HTTPoison.get!(perhap_base_url <> "/v1/model/" <>
-        "store_index/100077bd-5b34-41ac-b37b-62adbf86c1a5")
+        "storeindex/100077bd-5b34-41ac-b37b-62adbf86c1a5")
 
     makeIdMaps(data["stores"] || %{}, data["hashes"] || %{})
   end
@@ -139,7 +139,7 @@ defmodule Mix.Tasks.InitStores do
   end
 
   defp genStoreIndexEvent(index_map, hash_map) do
-     %{ url: "event/v1/nike/store_index/" <>
+     %{ url: "event/v1/nike/storeindex/" <>
          "100077bd-5b34-41ac-b37b-62adbf86c1a5" <>
          "/replace/" <> gen_uuidv1(),
         data: %{stores: index_map, hashes: hash_map}

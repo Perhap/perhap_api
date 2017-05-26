@@ -17,7 +17,7 @@ defmodule Service.StoreIndex do
   def call(events, %State{} = state) do
     events
     |> validate()
-    |> store_index_reducer_recursive(state)
+    |> storeindex_reducer_recursive(state)
   end
 
   def uuidv1({_type, event}) do
@@ -62,11 +62,11 @@ defmodule Service.StoreIndex do
   end
 
 
-  def store_index_reducer_recursive([event | remaining_events], state) do
-    store_index_reducer_recursive(remaining_events, play(event, state))
+  def storeindex_reducer_recursive([event | remaining_events], state) do
+    storeindex_reducer_recursive(remaining_events, play(event, state))
   end
 
-  def store_index_reducer_recursive([], state) do
+  def storeindex_reducer_recursive([], state) do
     state
   end
 

@@ -13,7 +13,7 @@ defmodule ServiceTransformerTest do
         357 => "62e36a89-7548-4fe0-8020-f059ce8549c2",
         358 => "74957173-3707-4976-926e-67dca5637625",
         359 => "af85b32f-13f6-409c-b82e-ee2b6a2deee0",
-        360 => "d68e938f-c597-4ada-9f7a-5bcad3dbbaaf",
+        "360" => "d68e938f-c597-4ada-9f7a-5bcad3dbbaaf",
         361 => "8222fa94-8e1f-42a7-b1db-b8ad7b535545",
         362 => "b376f6a9-e141-4b34-b93d-166e634992ca",
         363 => "d9a3bf8c-23f5-46c9-bb6a-2c7ac7b8932f",
@@ -55,6 +55,6 @@ defmodule ServiceTransformerTest do
   end
 
   test "transformer", context do
-    assert(Service.Transformer.transform_event(context[:stats_complete_event])== context[:transformed_event])
+    assert(Service.Transformer.transform_event(context[:stats_complete_event], {"model", []}) == {"model", [context[:transformed_event]]} )
   end
 end

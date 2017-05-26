@@ -18,31 +18,38 @@ defmodule Service.Transformer do
 
   # API CALL TO STORE INDEX HERE
   def stores do
-    %{
-      360 => "d68e938f-c597-4ada-9f7a-5bcad3dbbaaf",
-      93242 => "8222fa94-8e1f-42a7-b1db-b8ad7b535545",
-    }
+    perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
+    url = perhap_base_url <> "/v1/model/storeindex/100077bd-5b34-41ac-b37b-62adbf86c1a5"
+    {:ok, response} = HTTPoison.get(url)
+    {:ok, body} = Poison.decode(response.body)
+    body["stores"]
   end
 
   def get_entity_id(stores, store_number)do
-    stores[store_number]
+    store = to_string(store_number)
+    stores[store]
   end
 
-  # @spec call(list(Event.t), State.t) :: State.t
-  # def call(events, model)do
-  #   Enum.filter(events, fn(event) -> correct_type?(event) end)
-  #   %State{model: model, new_events: Enum.map(events, fn(event)-> transform_event(event) end)}
-  # end
+
 
   @spec call(list(Event.t), State.t) :: State.t
-  def call(events, model)do
-    model
+  def call(events, state)do
+    {model, new_events} = Enum.filter(events, fn(event) -> correct_type?(event) end)
+     |> transformer_recursive({state.model, []})
+    %State{model: model, new_events: new_events}
   end
 
-  def transform_event(event)do
-    event
+
+  def transformer_recursive([], {model, new_events}), do: {model, new_events}
+  def transformer_recursive([event | remaining_events], {model, new_events}) do
+    transformer_recursive(remaining_events, transform_event(event, {model, new_events}))
+  end
+
+
+  def transform_event(event, {model, new_events})do
+    {model, [event
     |> Map.put(:domain, "stats")
-    |> Map.put(:entity_id, get_entity_id(stores(), event.meta["store_id"]) )
+    |> Map.put(:entity_id, get_entity_id(stores(), event.meta["store_id"])) | new_events]}
   end
 
 end
