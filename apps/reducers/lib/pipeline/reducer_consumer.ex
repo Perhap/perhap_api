@@ -48,7 +48,7 @@ defmodule Reducer.Consumer do
             {domain, entity_id, _} = RS.split_key(reducer_state_key)
             indexed_events = case Event.find_by_entity_domain(entity_id, domain) do
               :not_found -> []
-              events -> Event.find() |> Enum.map(&(&1.model))
+              events -> events |> Event.find() |> Enum.map(&(&1.model))
             end
             reducer_events_all = (reducer_events ++ indexed_events) |> Enum.uniq
             {reducer_events_all, %State{}}
@@ -87,7 +87,6 @@ defmodule Reducer.Consumer do
       case Event.save(event) do
         %Event{} = event ->
           EventCoordinator.async_notify(event)
-          :ok
         _ ->
           :error
       end
