@@ -12,7 +12,7 @@ defmodule Reducer.State do
   def stale?(events, %Reducer.State{model: model}) do
     last_played = model |> Map.get("last_played", nil)
     case last_played do
-      nil -> false
+      nil -> true
       _ ->
         events = Enum.sort(events, &(V.flip_v1_uuid(&1.event_id) <= V.flip_v1_uuid(&2.event_id)))
         V.flip_v1_uuid(List.first(events).event_id) < last_played
