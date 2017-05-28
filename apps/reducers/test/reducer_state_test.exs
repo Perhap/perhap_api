@@ -13,6 +13,9 @@ defmodule Reducer.State.Test do
     events = [e2, e3, e4] |> Enum.map(&%Event{event_id: &1})
     state = %State{model: %{"last_played" => fe3}}
 
+    # Test any event invalidates empty state
+    assert true == State.stale?(events, %State{})
+
     # Test older events invalidate state
     assert true == State.stale?(events, state)
     assert true == State.stale?([%Event{event_id: e1}], state)
