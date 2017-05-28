@@ -454,12 +454,56 @@ test "out of season event", context do
 end
 
 test "get_period_model out of season" do
-  assert(Service.Stats.get_period_model("out_of_season", %{})== "out_of_season")
+  assert(Service.Stats.get_period_model("out_of_season", %{})== :out_of_season)
 end
 
 
 test " get new model", context do
-  assert(Service.Stats.get_new_model({:pre_challenge, context[:out_of_season]}, {"out_of_season", []}, %{}, "out_of_season") == {%{}, []})
-
+  assert(Service.Stats.get_new_model({:pre_challenge, context[:out_of_season]}, {:out_of_season, []}, %{}, "out_of_season") == {%{}, []})
 end
+
+test "out of season with begining state", context do
+  assert(Service.Stats.call([context[:out_of_season_event]], %State{model: %{
+    "last_played" => "11e7-3b3c-fb2eb7f4-a919-92ebcb67fe33",
+    "season" => Season1,
+    "stats" => %{
+      "season1preseason" => %{
+        "pre" => %{
+          "accuracy_percentage" => 0.007621951219512195,
+          "accuracy_score" => 0, "actual_units" => 1968,
+          "actuals_meta" => %{
+            "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968},
+          "pre_meta" => %{
+            "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1495279607000, "status" => "completed", "uph" => 180.0},
+            "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1495279607000, "status" => "completed", "uph" => 180.0},
+            "uuid-v4-challenge-complete-338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1495279607000, "status" => "completed", "uph" => 180.0}},
+          "pre_percentage" => 0.7200000000000001,
+          "pre_score" => 0,
+          "pre_units" => 15.0
+          }
+        }
+      }
+    }, new_events: []})== %State{model: %{
+      "last_played" => "11e7-3b3c-fb2eb7f4-a919-92ebcb67fe33",
+      "season" => Season1,
+      "stats" => %{
+        "season1preseason" => %{
+          "pre" => %{
+            "accuracy_percentage" => 0.007621951219512195,
+            "accuracy_score" => 0, "actual_units" => 1968,
+            "actuals_meta" => %{
+              "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968},
+            "pre_meta" => %{
+              "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1495279607000, "status" => "completed", "uph" => 180.0},
+              "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1495279607000, "status" => "completed", "uph" => 180.0},
+              "uuid-v4-challenge-complete-338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1495279607000, "status" => "completed", "uph" => 180.0}},
+            "pre_percentage" => 0.7200000000000001,
+            "pre_score" => 0,
+            "pre_units" => 15.0
+            }
+          }
+        }
+      }, new_events: []})
+end
+
 end
