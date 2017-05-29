@@ -3,7 +3,7 @@ use Mix.Config
 import_config "#{Mix.env}.exs"
 
 config :quantum,
-global?: true
+  global?: true
 
 config :quantum, :reducers,
   cron: [
@@ -15,9 +15,9 @@ config :quantum, :reducers,
 
 config :reducers,
   services: :all,
-  # services: [Service.Stats, Service.PerhapStats, Service.PerhapLog, Service.Challenge, Service.StoreIndex, Service.Domo, Service.Transformer],
   current_season: Season1,
-  current_periods: Season1periods
+  current_periods: Season1periods,
+  filter_by_domain: true
 
 config :reducers, :domo_creds,
   client_secret: "secret to be filled in",
