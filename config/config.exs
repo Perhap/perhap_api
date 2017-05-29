@@ -1,8 +1,5 @@
 use Mix.Config
 
-import_config "../apps/*/config/config.exs"
-import_config "*local.exs"
-
 config :ssl, protocol_version: :"tlsv1.2"
 
 config :logger,
@@ -16,14 +13,14 @@ config :logger,
 config :logger, :access_log,
   path: System.cwd <> "/log/access.log",
   metadata: [:function, :module],
-  level: :debug
-  # metadata_filter: [perhap_only: 1]
+  level: :info,
+  metadata_filter: [perhap_only: 1]
 
 config :logger, :error_log,
   path: System.cwd <> "/log/error.log",
   metadata: [:function, :module],
-  level: :error
-#  metadata_filter: [perhap_only: 1]
+  level: :error,
+  metadata_filter: [perhap_only: 1]
 
 # if a process decides to have a uuid cache
 config :quickrand,
@@ -37,3 +34,6 @@ config :setup,
 config :tzdata, [
   autoupdate: :enabled,
   data_dir: "./data"]
+
+import_config "../apps/*/config/config.exs"
+import_config "*local.exs"

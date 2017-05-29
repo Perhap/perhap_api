@@ -1,7 +1,7 @@
 defmodule Service.Cron do
   import Reducer.Utils, only: [gen_uuidv1: 0]
 
-    alias DB.Event
+  require Logger
 
   def bin_audit_event() do
     env = Application.get_env(:reducers, :domo_creds)
@@ -40,6 +40,6 @@ defmodule Service.Cron do
   end
 
   def test() do
-    IO.inspect("hello")
+    Logger.info("From Cron")
   end
 end

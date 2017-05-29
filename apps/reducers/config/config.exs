@@ -5,12 +5,11 @@ import_config "#{Mix.env}.exs"
 config :quantum,
   global?: true
 
-config :quantum, :reducers,
-  cron: [
-    # Every hour
-    "*/60 * * * *": {Service.Cron, :bin_audit_event},
-    "*/60 * * * *": {Service.Cron, :actuals_event},
-    "* * * * *": {Service.Cron, :test}
+config :reducers, Perhap.Scheduler,
+  jobs: [
+    {"* * * * *", {Service.Cron, :test, []}},
+    {"*/60 * * * *", {Service.Cron, :bin_audit_event}},
+    {"*/60 * * * *", {Service.Cron, :actuals_event}},
   ]
 
 config :reducers,
