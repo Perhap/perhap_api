@@ -14,10 +14,12 @@ defmodule Service.Store do
 
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, %State{} = state) do
-    events
+    {new_model, new_events} = events
     |> validate()
-    |> store_reducer_recursive(state)
+    |> store_reducer_recursive({state.model, []})
+    %State{state | model: new_model, new_events: new_events}
   end
+
 
   def uuidv1({_type, event}) do
     event.ordered_id
@@ -61,21 +63,21 @@ defmodule Service.Store do
   end
 
 
-  def store_reducer_recursive([event | remaining_events], state) do
-    store_reducer_recursive(remaining_events, play(event, state))
+  def store_reducer_recursive([event | remaining_events], {model, new_events}) do
+    IO.inspect({model, new_events})
+    store_reducer_recursive(remaining_events, play(event, {model, new_events}))
   end
-  def store_reducer_recursive([], state) do
-    state
+  def store_reducer_recursive([], {model, new_events}) do
+    {model, new_events}
   end
 
-  def play({type, event}, state) do
+  def play({type, event}, {model, new_events}) do
     {new_model, newer_events} =
       case type do
-        "add" -> add_store(event, state.model)
-        "delete" -> delete(event, state.model)
+        "add" -> add_store(event, model)
+        "delete" -> delete(event, model)
       end
-    %State{model: new_model,
-      new_events: state.new_events ++ newer_events}
+    {new_model, newer_events}
   end
 
   def add_store(event, model) do
