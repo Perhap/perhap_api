@@ -9,12 +9,17 @@ defmodule Service.Transformer do
   alias DB.Event
   alias Reducer.State
 
+  @spec call(list(Event.t), State.t) :: State.t
+  def call(events, state)do
+    {model, new_events} = Enum.filter(events, fn(event) -> correct_type?(event) end)
+     |> transformer_recursive({state.model, []})
+    %State{model: model, new_events: new_events}
+  end
 
   def correct_type?(event) do
     Enum.member?([
       "pre_challenge_transform", "refill_challenge_transform"], event.type)
   end
-
 
   # API CALL TO STORE INDEX HERE
   def stores do
@@ -35,21 +40,10 @@ defmodule Service.Transformer do
     stores[store]
   end
 
-
-
-  @spec call(list(Event.t), State.t) :: State.t
-  def call(events, state)do
-    {model, new_events} = Enum.filter(events, fn(event) -> correct_type?(event) end)
-     |> transformer_recursive({state.model, []})
-    %State{model: model, new_events: new_events}
-  end
-
-
   def transformer_recursive([], {model, new_events}), do: {model, new_events}
   def transformer_recursive([event | remaining_events], {model, new_events}) do
     transformer_recursive(remaining_events, transform_event(event, {model, new_events}))
   end
-
 
   def transform_event(%Event{type: "pre_challenge_transform"} = event, {model, new_events})  do
     {model, [event
@@ -61,7 +55,7 @@ defmodule Service.Transformer do
   def transform_event(%Event{type: "refill_challenge_transform"} = event, {model, new_events}) do
     {model, [event
     |> Map.put(:domain, "stats")
-      |> Map.put(:type, "refill_challenge")
+    |> Map.put(:type, "refill_challenge")
     |> Map.put(:entity_id, get_entity_id(stores(), event.meta["store_id"])) | new_events]}
   end
 

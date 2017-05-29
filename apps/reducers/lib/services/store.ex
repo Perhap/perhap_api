@@ -19,7 +19,6 @@ defmodule Service.Store do
     %State{state | model: new_model, new_events: new_events}
   end
 
-
   def uuidv1({_type, event}) do
     event.ordered_id
   end

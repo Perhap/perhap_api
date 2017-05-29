@@ -1,17 +1,16 @@
 defmodule Service.StoreIndex do
   @behaviour Reducer
 
+  import DB.Validation, only: [flip_v1_uuid: 1]
+
+  alias DB.Event
+  alias Reducer.State
+  require Logger
+
   @domains [:storeindex]
   @types [:replace]
   def domains, do: @domains
   def types, do: @types
-
-  alias DB.Event
-  alias Reducer.State
-
-  require Logger
-
-  import DB.Validation, only: [flip_v1_uuid: 1]
 
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, %State{} = state) do

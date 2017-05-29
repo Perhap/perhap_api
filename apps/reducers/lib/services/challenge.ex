@@ -1,10 +1,10 @@
 defmodule Service.Challenge do
   @behaviour Reducer
 
+  import DB.Validation, only: [flip_v1_uuid: 1]
+
   alias DB.Event
   alias Reducer.State
-
-  import DB.Validation, only: [flip_v1_uuid: 1]
 
   @domains [:challenge]
   @types [:start, :stop, :edit, :actual_units, :delete]
@@ -135,10 +135,10 @@ defmodule Service.Challenge do
     percentage = uph/ benchmark
 
     new_model = user_model
-        |> Map.put("status", "completed")
-        |> Map.put("actual_units", actual_units)
-        |> Map.put("uph", uph)
-        |> Map.put("percentage", percentage)
+      |> Map.put("status", "completed")
+      |> Map.put("actual_units", actual_units)
+      |> Map.put("uph", uph)
+      |> Map.put("percentage", percentage)
       {user, new_model}
   end
 
@@ -161,12 +161,12 @@ defmodule Service.Challenge do
     percentage = uph/ benchmark
 
     {user, user_model
-        |> Map.put("status", "editted")
-        |> Map.put("active_seconds", event.data["duration_min"] * 60)
-        |> Map.put("actual_units", actual_units)
-        |> Map.put("uph", uph)
-        |> Map.put("percentage", percentage)
-      }
+      |> Map.put("status", "editted")
+      |> Map.put("active_seconds", event.data["duration_min"] * 60)
+      |> Map.put("actual_units", actual_units)
+      |> Map.put("uph", uph)
+      |> Map.put("percentage", percentage)
+    }
   end
 
   def edit({:edit, event}, model, new_events) do
@@ -205,8 +205,8 @@ defmodule Service.Challenge do
 
   def delete_user(user, _event, user_model) do
     new_model = user_model
-        |> Map.put("status", "deleted")
-        |> Map.drop(["active_seconds", "actual_units", "uph", "percentage"])
+      |> Map.put("status", "deleted")
+      |> Map.drop(["active_seconds", "actual_units", "uph", "percentage"])
     {user, new_model}
   end
 

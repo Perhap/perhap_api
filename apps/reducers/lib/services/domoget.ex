@@ -1,13 +1,11 @@
 defmodule Service.Domo do
-  @moduledoc """
-  Documentation for Service.Domo.
-  """
   @behaviour Reducer
+
+  import DB.Validation, only: [flip_v1_uuid: 1]
 
   alias DB.Event
   alias Reducer.State
 
-  import DB.Validation, only: [flip_v1_uuid: 1]
 
   @domains [:domo]
   @types [:pull]

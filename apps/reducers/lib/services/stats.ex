@@ -1,10 +1,10 @@
 defmodule Service.Stats do
   @behaviour Reducer
 
+  import DB.Validation, only: [flip_v1_uuid: 1]
+
   alias DB.Event
   alias Reducer.State
-
-  import DB.Validation, only: [flip_v1_uuid: 1]
 
   @domains [:stats]
   @types [:bin_audit, :actuals, :pre_actual, :refill_actual, :pre_challenge, :refill_challenge]
