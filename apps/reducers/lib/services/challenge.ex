@@ -157,12 +157,12 @@ defmodule Service.Challenge do
   def edit_user(user, _event, %{"status" => "deleted"} = user_model, _benchmark), do: {user, user_model}
   def edit_user(user, event, user_model, benchmark) do
     actual_units = event.data["units"] / length(event.data["users"])
-    uph = actual_units / (event.data["mins"] / 60)
+    uph = actual_units / (event.data["duration_min"] / 60)
     percentage = uph/ benchmark
 
     {user, user_model
         |> Map.put("status", "editted")
-        |> Map.put("active_seconds", event.data["mins"] * 60)
+        |> Map.put("active_seconds", event.data["duration_min"] * 60)
         |> Map.put("actual_units", actual_units)
         |> Map.put("uph", uph)
         |> Map.put("percentage", percentage)

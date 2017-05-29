@@ -1,4 +1,4 @@
-defmodule InitStoreTest do
+defmodule StoreTest do
   use ExUnit.Case
 
   alias DB.Event
@@ -24,6 +24,21 @@ defmodule InitStoreTest do
           "subconcept" => "Clearance"
         }}
       },
+      unformated_add_event: %Event{
+        event_id: "uuid-v1-1-0-0",
+        domain: "store",
+        entity_id: "uuid-v4",
+        type: "add",
+        meta: %{
+          "display_name" => "Store 1",
+          "store_number" => 1,
+          "district" => "OC",
+          "district_id" => 42,
+          "territory" => "Southeast",
+          "concept" => "NFS",
+          "subconcept" => "Clearance"
+        }
+      },
       delete_event: {"delete", %{
         ordered_id: "2-v1-uuid-0-0",
         domain: "store",
@@ -31,7 +46,7 @@ defmodule InitStoreTest do
         data: %{}}
       },
       state_after_add:
-        %State{model:
+        %State{ model:
           %{"last_played" => "1-v1-uuid-0-0",
             "name" => "Store 1",
             "number" => 1,
@@ -41,10 +56,22 @@ defmodule InitStoreTest do
             "concept" => "NFS",
             "subconcept" => "Clearance",
             "active" => :true},
-          new_events: []},
+          new_events: []
+        },
+      state_after_add_tuple:  {
+          %{"last_played" => "1-v1-uuid-0-0",
+            "name" => "Store 1",
+            "number" => 1,
+            "district" => "OC",
+            "district_id" => 42,
+            "territory" => "Southeast",
+            "concept" => "NFS",
+            "subconcept" => "Clearance",
+            "active" => :true },
+          []},
 
       state_after_delete:
-        %State{model:
+        %State{ model:
           %{"last_played" => "2-v1-uuid-0-0",
             "name" => "Store 1",
             "number" => 1,
@@ -54,7 +81,7 @@ defmodule InitStoreTest do
             "concept" => "NFS",
             "subconcept" => "Clearance",
             "active" => :false},
-          new_events: []}
+        new_events: []}
     ]}
   end
 
@@ -132,8 +159,8 @@ defmodule InitStoreTest do
   end
 
   test "event when accumulator is empty", context do
-    assert(Service.Store.store_reducer_recursive([context[:add_event]], %State{model: %{}, new_events: []})==
-      context[:state_after_add])
+    assert(Service.Store.store_reducer_recursive([context[:add_event]], {%{}, []})==
+      context[:state_after_add_tuple])
   end
 
   test "delete after add", context do
@@ -149,7 +176,7 @@ defmodule InitStoreTest do
   end
 
   test "is idempotent", context do
-    assert(Service.Store.store_reducer_recursive([context[:add_event], context[:add_event]],
+    assert(Service.Store.call([context[:unformated_add_event], context[:unformated_add_event]],
       %State{model: %{}, new_events: []}) == context[:state_after_add])
   end
 end

@@ -46,7 +46,7 @@ defmodule ServiceChallengeTest do
         domain: "challenges",
         entity_id: "uuid-v4",
         data: %{
-          "mins" => 2,
+          "duration_min" => 2,
           "units" => 45,
           "users" => ["338897", "338998", "338904"]}
         }
