@@ -7,14 +7,9 @@ defmodule Service.Challenge do
   import DB.Validation, only: [flip_v1_uuid: 1]
 
   @domains [:challenge]
-  def domains do
-    @domains
-  end
-
-@types [:start, :stop, :edit, :actual_units, :delete]
-  def types do
-    @types
-  end
+  @types [:start, :stop, :edit, :actual_units, :delete]
+  def domains, do: @domains
+  def types, do: @types
 
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, %State{} = state) when is_list(events) do

@@ -2,14 +2,9 @@ defmodule Service.StoreIndex do
   @behaviour Reducer
 
   @domains [:storeindex]
-  def domains do
-    @domains
-  end
-
   @types [:replace]
-  def types do
-    @types
-  end
+  def domains, do: @domains
+  def types, do: @types
 
   alias DB.Event
   alias Reducer.State

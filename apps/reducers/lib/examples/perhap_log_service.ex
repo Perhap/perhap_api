@@ -3,18 +3,12 @@ defmodule Service.PerhapLog do
 
   alias DB.Event
   alias Reducer.State
+  require Logger
 
   @domains [:all]
-  def domains do
-    @domains
-  end
-
+  def domains, do: @domains
   @types []
-  def types do
-    @types
-  end
-
-  require Logger
+  def types, do: @types
 
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, %State{} = state) when is_list(events) do

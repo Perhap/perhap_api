@@ -7,14 +7,9 @@ defmodule Service.Stats do
   import DB.Validation, only: [flip_v1_uuid: 1]
 
   @domains [:stats]
-  def domains do
-    @domains
-  end
-
   @types [:bin_audit, :actuals, :pre_actual, :refill_actual, :pre_challenge, :refill_challenge]
-  def types do
-    @types
-  end
+  def domains, do: @domains
+  def types, do: @types
 
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, %State{} = state) when is_list(events) do

@@ -10,14 +10,9 @@ defmodule Service.Domo do
   import DB.Validation, only: [flip_v1_uuid: 1]
 
   @domains [:domo]
-  def domains do
-    @domains
-  end
-
   @types [:pull]
-  def types do
-    @types
-  end
+  def domains, do: @domains
+  def types, do: @types
 
   def correct_type?(event) do
     Enum.member?([
