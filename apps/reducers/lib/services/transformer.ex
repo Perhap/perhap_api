@@ -1,6 +1,11 @@
 defmodule Service.Transformer do
   @behaviour Reducer
 
+  @domains [:transformer]
+  def domains do
+    @domains
+  end
+
   @types [:pre_challenge_transform, :refill_challenge_transform]
   def types do
     @types

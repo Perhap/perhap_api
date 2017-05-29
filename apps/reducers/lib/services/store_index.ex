@@ -1,7 +1,12 @@
 defmodule Service.StoreIndex do
   @behaviour Reducer
-  @types [:replace]
 
+  @domains [:storeindex]
+  def domains do
+    @domains
+  end
+
+  @types [:replace]
   def types do
     @types
   end

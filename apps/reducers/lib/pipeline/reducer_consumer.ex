@@ -35,11 +35,10 @@ defmodule Reducer.Consumer do
         # Setup
         [target_domain, _] = String.split(reducer_context, unit_separator())
         [_|rest] = String.split(Atom.to_string(reducer), ".")
-        reducer_name = rest |> Enum.map(&String.downcase(&1))
-        reducer_domain = List.last(reducer_name)
-        reducer_name = reducer_name |> Enum.join(".")
+        reducer_name = rest |> Enum.map(&String.downcase(&1)) |> Enum.join(".")
+        reducer_domains = apply(reducer, :domains, [])
 
-        case maybe_filter_by_domain(target_domain, reducer_domain) do
+        case maybe_filter_by_domain(target_domain, reducer_domains) do
           false -> %Reducer.State{}
           true ->
             # Execution
@@ -47,10 +46,14 @@ defmodule Reducer.Consumer do
             result = execute(reducer_state_key, reducer_events, reducer, acc)
 
             # Post Processing
-            reducer_state = (result |> Map.fetch!(reducer_state_key))
-            %RS{state_id: reducer_state_key, data: reducer_state.model} |> RS.save
-            process_new_events(reducer_state.new_events)
-            result
+            case result do
+              :error -> %Reducer.State{}
+              _ ->
+                reducer_state = (result |> Map.fetch!(reducer_state_key))
+                %RS{state_id: reducer_state_key, data: reducer_state.model} |> RS.save
+                process_new_events(reducer_state.new_events)
+                result
+            end
         end
       end)
     end)
@@ -66,12 +69,15 @@ defmodule Reducer.Consumer do
     {:noreply, [], state}
   end
 
-  defp maybe_filter_by_domain(target_domain, reducer_domain) do
+  defp maybe_filter_by_domain(target_domain, reducer_domains) do
     case Application.get_env(:reducers, :filter_by_domain) do
       true ->
-        target_domain == reducer_domain
-      false ->
-        true
+        case Enum.member?(reducer_domains, :all) do
+          true -> true
+          false ->
+            Enum.member?(reducer_domains, String.to_atom(target_domain))
+        end
+      false -> true # no filter, just execute
     end
   end
 
@@ -97,7 +103,15 @@ defmodule Reducer.Consumer do
     end
 
     # Run Reducers
-    Map.put(acc, reducer_state_key, apply(reducer, :call, [reducer_events, reducer_state]))
+    try do
+      Map.put(acc, reducer_state_key, apply(reducer, :call, [reducer_events, reducer_state]))
+    rescue
+      error ->
+        Logger.error("Problem calling reducer: #{inspect(reducer)}, #{inspect(error)},
+                      with events: #{inspect(reducer_events)}
+                      and state: #{reducer_state_key}|#{inspect(reducer_state)}")
+        :error
+    end
   end
 
   # Save and dispatch new events

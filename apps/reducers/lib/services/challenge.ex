@@ -6,7 +6,12 @@ defmodule Service.Challenge do
 
   import DB.Validation, only: [flip_v1_uuid: 1]
 
-  @types [:start, :stop, :edit, :actual_units, :delete]
+  @domains [:challenge]
+  def domains do
+    @domains
+  end
+
+@types [:start, :stop, :edit, :actual_units, :delete]
   def types do
     @types
   end
