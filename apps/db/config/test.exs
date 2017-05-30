@@ -1,7 +1,6 @@
 use Mix.Config
 
 config :db,
-  url: 'perhap-test-load-1.bigsquid.com',
   unit_separator: "_"
 
 config :pooler,

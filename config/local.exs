@@ -1,14 +1,17 @@
 use Mix.Config
 
-config :db,
-  url: 'localhost'
+config :api,
+  enabled: true
 
-  config :logger, :access_log,
-    path: System.cwd <> "/log/access.log",
-    metadata: [:function, :module],
-    level: :debug
+# config :reducers,
+#   services: [Service.Stats, Service.PerhapStats, Service.PerhapLog, Service.Challenge, Service.StoreIndex],
 
-  config :logger, :error_log,
-    path: System.cwd <> "/log/error.log",
-    metadata: [:function, :module],
-    level: :error
+config :logger, :access_log,
+  path: System.cwd <> "/log/access.log",
+  metadata: [:function, :module],
+  level: :debug
+
+config :logger, :error_log,
+  path: System.cwd <> "/log/error.log",
+  metadata: [:function, :module],
+  level: :error

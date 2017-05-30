@@ -18,6 +18,7 @@ defmodule DB.Mixfile do
     [
       applications: [
         :logger,
+        :tzdata,
         :riak],
         #:phoenix_pubsub],
         # mod: {DB, []}
@@ -30,6 +31,7 @@ defmodule DB.Mixfile do
       {:geocalc, "~> 0.5.4"},
       {:riak, "~> 1.1.2"},
       {:timex, "~> 3.1"},
+      # {:tzdata, "== 0.1.8", override: true},
       # {:phoenix_pubsub, "~> 1.0"},
       {:uuid, github: "okeuday/uuid"}
     ]

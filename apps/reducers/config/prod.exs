@@ -1,4 +1,5 @@
 use Mix.Config
 
 config :reducers,
-  consumers: 10
+  partitions: System.schedulers_online * 4,
+  perhap_base_url: "https://perhap.bigsquidapp.com"

@@ -1,15 +1,15 @@
 defmodule Service.Challenge do
   @behaviour Reducer
 
+  import DB.Validation, only: [flip_v1_uuid: 1]
+
   alias DB.Event
   alias Reducer.State
 
-  import DB.Validation, only: [flip_v1_uuid: 1]
-
+  @domains [:challenge]
   @types [:start, :stop, :edit, :actual_units, :delete]
-  def types do
-    @types
-  end
+  def domains, do: @domains
+  def types, do: @types
 
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, %State{} = state) when is_list(events) do
@@ -43,7 +43,7 @@ defmodule Service.Challenge do
       "stop",
       "edit",
       "actual_units",
-      "delete"], event.type)
+      "delete"], String.downcase(event.type))
   end
 
   def event_structure(%Event{event_id: event_id, meta: meta} = event) do
@@ -135,10 +135,10 @@ defmodule Service.Challenge do
     percentage = uph/ benchmark
 
     new_model = user_model
-        |> Map.put("status", "completed")
-        |> Map.put("actual_units", actual_units)
-        |> Map.put("uph", uph)
-        |> Map.put("percentage", percentage)
+      |> Map.put("status", "completed")
+      |> Map.put("actual_units", actual_units)
+      |> Map.put("uph", uph)
+      |> Map.put("percentage", percentage)
       {user, new_model}
   end
 
@@ -157,16 +157,16 @@ defmodule Service.Challenge do
   def edit_user(user, _event, %{"status" => "deleted"} = user_model, _benchmark), do: {user, user_model}
   def edit_user(user, event, user_model, benchmark) do
     actual_units = event.data["units"] / length(event.data["users"])
-    uph = actual_units / (event.data["mins"] / 60)
+    uph = actual_units / (event.data["duration_min"] / 60)
     percentage = uph/ benchmark
 
     {user, user_model
-        |> Map.put("status", "editted")
-        |> Map.put("active_seconds", event.data["mins"] * 60)
-        |> Map.put("actual_units", actual_units)
-        |> Map.put("uph", uph)
-        |> Map.put("percentage", percentage)
-      }
+      |> Map.put("status", "editted")
+      |> Map.put("active_seconds", event.data["duration_min"] * 60)
+      |> Map.put("actual_units", actual_units)
+      |> Map.put("uph", uph)
+      |> Map.put("percentage", percentage)
+    }
   end
 
   def edit({:edit, event}, model, new_events) do
@@ -180,30 +180,33 @@ defmodule Service.Challenge do
 
   def stats_type(challenge_type)do
     case challenge_type do
-      "equipment" -> "pre_challenge"
-      "apparel" -> "pre_challenge"
-      "footwear" -> "pre_challenge"
-      "product_refill" -> "refill_challenge"
+      "equipment" -> "pre_challenge_transform"
+      "apparel" -> "pre_challenge_transform"
+      "footwear" -> "pre_challenge_transform"
+      "product_refill" -> "refill_challenge_transform"
       _ -> :reject
     end
   end
 
   def create_stats_event(:reject, _, new_events), do: new_events
   def create_stats_event(type, model, new_events) do
+    meta = Map.drop(model, ["last_played", "domain", "entity_id"])
+    |> Map.put("challenge_id", model["entity_id"])
     [%Event{
       type: type,
       domain: "transformer",
       realm: "nike",
       entity_id: model["entity_id"],
-      meta: Map.drop(model, ["last_played", "domain", "entity_id"]),
-      event_id: gen_uuidv1()
+      meta: meta,
+      event_id: gen_uuidv1(),
+      remote_ip: "127.0.0.1"
     } | new_events]
   end
 
   def delete_user(user, _event, user_model) do
     new_model = user_model
-        |> Map.put("status", "deleted")
-        |> Map.drop(["active_seconds", "actual_units", "uph", "percentage"])
+      |> Map.put("status", "deleted")
+      |> Map.drop(["active_seconds", "actual_units", "uph", "percentage"])
     {user, new_model}
   end
 

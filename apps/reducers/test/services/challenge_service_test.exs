@@ -2,6 +2,8 @@ defmodule ServiceChallengeTest do
   use ExUnit.Case
   doctest Service.Challenge
 
+  alias DB.Event
+
   setup_all _context do
     {:ok, [
       start_event: {:start, %{
@@ -44,7 +46,7 @@ defmodule ServiceChallengeTest do
         domain: "challenges",
         entity_id: "uuid-v4",
         data: %{
-          "mins" => 2,
+          "duration_min" => 2,
           "units" => 45,
           "users" => ["338897", "338998", "338904"]}
         }
@@ -58,10 +60,11 @@ defmodule ServiceChallengeTest do
           "users" => ["338897", "338998", "338904"]}
         }
       },
-      stats_complete_event: %DB.Event{
+      stats_complete_event: %Event{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
+          "challenge_id" => "uuid-v4",
             "users" => %{
           "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
           "338904" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
@@ -71,12 +74,14 @@ defmodule ServiceChallengeTest do
           "challenge_type" => "equipment",
           "store_id" => 93242},
         event_id: "",
+        remote_ip: "127.0.0.1",
         realm: "nike",
-        type: "pre_challenge"},
-      stats_complete_event_partial: %DB.Event{
+        type: "pre_challenge_transform"},
+      stats_complete_event_partial: %Event{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
+          "challenge_id" => "uuid-v4",
             "users" => %{
           "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
           "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
@@ -86,12 +91,14 @@ defmodule ServiceChallengeTest do
           "challenge_type" => "equipment",
           "store_id" => 93242},
         event_id: "",
+        remote_ip: "127.0.0.1",
         realm: "nike",
-        type: "pre_challenge"},
-      stats_edit_event: %DB.Event{
+        type: "pre_challenge_transform"},
+      stats_edit_event: %Event{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
+          "challenge_id" => "uuid-v4",
             "users" => %{
               "338897" => %{"start_time" => 1492712720633, "status" => "editted", "active_seconds" => 120, "actual_units" => 15.0, "uph" => 450.0, "percentage" => 1.8},
               "338998" => %{"start_time" => 1492712720633, "status" => "editted", "active_seconds" => 120, "actual_units" => 15.0, "uph" => 450.0, "percentage" => 1.8},
@@ -102,11 +109,13 @@ defmodule ServiceChallengeTest do
           "store_id" => 93242},
         event_id: "",
         realm: "nike",
-        type: "pre_challenge"},
-      stats_delete_event: %DB.Event{
+        remote_ip: "127.0.0.1",
+        type: "pre_challenge_transform"},
+      stats_delete_event: %Event{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
+          "challenge_id" => "uuid-v4",
             "users" => %{
           "338897" => %{"start_time" => 1492712720633, "status" => "deleted"},
           "338998" => %{"start_time" => 1492712720633, "status" => "deleted"},
@@ -117,7 +126,8 @@ defmodule ServiceChallengeTest do
           "store_id" => 93242},
         event_id: "",
         realm: "nike",
-        type: "pre_challenge"},
+        remote_ip: "127.0.0.1",
+        type: "pre_challenge_transform"},
 
       state_after_start: %{
         "last_played" => "11e7-25ed-9d16b16c-93ae-92361f002671",
@@ -289,7 +299,7 @@ defmodule ServiceChallengeTest do
     "start_time" => 1492712720633, "status" => "editted", "uph" => 450.0}},
     "challenge_benchmark" => 250, "challenge_type" => "equipment", "domain" => "challenges",
     "entity_id" => "uuid-v4", "last_played" => "11e7-25ff-9d16b16c-93ae-92361f002671", "store_id" => 93242},
-    [%{domain: "transformer", entity_id: "uuid-v4", meta: %{"users" => %{"338897" => %{"active_seconds" => 120,
+    [%{domain: "transformer", entity_id: "uuid-v4", meta: %{"challenge_id" => "uuid-v4", "users" => %{"338897" => %{"active_seconds" => 120,
     "actual_units" => 15.0, "percentage" => 1.8, "start_time" => 1492712720633,
     "status" => "editted", "uph" => 450.0}, "338904" => %{"active_seconds" => 120,
     "actual_units" => 15.0, "percentage" => 1.8,
@@ -297,7 +307,7 @@ defmodule ServiceChallengeTest do
     "338998" => %{"active_seconds" => 120, "actual_units" => 15.0, "percentage" => 1.8,
     "start_time" => 1492712720633, "status" => "editted", "uph" => 450.0}},
     "challenge_benchmark" => 250, "challenge_type" => "equipment", "store_id" => 93242},
-    realm: "nike", type: "pre_challenge", event_id: '62c02cfa-3669-11e7-a118-2bb80000010f'}]})
+    realm: "nike", type: "pre_challenge_transform", event_id: '62c02cfa-3669-11e7-a118-2bb80000010f'}]})
     ==
     {%{"users" => %{"338897" => %{"active_seconds" => 120, "actual_units" => 15.0,
     "percentage" => 1.8, "start_time" => 1492712720633, "status" => "editted",
@@ -308,14 +318,14 @@ defmodule ServiceChallengeTest do
     "uph" => 450.0}}, "challenge_benchmark" => 250, "challenge_type" => "equipment",
     "domain" => "challenges", "entity_id" => "uuid-v4", "last_played" => "11e7-25ff-9d16b16c-93ae-92361f002671",
     "store_id" => 93242}, [%{domain: "transformer", entity_id: "uuid-v4",
-    meta: %{"users" => %{"338897" => %{"active_seconds" => 120, "actual_units" => 15.0,
+    meta: %{"challenge_id" => "uuid-v4", "users" => %{"338897" => %{"active_seconds" => 120, "actual_units" => 15.0,
     "percentage" => 1.8, "start_time" => 1492712720633, "status" => "editted",
     "uph" => 450.0}, "338904" => %{"active_seconds" => 120, "actual_units" => 15.0,
     "percentage" => 1.8, "start_time" => 1492712720633, "status" => "editted", "uph" => 450.0},
     "338998" => %{"active_seconds" => 120, "actual_units" => 15.0, "percentage" => 1.8,
     "start_time" => 1492712720633, "status" => "editted", "uph" => 450.0}},
     "challenge_benchmark" => 250, "challenge_type" => "equipment", "store_id" => 93242},
-    realm: "nike", type: "pre_challenge", event_id: ""}]}
+    realm: "nike", type: "pre_challenge_transform", event_id: ""}]}
 
       )
   end

@@ -81,7 +81,7 @@ defmodule DB.Event do
   @spec find_by_entity_domain(String.t, String.t) :: list(String.t) | :not_found | :error
   def find_by_entity_domain(entity_id, domain) do
     result = try do
-      Riak.find("sets", namespace_index(:bucket), namespace_index(:key, entity_id, domain)) |> RS.value
+      Riak.find("set", namespace_index(:bucket), namespace_index(:key, entity_id, domain)) |> RS.value
     rescue
       error ->
         Logger.error("Problem reading events by entity: #{inspect(error)}")
@@ -90,6 +90,7 @@ defmodule DB.Event do
     case result do
       nil -> :not_found
       :error -> :error
+      {:error, :nil_object} -> :not_found
       _ -> result
     end
   end
@@ -97,7 +98,7 @@ defmodule DB.Event do
   # this should be used for admin purposes only
   @spec delete_entity_domain_index(String.t, String.t) :: :ok
   def delete_entity_domain_index(entity_id, domain) do
-    Riak.delete("sets", namespace_index(:bucket), namespace_index(:key, entity_id, domain))
+    Riak.delete("set", namespace_index(:bucket), namespace_index(:key, entity_id, domain))
   end
 
   @spec hll_stat(String.t) :: integer() | :not_found | :error
@@ -116,6 +117,11 @@ defmodule DB.Event do
     end
   end
 
+  @spec bucket() :: String.t
+  def bucket() do
+    namespace(@bucket)
+  end
+
   defp namespace_index(:bucket) do
     namespace(@bucket) <> Common.unit_separator <> "index"
   end
@@ -128,12 +134,13 @@ defmodule DB.Event do
   defp update_entity_domain_index(%Event{domain: domain, entity_id: entity_id, event_id: event_id}) do
     RS.new
       |> RS.put(event_id)
-      |> Riak.update("sets", namespace_index(:bucket), namespace_index(:key, entity_id, domain))
+      |> Riak.update("set", namespace_index(:bucket), namespace_index(:key, entity_id, domain))
   end
 
   #called async, don't need a response
   @spec update_hll(Event.t) :: :ok | :error
-  defp update_hll(%Event{domain: domain, entity_id: entity_id, event_id: event_id}) do
+  defp update_hll(%Event{realm: realm, domain: domain,
+                         entity_id: entity_id, event_id: event_id}) do
     HLL.new
      |> HLL.add_element(event_id)
      |> Riak.update("hll", namespace(@hll_bucket), "events")
@@ -143,6 +150,9 @@ defmodule DB.Event do
     HLL.new
      |> HLL.add_element(domain)
      |> Riak.update("hll", namespace(@hll_bucket), "domains")
+    HLL.new
+     |> HLL.add_element(realm)
+     |> Riak.update("hll", namespace(@hll_bucket), "realms")
   end
 
   @spec find_event(String.t, boolean()) :: Common.r_json_t | :not_found | :error

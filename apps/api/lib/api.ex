@@ -5,9 +5,12 @@ defmodule API do
     import Supervisor.Spec, warn: false
 
     children = [
-      supervisor(Task.Supervisor, [[name: Perhap.TaskSupervisor]]),
-      cowboy_child_spec()
+      supervisor(Task.Supervisor, [[name: Perhap.TaskSupervisor]])
     ]
+    children = case Application.get_env(:api, :enabled, true) do
+      true -> children ++ [cowboy_child_spec()]
+      false -> children
+    end
     opts = [strategy: :one_for_one, name: API.Supervisor]
     Supervisor.start_link(children, opts)
   end

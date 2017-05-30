@@ -16,7 +16,8 @@ defmodule Reducer.Mixfile do
 
   def application do
     [applications: [
-      # :kafka_ex,
+      :quantum,
+      :timex,
       :logger],
       mod: {Reducers, []}
     ]
@@ -26,7 +27,10 @@ defmodule Reducer.Mixfile do
     [
       {:db, in_umbrella: true},
       {:poison, "~> 3.1"},
-      {:kafka_ex, "~> 0.6.5"}
+      {:quantum, github: "c-rack/quantum-elixir"},
+      {:httpoison, "~> 0.11.1"},
+      {:csv, "~> 1.4.2"},
+      {:poolboy, github: "devinus/poolboy"}
     ]
   end
 end

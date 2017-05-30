@@ -19,5 +19,10 @@ erl_crash.dump
 # Ignore Log Dir
 /log
 
+# Ignore Data Dir
+/data
+
+# Ignore mix.lock for now
 mix.lock
+
 *.swp

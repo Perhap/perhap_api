@@ -1,8 +1,5 @@
 use Mix.Config
 
-import_config "../apps/*/config/config.exs"
-import_config "*local.exs"
-
 config :ssl, protocol_version: :"tlsv1.2"
 
 config :logger,
@@ -32,3 +29,11 @@ config :quickrand,
 # prevent exometer from creating spurious directories
 config :setup,
   verify_directories: false
+
+# configure tzdata to autoupdate and use a data dir
+config :tzdata, [
+  autoupdate: :enabled,
+  data_dir: "./data"]
+
+import_config "../apps/*/config/config.exs"
+import_config "*local.exs"

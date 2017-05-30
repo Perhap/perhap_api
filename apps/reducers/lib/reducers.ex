@@ -4,11 +4,13 @@ defmodule Reducers do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
+    partitions = Application.get_env(:reducers, :partitions)
+
     children = [
-      worker(EventDispatcher, [])
+      worker(EventCoordinator, [partitions: partitions]),
+      worker(Perhap.Scheduler, [])
     ]
-    max_consumers = Application.get_env(:reducers, :consumers)
-    children = children ++ Enum.map(1..max_consumers, &worker(Reducer.Consumer, [], [id: &1]))
+    children = children ++ Enum.map(0..partitions-1, &worker(Reducer.Consumer, [&1], [id: &1]))
 
     opts = [strategy: :one_for_one, name: Reducers.Supervisor]
     Supervisor.start_link(children, opts)
