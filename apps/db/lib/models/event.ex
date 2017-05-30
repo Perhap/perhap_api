@@ -139,7 +139,8 @@ defmodule DB.Event do
 
   #called async, don't need a response
   @spec update_hll(Event.t) :: :ok | :error
-  defp update_hll(%Event{domain: domain, entity_id: entity_id, event_id: event_id}) do
+  defp update_hll(%Event{realm: realm, domain: domain,
+                         entity_id: entity_id, event_id: event_id}) do
     HLL.new
      |> HLL.add_element(event_id)
      |> Riak.update("hll", namespace(@hll_bucket), "events")
@@ -149,6 +150,9 @@ defmodule DB.Event do
     HLL.new
      |> HLL.add_element(domain)
      |> Riak.update("hll", namespace(@hll_bucket), "domains")
+    HLL.new
+     |> HLL.add_element(realm)
+     |> Riak.update("hll", namespace(@hll_bucket), "realms")
   end
 
   @spec find_event(String.t, boolean()) :: Common.r_json_t | :not_found | :error

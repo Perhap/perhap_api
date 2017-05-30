@@ -22,7 +22,8 @@ defmodule Stats do
      c_stat(Exometer.get_value(["model", "GET", :histogram]), M_Get) |||
      %{"total_events" => DB.Event.hll_stat("events")} |||
      %{"total_entities" => DB.Event.hll_stat("entities")} |||
-     %{"total_domains" => DB.Event.hll_stat("domains")})
+     %{"total_domains" => DB.Event.hll_stat("domains")} |||
+     %{"total_realms" => DB.Event.hll_stat("realms")})
   end
 
   defp c_stat({:error, :not_found}, _), do: %{}
