@@ -16,7 +16,7 @@ defmodule Service.Cron do
     event_id = gen_uuidv1()
     {_, data} =Poison.encode(eventdata)
 
-    _url = "https://perhap/bigsquidapp.com/v1/event/domo/" <> entity_id <> "/pull/" <> event_id
+    _url = "https://perhap.bigsquidapp.com/v1/event/domo/" <> entity_id <> "/pull/" <> event_id
 
     HTTPoison.post("https://requestb.in/q8usdhq8", data, [], [])
   end
@@ -34,12 +34,12 @@ defmodule Service.Cron do
     event_id = gen_uuidv1()
     {_, data} =Poison.encode(eventdata)
 
-    _url = "https://perhap/bigsquidapp.com/v1/event/domo/" <> entity_id <> "/pull/" <> event_id
+    _url = "https://perhap.bigsquidapp.com/v1/event/domo/" <> entity_id <> "/pull/" <> event_id
 
     HTTPoison.post("https://requestb.in/q8usdhq8", data, [], [])
   end
 
-  def test() do
-    Logger.info("From Cron")
+  def heartbeat() do
+    Logger.debug("Cron: Heartbeat")
   end
 end

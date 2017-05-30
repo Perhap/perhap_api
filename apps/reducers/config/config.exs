@@ -7,9 +7,9 @@ config :quantum,
 
 config :reducers, Perhap.Scheduler,
   jobs: [
-    {"* * * * *", {Service.Cron, :test, []}},
-    {"*/60 * * * *", {Service.Cron, :bin_audit_event, []}},
-    {"*/60 * * * *", {Service.Cron, :actuals_event, []}},
+    [name: "heartbeat", schedule: "* * * * *", task: {Service.Cron, :heartbeat, []}],
+    [name: "bin_audit_event", schedule: "*/60 * * * *", task: {Service.Cron, :bin_audit_event, []}],
+    [name: "actuals_event", schedule: "*/60 * * * *", task: {Service.Cron, :actuals_event, []}]
   ]
 
 config :reducers,

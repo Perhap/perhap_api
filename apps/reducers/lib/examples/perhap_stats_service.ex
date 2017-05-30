@@ -6,8 +6,8 @@ defmodule Service.PerhapStats do
   require Logger
 
   @domains [:all]
-  def domains, do: @domains
   @types []
+  def domains, do: @domains
   def types, do: @types
 
   @spec call(list(Event.t), State.t) :: State.t
