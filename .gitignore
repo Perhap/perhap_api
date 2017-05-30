@@ -24,3 +24,5 @@ erl_crash.dump
 
 # Ignore mix.lock for now
 mix.lock
+
+*.swp
