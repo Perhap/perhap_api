@@ -43,7 +43,7 @@ defmodule Service.Challenge do
       "stop",
       "edit",
       "actual_units",
-      "delete"], event.type)
+      "delete"], String.downcase(event.type))
   end
 
   def event_structure(%Event{event_id: event_id, meta: meta} = event) do
