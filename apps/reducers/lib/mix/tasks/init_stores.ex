@@ -3,28 +3,54 @@ defmodule Mix.Tasks.InitStores do
 
   @shortdoc "Initialize Store Data"
 
+  require Logger
+
   import Reducer.Utils, only: [gen_uuidv1: 0, gen_uuidv4: 0]
 
   defp getLastHashes() do
     #API call to get last hash set
     perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
-    %HTTPoison.Response{status_code: 200, body: data} =
-      HTTPoison.get!(perhap_base_url <> "/v1/model/" <>
-        "storeindex/100077bd-5b34-41ac-b37b-62adbf86c1a5")
+    response = HTTPoison.get!(perhap_base_url <> "/v1/model/" <>
+      "storeindex/100077bd-5b34-41ac-b37b-62adbf86c1a5")
 
-    makeIdMaps(data["stores"] || %{}, data["hashes"] || %{})
+      case response do
+        %HTTPoison.Response{status_code: 200, body: data} ->
+          {:ok, decoded_data} = Poison.decode(data)
+          makeIdMaps(decoded_data["stores"] || %{}, decoded_data["hashes"] || %{})
+        %HTTPoison.Response{status_code: 404} ->
+          makeIdMaps(%{}, %{})
+      end
   end
 
   defp sendEvent(%{url: url, data: data}) do
     perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
-    %HTTPoison.Response{status_code: 204} =
-      HTTPoison.post perhap_base_url <> "/v1/" <> url,
-        Poison.encode(%{body: data}),
-        [{"Content-Type", "application/json"}]
+    {:ok, body} = Poison.encode(data)
+    response = HTTPoison.post perhap_base_url <> "/v1/" <> url, body,
+    [{"Content-Type", "application/json"}]
+
+    case response do
+      {:ok, %HTTPoison.Response{status_code: 204}} -> Logger.info("success, store number #{data.store_number}")
+      _ -> Logger.info("failure, store number #{data.store_number}" )
+    end
+
   end
+
   defp sendEvent(events) when is_list(events) do
     Enum.each(events, &sendEvent/1)
   end
+
+  defp sendIndex(%{url: url, data: data}) do
+    perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
+    {:ok, body} = Poison.encode(data)
+    response = HTTPoison.post perhap_base_url <> "/v1/" <> url, body,
+    [{"Content-Type", "application/json"}]
+
+    case response do
+      {:ok, %HTTPoison.Response{status_code: 204}} -> Logger.info("success, store index")
+      _ -> Logger.info("failure, store index" )
+    end
+  end
+
 
   def run([csvfile | _args]) do
     HTTPoison.start
@@ -54,7 +80,7 @@ defmodule Mix.Tasks.InitStores do
                            fn map -> genDeleteStoreEvent(map.entity_id) |> sendEvent end)
 
       # remake store index
-      genStoreIndexEvent(newEntIds, newHashes) |> sendEvent
+      genStoreIndexEvent(newEntIds, newHashes) |> sendIndex
 
   end
 
@@ -91,10 +117,9 @@ defmodule Mix.Tasks.InitStores do
 
   defp whichDiffType?(row_data, old_maps, newEntIds) do
     current_hash = row_data.hash
-
     if row_data.id_storenum do
       %{type: :skip,
-        entity_id: old_maps[row_data.id_storenum] || newEntIds[row_data.id_storenum]}
+        entity_id: old_maps[to_string(row_data.id_storenum)][:entity_id] || newEntIds[to_string(row_data.id_storenum)]}
         # assumes copy types created after
     else
       case old_maps[row_data.storenum] do
@@ -116,7 +141,7 @@ defmodule Mix.Tasks.InitStores do
 
 
   defp genDeleteStoreEvent(entity_id) do
-    %{ url: "event/v1/nike/store/" <>
+    %{ url: "event/nike/store/" <>
            "100077bd-5b34-41ac-b37b-62adbf86c1a5" <>
            "/delete/" <> gen_uuidv1(),
         data: %{entity_id: entity_id}
@@ -124,7 +149,7 @@ defmodule Mix.Tasks.InitStores do
   end
 
   defp genAddStoreEvent(entity_id, row_data) do
-    %{url: "event/v1/nike/store/" <> entity_id <>
+    %{url: "event/nike/store/" <> entity_id <>
           "/add/" <> gen_uuidv1(),
       data:
       %{display_name: row_data.name,
@@ -139,19 +164,21 @@ defmodule Mix.Tasks.InitStores do
   end
 
   defp genStoreIndexEvent(index_map, hash_map) do
-     %{ url: "event/v1/nike/storeindex/" <>
+     %{ url: "event/nike/storeindex/" <>
          "100077bd-5b34-41ac-b37b-62adbf86c1a5" <>
          "/replace/" <> gen_uuidv1(),
         data: %{stores: index_map, hashes: hash_map}
       }
   end
 
-  def makeIdMaps(lastHashes, lastEntIds) do
-    lastHashes
+  def makeIdMaps(lastEntIds, lastHashes) do
+      lastHashes
       |> Map.new(fn {num, hash} -> {num, %{hash: hash, entity_id: lastEntIds[num]}} end)
       |> Map.merge(
           Map.new(lastEntIds, fn {num, eid} -> {num, %{hash: nil, entity_id: eid}} end),
           fn _, hashV, eidV -> Map.merge(eidV, hashV) end
         )
+
+
   end
 end

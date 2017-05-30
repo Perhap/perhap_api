@@ -62,7 +62,6 @@ defmodule Service.Store do
 
 
   def store_reducer_recursive([event | remaining_events], {model, new_events}) do
-    IO.inspect({model, new_events})
     store_reducer_recursive(remaining_events, play(event, {model, new_events}))
   end
   def store_reducer_recursive([], {model, new_events}) do
