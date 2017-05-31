@@ -16,9 +16,9 @@ defmodule Service.Cron do
     event_id = gen_uuidv1()
     {_, data} =Poison.encode(eventdata)
 
-    _url = "https://perhap.bigsquidapp.com/v1/event/domo/" <> entity_id <> "/pull/" <> event_id
-
-    HTTPoison.post("https://requestb.in/q8usdhq8", data, [], [])
+    url = "https://perhap.bigsquidapp.com/v1/event/domo/" <> entity_id <> "/pull/" <> event_id
+    Logger.info("bin audit request from domo", perhap_only: 1)
+    HTTPoison.post(url, data, [], [])
   end
 
   def actuals_event() do
@@ -34,9 +34,9 @@ defmodule Service.Cron do
     event_id = gen_uuidv1()
     {_, data} =Poison.encode(eventdata)
 
-    _url = "https://perhap.bigsquidapp.com/v1/event/domo/" <> entity_id <> "/pull/" <> event_id
-
-    HTTPoison.post("https://requestb.in/q8usdhq8", data, [], [])
+    url = "https://perhap.bigsquidapp.com/v1/event/domo/" <> entity_id <> "/pull/" <> event_id
+    Logger.info("actuals request from domo", perhap_only: 1)
+    HTTPoison.post(url, data, [], [])
   end
 
   def heartbeat() do
