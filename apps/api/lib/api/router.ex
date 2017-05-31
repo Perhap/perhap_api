@@ -24,8 +24,9 @@ defmodule API.Router do
   plug :match
   plug :dispatch
 
-  get "/v1/ping", do: Response.send(conn, 200, %{status: "OK"})
+  # API V1
 
+  get "/v1/ping", do: Response.send(conn, 200, %{status: "OK"})
   get "/v1/event/:event_id", do: Event.get(conn, event_id)
   post "/v1/event/:realm/:domain/:entity_id/:event_type/:event_id" do
     case V.is_uuid_v1(event_id) and V.is_uuid_v4(entity_id) do
@@ -38,11 +39,19 @@ defmodule API.Router do
         Response.send(conn, E.make(:invalid_id))
     end
   end
-
   get "/v1/events/:domain/:entity_id", do: Event.get_by_entity(conn, entity_id, domain)
   get "/v1/model/:domain/:entity_id", do: Model.get(conn, domain, entity_id)
   get "/v1/stats", do: Stats.get(conn)
 
+  # CORS Preflight Requests
+  options _ do
+    conn |>
+      put_resp_header("access-control-allow-methods", "GET PUT POST DELETE OPTIONS") |>
+      put_resp_header("access-control-max-age", "86400") |>
+      Response.send(200, "")
+  end
+
+  # Catch All
   match _ do
     Response.send(conn, E.make(:not_found))
   end
