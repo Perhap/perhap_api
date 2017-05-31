@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Etl.Dump do
 
   def run(argv) do
     IO.puts ("MIX ENV: #{Mix.env}")
-    [file|rest] = argv
+    [file|_] = argv
     Application.ensure_all_started(:db)
     max_concurrency = System.schedulers_online * 4
     start_pool(max_concurrency)
@@ -23,14 +23,14 @@ defmodule Mix.Tasks.Etl.Dump do
   end
 
   def do_work(chunk, file) do
-    Logger.debug("Grabbing Another Chunk: #{inspect(self)}")
+    Logger.debug("Grabbing Another Chunk: #{inspect(self())}")
     ETL.Extract.process(chunk, file)
   end
 
-  defp pool_load(%{chunk: chunk, file: file} = map) do
+  defp pool_load(%{chunk: _, file: _} = map) do
     :poolboy.transaction(
       pool_name(), fn(pid) ->
-        Logger.debug("Grabbing Another Chunk: #{inspect(self)}")
+        Logger.debug("Grabbing Another Chunk: #{inspect(self())}")
         time = :gen_server.call(pid, map, :infinity)
         stats = :gen_server.call(pid, :stats, :infinity)
         Logger.debug("#{inspect(stats)}:#{inspect(time)}")

@@ -14,13 +14,9 @@ defmodule ETL.Extract do
     {:ok, state}
   end
 
-  def handle_call(:stats, _, state) do
-    {:reply, state, state}
-  end
-
   def process(chunk, file) do
     # Do the Key processing
-    results = Enum.map(chunk, fn event_id ->
+    _results = Enum.map(chunk, fn event_id ->
       result = Event.find(event_id).model
       log_result(result, file)
       case result do
@@ -33,7 +29,11 @@ defmodule ETL.Extract do
     end)
   end
 
-  def handle_call(%{chunk: chunk, file: file} = map, _from, [{:ok, oks},{:fail, fails}]) do
+  def handle_call(:stats, _, state) do
+    {:reply, state, state}
+  end
+
+  def handle_call(%{chunk: chunk, file: file} = _map, _from, [{:ok, oks},{:fail, fails}]) do
     start_time = :calendar.datetime_to_gregorian_seconds(:calendar.universal_time())
 
     results = process(chunk, file)

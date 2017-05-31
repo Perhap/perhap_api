@@ -6,18 +6,22 @@ defmodule API.Response do
   def send(conn, %API.Error{} = error) do
     conn |> send(error.http_code, E.format(error))
   end
-
   def send(conn, 204) do
     send_resp(conn, 204, "")
   end
 
+  def send(conn, 200, "") do
+    conn |>
+      put_resp_header("access-control-allow-origin", "*") |>
+      send_resp(200, "")
+  end
   def send(conn, status, response_term) do
     {:ok, json, crc32} = make(response_term)
     conn |>
       put_resp_header("content-type", "application/json") |>
       put_resp_header("access-control-allow-origin", "*") |>
       put_resp_header("x-bigsquid-crc32", Integer.to_string(crc32)) |>
-    send_resp(status, json)
+      send_resp(status, json)
   end
 
   defp make(map) when is_map(map) do

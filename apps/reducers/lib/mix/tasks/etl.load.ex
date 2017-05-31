@@ -3,13 +3,12 @@ defmodule Mix.Tasks.Etl.Load do
   @shortdoc "Load data from file to Riak"
   @preferred_cli_env :dev
 
-  alias DB.Event
   require Logger
 
   def run(argv) do
     Application.ensure_all_started(:db)
     IO.puts ("MIX ENV: #{Mix.env}")
-    [file|rest] = argv
+    [file|_] = argv
     IO.puts ("Run: #{inspect(self())}")
     start_pool()
     tasks = file
