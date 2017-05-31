@@ -13,6 +13,7 @@ defmodule API.Response do
   def send(conn, 200, "") do
     conn |>
       put_resp_header("access-control-allow-origin", "*") |>
+      put_resp_header("access-control-allow-headers", "content-type") |>
       send_resp(200, "")
   end
   def send(conn, status, response_term) do
