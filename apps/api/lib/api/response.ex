@@ -15,10 +15,11 @@ defmodule API.Response do
     {:ok, json, crc32} = make(response_term)
     conn |>
       put_resp_header("content-type", "application/json") |>
+      put_resp_header("access-control-allow-origin", "*") |>
       put_resp_header("x-bigsquid-crc32", Integer.to_string(crc32)) |>
     send_resp(status, json)
   end
-  
+
   defp make(map) when is_map(map) do
     json = JSON.encode!(map)
     makeCRC(json)
