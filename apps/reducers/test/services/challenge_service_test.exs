@@ -36,7 +36,7 @@ defmodule ServiceChallengeTest do
         entity_id: "uuid-v4",
         data: %{
           "timestamp" => "1492712820833",
-          "units" => 15,
+          "units" => "15",
           "users" => ["338897", "338998", "338904"]}
         }
       },
@@ -47,7 +47,7 @@ defmodule ServiceChallengeTest do
         entity_id: "uuid-v4",
         data: %{
           "duration_min" => 2,
-          "units" => 45,
+          "units" => "45",
           "users" => ["338897", "338998", "338904"]}
         }
       },
@@ -408,8 +408,8 @@ defmodule ServiceChallengeTest do
     context[:start_event]], {%{}, []})== {context[:state_after_start], []})
   end
 
-  # test "call", context do
-  #   assert(Service.Challenge.call())
-  # end
-
+test "actual units problem" do
+  assert(Service.Challenge.call([%DB.Event{domain: "challenge", entity_id: "e6b598c9-9b44-4a0e-a024-f5da681c4414", event_id: "4026fb31-46de-11e7-94dd-eb30939b15a1", kv: <<112, 114, 111, 100, 31, 101, 118, 101, 110, 116, 115, 47, 52, 48, 50, 54, 102, 98, 51, 49, 45, 52, 54, 100, 101, 45, 49, 49, 101, 55, 45, 57, 52, 100, 100, 45, 101, 98, 51, 48, 57, 51, 57, 98, 49, 53>>, kv_time: "2017-06-01T15:23:23.107000Z", meta: %{"timestamp" => "1496330603107", "units" => "16", "users" => [133129, 155256]}, realm: "nike", remote_ip: "108.171.135.161", type: "ACTUAL_UNITS"}],
+  %Reducer.State{deferred_events: [], model: %{"challenge_benchmark" => 1, "challenge_type" => "pre runner", "domain" => "challenge", "entity_id" => "e6b598c9-9b44-4a0e-a024-f5da681c4414", "last_played" => "11e7-46de-4026fb30-94dd-eb30939b15a1", "store_id" => 65, "users" => %{"133129" => %{"active_seconds" => 291.671, "start_time" => 1496330311436, "status" => "stopped"}}}, new_events: []})== %{})
+end
 end

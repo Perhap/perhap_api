@@ -130,7 +130,9 @@ defmodule Service.Challenge do
   end
 
   def actual_units_user(user, event, %{"status" => "stopped"} = user_model, benchmark) do
-    actual_units = event.data["units"] / length(event.data["users"])
+    units = String.to_integer(event.data["units"])
+    users = length(event.data["users"])
+    actual_units = units / users
     uph = actual_units / (user_model["active_seconds"] / 3600)
     percentage = uph/ benchmark
 
@@ -156,7 +158,7 @@ defmodule Service.Challenge do
 
   def edit_user(user, _event, %{"status" => "deleted"} = user_model, _benchmark), do: {user, user_model}
   def edit_user(user, event, user_model, benchmark) do
-    actual_units = event.data["units"] / length(event.data["users"])
+    actual_units = String.to_integer(event.data["units"]) / length(event.data["users"])
     uph = actual_units / (event.data["duration_min"] / 60)
     percentage = uph/ benchmark
 
@@ -218,5 +220,7 @@ defmodule Service.Challenge do
     |> Map.put("last_played", event.ordered_id)
     {new_model, create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
   end
+
+
 
 end
