@@ -75,7 +75,7 @@ defmodule Mix.Tasks.InitStores do
       Enum.reduce(newIdTuples, acc0, fn item, acc -> diffFold(&sendEvent/1, item, acc) end)
 
       # deactivate old stores
-      Logger.info("Map: #{inspect(oldMaps)}")
+      # Logger.info("Map: #{inspect(oldMaps)}")
       oldMaps
         |> Enum.filter_map(fn map -> map.entity_id end,
                            fn map -> genDeleteStoreEvent(map.entity_id) |> sendEvent end)

@@ -506,4 +506,9 @@ test "out of season with begining state", context do
       }, new_events: []})
 end
 
+# test "actaul event from perhap" do
+#   assert(Service.Stats.call( [%DB.Event{domain: "stats", entity_id: "53f97f3c-8174-42e6-a2e8-f8cd153715fb", event_id: "86008180-46de-11e7-b67d-abb60000017a", kv: <<112, 114, 111, 100, 31, 101, 118, 101, 110, 116, 115, 47, 56, 54, 48, 48, 56, 49, 56, 48, 45, 52, 54, 100, 101, 45, 49, 49, 101, 55, 45, 98, 54, 55, 100, 45, 97, 98, 98, 54, 48, 48, 48, 48, 48, 49>>, kv_time: "", meta: %{"challenge_benchmark" => 150, "challenge_id" => "c75d01af-57c9-475f-8a21-aa54aec6e031", "challenge_type" => "footwear", "store_id" => 39, "users" => %{"145083" => %{"start_time" => 1496329896784, "status" => "running"}}}, realm: "nike", remote_ip: "127.0.0.1", type: "pre_challenge"}],
+#               %Reducer.State{deferred_events: [], model: %{"last_played" => "11e7-46dc-b7c620d2-b9ae-abb40000017f", "season" => "Elixir.Season1", "stats" => %{"season1preseason" => %{"pre" => %{"pre_meta" => %{"222f5d9f-f835-4eae-83f1-10f263b2520f-311241" => %{"active_seconds" => 1895.457, "actual_units" => 77.0, "percentage" => 0.9749627662352667, "start_time" => 1496251037740, "status" => "completed", "uph" => 146.24441493529}, "75a0d82a-a5cc-4eff-9294-340d6e46d670-261536" => %{"active_seconds" => 53409.252, "actual_units" => 42.0, "percentage" => 0.03145522427462567, "start_time" => 1496276525382, "status" => "completed", "uph" => 2.830970184716311}, "b6f30a87-6180-49fc-bc90-078d6986da22-338121" => %{"active_seconds" => 1898.911, "actual_units" => 97.0, "percentage" => 1.2259658298888152, "start_time" => 1496251166125, "status" => "completed", "uph" => 183.89487448332227}}, "pre_percentage" => 0.7441279401329025, "pre_score" => 0, "pre_units" => 216.0}}}}, new_events: []})== %{})
+# end
+
 end
