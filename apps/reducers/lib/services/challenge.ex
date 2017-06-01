@@ -133,8 +133,8 @@ defmodule Service.Challenge do
     |> Map.put("last_played", event.ordered_id), new_events}
   end
 
-  def actual_units_user(user, %{:data => %{"units" => units}} = event, %{"status" => "stopped"} = user_model, benchmark) when is_number(units) do
-    units = event.data["units"]
+  def actual_units_user(user, %{:data => %{"units" => units}} = event, %{"status" => "stopped"} = user_model, benchmark) do
+    units = normalize_units(event.data["units"])
     users = length(event.data["users"])
     actual_units = units / users
     uph = actual_units / (user_model["active_seconds"] / 3600)
@@ -149,7 +149,7 @@ defmodule Service.Challenge do
   end
 
   def actual_units_user(user, event, %{"status" => "stopped"} = user_model, benchmark) do
-    {units, _} = Float.parse(event.data["units"])
+    units = normalize_units(event.data["units"])
     users = length(event.data["users"])
     actual_units = units / users
     uph = actual_units / (user_model["active_seconds"] / 3600)
@@ -180,7 +180,7 @@ defmodule Service.Challenge do
 
   def edit_user(user, _event, %{"status" => "deleted"} = user_model, _benchmark), do: {user, user_model}
   def edit_user(user, %{:data => %{"units" => units}} = event, %{"status" => "stopped"} = user_model, benchmark) when is_number(units) do
-    actual_units = event.data["units"] / length(event.data["users"])
+    actual_units = normalize_units(event.data["units"]) / length(event.data["users"])
     uph = actual_units / (event.data["duration_min"] / 60)
     percentage = uph/ benchmark
 
@@ -193,8 +193,16 @@ defmodule Service.Challenge do
     }
   end
 
+  defp normalize_units(units0) when is_binary(units0) do
+    {units, _} = Float.parse(units0)
+    units
+  end
+  defp normalize_units(units0) when is_number(units0) do
+    units0
+  end
+
   def edit_user(user, event, user_model, benchmark) do
-    {units, _} = Float.parse(event.data["units"]) 
+    units = normalize_units(event.data["units"])
     actual_units= units / length(event.data["users"])
     uph = actual_units / (event.data["duration_min"] / 60)
     percentage = uph/ benchmark
