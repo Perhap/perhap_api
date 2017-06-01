@@ -134,6 +134,8 @@ defmodule Service.Stats do
 
   def count_sum(meta, metric)do
     filtered_scores = Enum.filter(meta, fn({_k, score}) -> score["status"] == "completed" || score["status"] == "editted" end)
+    IO.inspect(filtered_scores)
+    IO.inspect(Enum.count(filtered_scores))
     {Enum.count(filtered_scores), Enum.reduce(filtered_scores, 0,
       fn
         {_k, %{^metric => actual_data} = score}, acc  when is_number(actual_data) -> actual_data + acc
@@ -145,7 +147,11 @@ defmodule Service.Stats do
 
   def average(meta, metric) do
     {count, sum} = count_sum(meta, metric)
-    sum / count
+    if count > 0 do
+       sum / count)
+    else
+      0
+    end
   end
 
   def percentage_score(percent) do
