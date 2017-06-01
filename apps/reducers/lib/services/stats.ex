@@ -131,9 +131,14 @@ defmodule Service.Stats do
     |> Enum.into(meta)
   end
 
+
   def count_sum(meta, metric)do
     filtered_scores = Enum.filter(meta, fn({_k, score}) -> score["status"] == "completed" || score["status"] == "editted" end)
-    {Enum.count(filtered_scores), Enum.reduce(filtered_scores, 0, fn({_k, score}, acc) -> score[metric] + acc end)}
+    {Enum.count(filtered_scores), Enum.reduce(filtered_scores, 0,
+      fn
+        {_k, %{^metric => actual_data} = score}, acc  when is_number(actual_data) -> actual_data + acc
+        {_k, %{^metric => actual_data} = score}, acc   -> String.to_integer(actual_data) + acc
+      end)}
   end
 
   def average(meta, metric) do

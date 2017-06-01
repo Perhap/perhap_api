@@ -129,7 +129,7 @@ defmodule Service.Challenge do
     |> Map.put("last_played", event.ordered_id), new_events}
   end
 
-  def actual_units_user(user, %{:data => %{"units" => units}} = event, %{"status" => "stopped"} = user_model, benchmark) when is_integer(units) do
+  def actual_units_user(user, %{:data => %{"units" => units}} = event, %{"status" => "stopped"} = user_model, benchmark) when is_number(units) do
     units = event.data["units"]
     users = length(event.data["users"])
     actual_units = units / users
@@ -172,7 +172,7 @@ defmodule Service.Challenge do
   end
 
   def edit_user(user, _event, %{"status" => "deleted"} = user_model, _benchmark), do: {user, user_model}
-  def edit_user(user, %{:data => %{"units" => units}} = event, %{"status" => "stopped"} = user_model, benchmark) when is_integer(units) do
+  def edit_user(user, %{:data => %{"units" => units}} = event, %{"status" => "stopped"} = user_model, benchmark) when is_number(units) do
     actual_units = event.data["units"] / length(event.data["users"])
     uph = actual_units / (event.data["duration_min"] / 60)
     percentage = uph/ benchmark
