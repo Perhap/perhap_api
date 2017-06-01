@@ -121,6 +121,10 @@ defmodule Service.Challenge do
 
   def stop_user(user, _event, user_model), do: {user, user_model}
 
+
+  def stop({:stop, event}, model, new_events ) when model == %{} do
+    {model, new_events}
+  end
   def stop({:stop, event}, model, new_events) do
     user_models = Enum.map(event.data["users"], fn(user) -> stop_user(to_string(user), event, model["users"][to_string(user)]) end)
     |> Enum.into(model["users"])
@@ -145,7 +149,7 @@ defmodule Service.Challenge do
   end
 
   def actual_units_user(user, event, %{"status" => "stopped"} = user_model, benchmark) do
-    units = String.to_integer(event.data["units"])
+    {units, _} = Float.parse(event.data["units"])
     users = length(event.data["users"])
     actual_units = units / users
     uph = actual_units / (user_model["active_seconds"] / 3600)
@@ -161,6 +165,9 @@ defmodule Service.Challenge do
 
   def actual_units_user(user, _event, user_model, _benchmark), do: {user, user_model}
 
+  def actual_units({:actual_units, event}, model, new_events ) when model == %{} do
+    {model, new_events}
+  end
   def actual_units({:actual_units, event}, model, new_events ) do
     user_models = Enum.map(event.data["users"], fn(user) -> actual_units_user(to_string(user), event, model["users"][to_string(user)], model["challenge_benchmark"]) end)
     |> Enum.into(model["users"])
@@ -187,7 +194,8 @@ defmodule Service.Challenge do
   end
 
   def edit_user(user, event, user_model, benchmark) do
-    actual_units = String.to_integer(event.data["units"]) / length(event.data["users"])
+    {units, _} = Float.parse(event.data["units"]) 
+    actual_units= units / length(event.data["users"])
     uph = actual_units / (event.data["duration_min"] / 60)
     percentage = uph/ benchmark
 
@@ -200,6 +208,9 @@ defmodule Service.Challenge do
     }
   end
 
+  def edit({:edit, event}, model, new_events ) when model == %{} do
+    {model, new_events}
+  end
   def edit({:edit, event}, model, new_events) do
     user_models = Enum.map(event.data["users"], fn(user) -> edit_user(to_string(user), event, model["users"][to_string(user)], model["challenge_benchmark"]) end)
     |> Enum.into(model["users"])
@@ -241,6 +252,10 @@ defmodule Service.Challenge do
     {user, new_model}
   end
 
+
+  def delete({:delete, event}, model, new_events ) when model == %{} do
+    {model, new_events}
+  end
   def delete({:delete, event}, model, new_events) do
     user_models = Enum.map(event.data["users"], fn(user) -> delete_user(to_string(user), event, model["users"][to_string(user)]) end)
     |> Enum.into(model["users"])

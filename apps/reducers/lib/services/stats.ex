@@ -137,7 +137,9 @@ defmodule Service.Stats do
     {Enum.count(filtered_scores), Enum.reduce(filtered_scores, 0,
       fn
         {_k, %{^metric => actual_data} = score}, acc  when is_number(actual_data) -> actual_data + acc
-        {_k, %{^metric => actual_data} = score}, acc   -> String.to_integer(actual_data) + acc
+        {_k, %{^metric => actual_data} = score}, acc   ->
+          {data, _} = Float.parse(actual_data)
+          data + acc
       end)}
   end
 
@@ -265,10 +267,11 @@ defmodule Service.Stats do
 
 
   def bin_audit({_type, event}, {period_model, new_events}) do
+    {bin_percentage, _} = Float.parse(event.data["BIN_PERCENTAGE"])
     {period_model
     |> Map.put("bin_audit", %{})
-    |> put_in(["bin_audit", "bin_percentage"], event.data["BIN_PERCENTAGE"])
-    |> put_in(["bin_audit", "bin_score"], bin_audit_score(event.data["BIN_PERCENTAGE"])), new_events}
+    |> put_in(["bin_audit", "bin_percentage"], bin_percentage)
+    |> put_in(["bin_audit", "bin_score"], bin_audit_score(bin_percentage)), new_events}
   end
 
   def actuals({_type, event}, {period_model, new_events}) do
@@ -280,8 +283,9 @@ defmodule Service.Stats do
 
 
   def add_actuals(event, meta)do
+    {count, _} = Float.parse(event.data["Count"])
     meta
-    |> Map.put(event.event_id, event.data["Count"])
+    |> Map.put(event.event_id, count)
   end
 
   def sum_actuals(meta)do

@@ -16,7 +16,7 @@ defmodule Service.Cron do
     event_id = gen_uuidv1()
     {_, data} =Poison.encode(eventdata)
 
-    url = "https://perhap.bigsquidapp.com/v1/event/nike/domo/" <> entity_id <> "/pull/" <> event_id
+    url = Application.get_env(:reducers, :perhap_base_url) <> "/v1/event/nike/domo/" <> entity_id <> "/pull/" <> event_id
     Logger.info("bin audit request from domo", perhap_only: 1)
     response = HTTPoison.post(url, data, ["Content-Type": "application/json"], [])
     response
@@ -35,7 +35,7 @@ defmodule Service.Cron do
     event_id = gen_uuidv1()
     {_, data} =Poison.encode(eventdata)
 
-    url = "https://perhap.bigsquidapp.com/v1/event/nike/domo/" <> entity_id <> "/pull/" <> event_id
+    url = Application.get_env(:reducers, :perhap_base_url) <> "/v1/event/nike/domo/" <> entity_id <> "/pull/" <> event_id
     Logger.info("actuals request from domo", perhap_only: 1)
     response = HTTPoison.post(url, data, ["Content-Type": "application/json"], [])
     response
