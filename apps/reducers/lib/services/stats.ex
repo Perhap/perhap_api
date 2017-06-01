@@ -145,10 +145,9 @@ defmodule Service.Stats do
 
   def average(meta, metric) do
     {count, sum} = count_sum(meta, metric)
-    if count > 0 do
-       sum / count
-    else
-      0
+    case count > 0 do
+      true -> sum / count
+      false -> 0
     end
   end
 
