@@ -122,7 +122,7 @@ defmodule Service.Challenge do
   def stop_user(user, _event, user_model), do: {user, user_model}
 
 
-  def stop({:stop, event}, model, new_events ) when model == %{} do
+  def stop({:stop, _event}, model, new_events ) when model == %{} do
     {model, new_events}
   end
   def stop({:stop, event}, model, new_events) do
@@ -134,7 +134,7 @@ defmodule Service.Challenge do
   end
 
   def actual_units_user(user, %{:data => %{"units" => units}} = event, %{"status" => "stopped"} = user_model, benchmark) do
-    units = normalize_units(event.data["units"])
+    units = normalize_units(units)
     users = length(event.data["users"])
     actual_units = units / users
     uph = actual_units / (user_model["active_seconds"] / 3600)
@@ -165,7 +165,7 @@ defmodule Service.Challenge do
 
   def actual_units_user(user, _event, user_model, _benchmark), do: {user, user_model}
 
-  def actual_units({:actual_units, event}, model, new_events ) when model == %{} do
+  def actual_units({:actual_units, _event}, model, new_events ) when model == %{} do
     {model, new_events}
   end
   def actual_units({:actual_units, event}, model, new_events ) do
@@ -216,7 +216,7 @@ defmodule Service.Challenge do
     }
   end
 
-  def edit({:edit, event}, model, new_events ) when model == %{} do
+  def edit({:edit, _event}, model, new_events ) when model == %{} do
     {model, new_events}
   end
   def edit({:edit, event}, model, new_events) do
@@ -261,7 +261,7 @@ defmodule Service.Challenge do
   end
 
 
-  def delete({:delete, event}, model, new_events ) when model == %{} do
+  def delete({:delete, _event}, model, new_events ) when model == %{} do
     {model, new_events}
   end
   def delete({:delete, event}, model, new_events) do
