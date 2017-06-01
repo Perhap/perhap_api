@@ -89,7 +89,7 @@ defmodule Service.Stats do
     to_string(period)
   end
 
-  def get_period_model(period, model) when period == "out_of_season" do
+  def get_period_model(period, _model) when period == "out_of_season" do
     :out_of_season
   end
 
@@ -112,7 +112,7 @@ defmodule Service.Stats do
     get_new_model({type, event}, {period_model, new_events}, model, period)
   end
 
-  def get_new_model({type, event}, {:out_of_season, new_events}, model, period) do
+  def get_new_model({_type, _event}, {:out_of_season, new_events}, model, _period) do
     {model, new_events}
   end
 
@@ -134,12 +134,10 @@ defmodule Service.Stats do
 
   def count_sum(meta, metric)do
     filtered_scores = Enum.filter(meta, fn({_k, score}) -> score["status"] == "completed" || score["status"] == "editted" end)
-    IO.inspect(filtered_scores)
-    IO.inspect(Enum.count(filtered_scores))
     {Enum.count(filtered_scores), Enum.reduce(filtered_scores, 0,
       fn
-        {_k, %{^metric => actual_data} = score}, acc  when is_number(actual_data) -> actual_data + acc
-        {_k, %{^metric => actual_data} = score}, acc   ->
+        {_k, %{^metric => actual_data}}, acc  when is_number(actual_data) -> actual_data + acc
+        {_k, %{^metric => actual_data}}, acc   ->
           {data, _} = Float.parse(actual_data)
           data + acc
       end)}
@@ -148,7 +146,7 @@ defmodule Service.Stats do
   def average(meta, metric) do
     {count, sum} = count_sum(meta, metric)
     if count > 0 do
-       sum / count)
+       sum / count
     else
       0
     end
