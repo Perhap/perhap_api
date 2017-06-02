@@ -27,14 +27,15 @@ defmodule API.Mixfile do
   defp deps do
     [
       {:cowboy, github: "ninenines/cowboy", ref: "2.0.0-pre.9"},
-      {:httpoison, "~> 0.11.1"},
+      # {:httpoison, "~> 0.11.1"},
+      {:ranch, github: "ninenines/ranch", ref: "1.3.0", override: true},
+      {:gun, github: "ninenines/gun", ref: "1.0.0-pre.3"},
       {:reducers, in_umbrella: true},
       {:json, "~> 1.0"},
       {:snappy, github: "fdmanana/snappy-erlang-nif"},
       {:exometer_core, github: "Feuerlabs/exometer_core"},
       {:setup, github: "uwiger/setup", manager: :rebar, override: true},
       {:gen_stage, "~> 0.11.0"},
-      {:faker, "~> 0.7.0", only: [:dev,:test], runtime: false},
       {:meck, "~> 0.8.4", runtime: false, override: true}
     ]
   end
