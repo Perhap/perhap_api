@@ -26,7 +26,7 @@ defmodule API do
       {:_, [
         {"/v1/ping", PingHandler, []},
         {"/v1/event/:event_id", EventHandler, []},
-        {"/v1/event/:realm/:domain/:entity_id/:event_type/:event_id", EventHandler, []},
+        {"/v1/event/:realm/:domain/:entity_id/:type/:event_id", EventHandler, []},
         {"/v1/events/:domain/:entity_id", EventsHandler, []},
         {"/v1/model/:domain/:entity_id", ModelHandler, []},
         {"/v1/stats", StatsHandler, []},
