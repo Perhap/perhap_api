@@ -25,8 +25,11 @@ defmodule API.Event do
 
   @spec post(Plug.Conn, DB.Event.t) :: Plug.Conn
   def post(conn, %DB.Event{} = event) do
-    ip_addr = conn.remote_ip |> Tuple.to_list |> Enum.join(".")
-    case DB.Event.save(%{event | meta: conn.body_params, remote_ip: ip_addr}) do
+    {:ok, body, _} = :cowboy_req.read_body(conn)
+    {remote_ip, remote_port} = :cowboy_req.peer(conn)
+    json_map = JSON.decode!(body)
+    ip_addr = remote_ip |> Tuple.to_list |> Enum.join(".")
+    case DB.Event.save(%{event | meta: json_map, remote_ip: ip_addr}) do
       %DB.Event{} = event ->
         EventCoordinator.async_notify(event)
         Response.send(conn, 204)

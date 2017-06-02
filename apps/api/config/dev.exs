@@ -1,5 +1,10 @@
 use Mix.Config
 
 config :api,
-  port: 4500,
-  use_ssl: false
+  [
+    network: [
+      {:protocol, :http},
+      {:bind, {'0.0.0.0', 4500}},
+      {:acceptors, System.schedulers_online * 2},
+    ]
+  ]
