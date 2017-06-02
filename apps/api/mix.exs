@@ -26,8 +26,7 @@ defmodule API.Mixfile do
 
   defp deps do
     [
-      {:cowboy, "~> 1.1.2"},
-      {:plug, "~> 1.3"},
+      {:cowboy, github: "ninenines/cowboy", ref: "2.0.0-pre.9"},
       {:httpoison, "~> 0.11.1"},
       {:reducers, in_umbrella: true},
       {:json, "~> 1.0"},

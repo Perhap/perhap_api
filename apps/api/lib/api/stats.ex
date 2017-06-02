@@ -1,4 +1,4 @@
-defmodule Stats do
+defmodule API.Stats do
   alias API.Response
   alias :exometer, as: Exometer
   alias :event_get, as: E_Get
