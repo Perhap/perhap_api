@@ -136,12 +136,10 @@ defmodule Service.Stats do
 
   def count_sum(meta, metric)do
     filtered_scores = Enum.filter(meta, fn({_k, score}) -> score["status"] == "completed" || score["status"] == "editted" end)
-    Logger.debug(inspect(filtered_scores))
-    Logger.debug(inspect(Enum.count(filtered_scores)))
     {Enum.count(filtered_scores), Enum.reduce(filtered_scores, 0,
       fn
-        {_k, %{^metric => actual_data} = _score}, acc  when is_number(actual_data) -> actual_data + acc
-        {_k, %{^metric => actual_data} = _score}, acc   ->
+        {_k, %{^metric => actual_data}}, acc  when is_number(actual_data) -> actual_data + acc
+        {_k, %{^metric => actual_data}}, acc   ->
           {data, _} = Float.parse(actual_data)
           data + acc
       end)}

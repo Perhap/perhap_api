@@ -2,10 +2,7 @@ defmodule ServiceTransformerTest do
   use ExUnit.Case
   doctest Service.Transformer
 
-
-    alias DB.Event
-    alias Reducer.State
-
+  alias DB.Event
 
   setup_all _context do
     {:ok, [
@@ -36,7 +33,7 @@ defmodule ServiceTransformerTest do
         type: "pre_challenge_transform"},
       transformed_event: %Event{
         domain: "stats",
-        entity_id: "8222fa94-8e1f-42a7-b1db-b8ad7b535545",
+        entity_id: nil,
         meta: %{
           "challenge_id" => "uuid-v4-old",
           "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
