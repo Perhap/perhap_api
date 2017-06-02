@@ -41,10 +41,10 @@ defmodule Service.Domo do
     client_id = meta["client_id"]
     client_secret = meta["client_secret"]
     type = meta["out_going_type"]
-    last_played = event.event_id |> flipper
+    last_played = flip_v1_uuid(event.event_id)
 
     domo_dataset(dataset_id, client_id, client_secret)
-      |> hash_file(model["hash_state"], type, store_ids)
+      |> hash_file(model, type, store_ids)
       |> return_model_and_events(last_played)
 
 
@@ -92,6 +92,8 @@ defmodule Service.Domo do
   end
 
   def reducer(row, {events, col_heads, type, hash_state, store_ids}) when row != "" do
+    IO.inspect(row)
+    IO.inspect(hash_state)
     {new_events, col_heads, type, new_hash_state, store_ids} =
       case Donethat.new?(row, hash_state) do
         {true, new_hash_state} ->
