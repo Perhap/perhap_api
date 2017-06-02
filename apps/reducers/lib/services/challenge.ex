@@ -233,7 +233,7 @@ defmodule Service.Challenge do
       "equipment" -> "pre_challenge_transform"
       "apparel" -> "pre_challenge_transform"
       "footwear" -> "pre_challenge_transform"
-      "product_refill" -> "refill_challenge_transform"
+      "product refill" -> "refill_challenge_transform"
       _ -> :reject
     end
   end
