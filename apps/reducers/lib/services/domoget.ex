@@ -5,6 +5,7 @@ defmodule Service.Domo do
 
   alias DB.Event
   alias Reducer.State
+  require Logger
 
 
   @domains [:domo]
@@ -33,6 +34,7 @@ defmodule Service.Domo do
 
 
   def domo_service(event, {state, new_events}) do
+    store_ids = get_store_ids()
     model = state.model
     meta = event.meta
     dataset_id = meta["dataset_id"]
@@ -42,7 +44,7 @@ defmodule Service.Domo do
     last_played = event.event_id |> flipper
 
     domo_dataset(dataset_id, client_id, client_secret)
-      |> hash_file(model, type)
+      |> hash_file(model["hash_state"], type, store_ids)
       |> return_model_and_events(last_played)
 
 
@@ -60,10 +62,10 @@ defmodule Service.Domo do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         response = Poison.Parser.parse!(body)
         response["access_token"]
-      {:ok, %HTTPoison.Response{status_code: 404}} ->
-        {:err, "404:Not Found"}
+      {:ok, %HTTPoison.Response{status_code: code}} ->
+        Logger.error("token error, status_code#{code}")
       {:error, %HTTPoison.Error{reason: reason}} ->
-        {:err, reason}
+        Logger.error("token error, #{reason}")
     end
 
   end
@@ -74,34 +76,34 @@ defmodule Service.Domo do
     case HTTPoison.get(url, [{"Authorization", "bearer #{access_token}"}]) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         body
-      {:ok, %HTTPoison.Response{status_code: 404}} ->
-        {:err, "404:Not Found"}
-      {:error, %HTTPoison.Error{reason: reason}} ->
-        {:err, reason}
+        {:ok, %HTTPoison.Response{status_code: code}} ->
+          Logger.error("dataset error, status_code#{code}")
+        {:error, %HTTPoison.Error{reason: reason}} ->
+          Logger.error("dataset error, #{reason}")
     end
 
   end
 
-  def hash_file(body, model, type) do
+  def hash_file(body, model, type, store_ids) do
     hash_state = is_empty?(model)
     [col_heads | values] = String.split(body, "\n", parts: 2)
     file = String.split(to_string(values), "\n")
-    file |> Enum.reduce({[], col_heads, type, hash_state}, &reducer/2)
+    file |> Enum.reduce({[], col_heads, type, hash_state, store_ids}, &reducer/2)
   end
 
-  def reducer(row, {events, col_heads, type, hash_state}) when row != "" do
-    {new_events, col_heads, type, new_hash_state} =
+  def reducer(row, {events, col_heads, type, hash_state, store_ids}) when row != "" do
+    {new_events, col_heads, type, new_hash_state, store_ids} =
       case Donethat.new?(row, hash_state) do
         {true, new_hash_state} ->
-          {[make_event(col_heads, type, row) | events], col_heads, type, new_hash_state}
+          {[make_event(col_heads, type, row, store_ids) | events], col_heads, type, new_hash_state, store_ids}
         {_, new_hash_state} ->
-          {events, col_heads, type, new_hash_state}
+          {events, col_heads, type, new_hash_state, store_ids}
       end
-    {new_events, col_heads, type, new_hash_state}
+    {new_events, col_heads, type, new_hash_state, store_ids}
   end
 
-  def reducer(row, {events, col_heads, type, hash_state}) do
-    {events, col_heads, type, hash_state}
+  def reducer(row, {events, col_heads, type, hash_state, store_ids}) do
+    {events, col_heads, type, hash_state, store_ids}
   end
 
   def is_empty?(model) when map_size(model) == 0 do
@@ -112,12 +114,12 @@ defmodule Service.Domo do
     model[:hash_state]
   end
 
-  def make_event(col_heads, type, row) do
+  def make_event(col_heads, type, row, store_ids) do
     [store | _t] = String.split(row, ",", parts: 2)
     meta = build_meta_map(col_heads, row)
     event = %Event{domain: "stats",
                       meta: meta,
-                      entity_id: get_entity_id(meta["STORE"] || meta["Store"]),
+                      entity_id: get_entity_id(meta["STORE"] || meta["Store"], store_ids),
                       event_id: gen_event_id(),
                       realm: "nike",
                       remote_ip: "127.0.0.1",
@@ -134,8 +136,12 @@ defmodule Service.Domo do
       |> Map.new
   end
 
-  def get_entity_id(store_id) do
+  def get_entity_id(store_id, stores) do
     store = to_string(store_id)
+    stores[store]
+  end
+
+  def get_store_ids() do
     perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
     url = perhap_base_url <> "/v1/model/storeindex/100077bd-5b34-41ac-b37b-62adbf86c1a5"
     {:ok, response} = case Mix.env do
@@ -145,7 +151,7 @@ defmodule Service.Domo do
         HTTPoison.get(url)
     end
     {:ok, body} = Poison.decode(response.body)
-    body["stores"][store]
+    body["stores"]
   end
 
   def gen_event_id() do
@@ -154,7 +160,7 @@ defmodule Service.Domo do
     event_id
   end
 
-  def return_model_and_events({new_events, _col_heads, _type, new_hash_state}, last_played) do
+  def return_model_and_events({new_events, _col_heads, _type, new_hash_state, store_ids}, last_played) do
     model = Map.put(%{}, :last_played, last_played)
       |> Map.put(:hash_state, new_hash_state)
     {model, new_events}
