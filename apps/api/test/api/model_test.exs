@@ -1,10 +1,8 @@
 defmodule ModelTest do
   use ExUnit.Case, async: true
-  use Plug.Test
+  import API.Test.Helper
 
   alias DB.Reducer.State, as: RS
-
-  @api_router_opts API.Router.init([])
 
   setup do
     domain = :uuid.uuid_to_string(:uuid.get_v4(:strong))
@@ -29,16 +27,12 @@ defmodule ModelTest do
   end
 
   test "query model, :not_found" do
-    conn = conn(:get, "https://example.com/v1/model/not_found_domain/fake_entity_id")
-    conn = API.Router.call(conn, @api_router_opts)
-    assert conn.state == :sent
-    assert conn.status == 404
+    %{status: status, headers: headers} = get("/v1/model/not_found_domain/fake_entity_id")
+    assert status == 404
   end
 
   test "query model, :found", context do
-    conn = conn(:get, "https://example.com/v1/model/#{context[:domain]}/#{context[:entity_id]}")
-    conn = API.Router.call(conn, @api_router_opts)
-    assert conn.state == :sent
-    assert conn.status == 200
+    %{status: status, headers: _, body: _} = get("/v1/model/#{context[:domain]}/#{context[:entity_id]}")
+    assert status == 200
   end
 end
