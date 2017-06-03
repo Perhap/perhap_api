@@ -109,16 +109,19 @@ defmodule Service.Domo do
   end
 
   def is_empty?(model) do
-    to_struct(HashState, model["hash_state"])
+    case is_nil(model) or is_nil(model["hash_state"]) do
+      true -> Donethat.empty_state
+      false -> to_struct(HashState, model["hash_state"])
+    end
   end
 
   def to_struct(kind, attrs) do
-  struct = struct(kind)
-  Enum.reduce Map.to_list(struct), struct, fn {k, _}, acc ->
-    case Map.fetch(attrs, Atom.to_string(k)) do
-      {:ok, v} -> %{acc | k => v}
-      :error -> acc
-    end
+    struct = struct(kind)
+    Enum.reduce Map.to_list(struct), struct, fn {k, _}, acc ->
+      case Map.fetch(attrs, Atom.to_string(k)) do
+        {:ok, v} -> %{acc | k => v}
+        :error -> acc
+      end
   end
 end
 
