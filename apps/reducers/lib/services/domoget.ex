@@ -168,6 +168,7 @@ end
     event_id
   end
 
+  # case when hash_file doesn't work right, should we just record last played?
   def return_model_and_events({}, last_played) do
     model = Map.put(%{}, :last_played, last_played)
     {model, []}
