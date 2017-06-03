@@ -12,6 +12,11 @@ defmodule ValidationTest do
     [uuid_v1: uuid_v1_string, uuid_v4: uuid_v4_string]
   end
 
+  test "nil is not a valid uuid" do
+    assert false == V.is_uuid_v1(nil)
+    assert false == V.is_uuid_v4(nil)
+  end
+
   test "can test a string for comforming to uuid_v4", ctx do
     assert false == V.is_uuid_v4("not a uuid v4")
     assert false == V.is_uuid_v4(ctx[:uuid_v1])
