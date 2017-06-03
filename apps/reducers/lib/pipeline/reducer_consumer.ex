@@ -4,6 +4,7 @@ defmodule Reducer.Consumer do
   import DB.Common, only: [unit_separator: 0]
   alias DB.Event
   alias DB.Reducer.State, as: RS
+  alias DB.Validation, as: V
   alias Reducer.State
 
   require Logger
@@ -118,11 +119,17 @@ defmodule Reducer.Consumer do
   # Save and dispatch new events
   defp process_new_events(events) when is_list(events) do
     Enum.each(events, fn(event) ->
-      case Event.save(event) do
-        %Event{} = event ->
-          EventCoordinator.async_notify(event)
-        _ ->
-          :error
+      case V.valid_event(event) do
+        false ->
+          Logger.error("Reducers generated invalid event #{inspect(event)}")
+          :invalid_event
+        true ->
+          case Event.save(event) do
+            %Event{} = event ->
+              EventCoordinator.async_notify(event)
+            _ ->
+              :error
+          end
       end
     end)
   end

@@ -16,7 +16,7 @@ defmodule API.EventHandler do
   end
   def handle("POST", bindings, req0) do
     event = struct(DB.Event, bindings)
-    case V.is_uuid_v1(event.event_id) and V.is_uuid_v4(event.entity_id) do
+    case V.valid_event(event) do
       true ->
         kv_time = V.extract_datetime(event.event_id)
         event = %DB.Event{event|kv_time: kv_time}

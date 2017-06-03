@@ -4,7 +4,7 @@ defmodule API.Model do
   alias API.Response
   alias API.Error, as: E
 
-  @spec get(Plug.Conn, String.t, String.t) :: Plug.Conn
+  @spec get(:cowboy_req.req(), String.t, String.t) :: :cowboy_req.req()
   def get(conn, domain, entity_id) do
     e_ctx = DB.Common.event_context(%{entity_id: entity_id, domain: domain})
     reducer_state_key = e_ctx <> unit_separator() <> "service." <> domain

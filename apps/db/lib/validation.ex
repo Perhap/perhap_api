@@ -1,6 +1,13 @@
+alias DB.Event
+
 defmodule DB.Validation do
   @uuid_v1_regex "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
   @flipped_regex "[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{12}"
+
+  @spec valid_event(Event.t) :: true|false
+  def valid_event(%Event{event_id: event_id, entity_id: entity_id} = event) do
+    is_uuid_v1(event.event_id) and is_uuid_v4(event.entity_id)
+  end
 
   @spec is_uuid_v1(charlist()|binary()) :: true|false
   def is_uuid_v1(input) when is_list(input), do: is_uuid_v1(to_string(input))
