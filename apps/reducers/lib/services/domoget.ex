@@ -7,7 +7,6 @@ defmodule Service.Domo do
   alias Reducer.State
   require Logger
 
-
   @domains [:domo]
   @types [:pull]
   def domains, do: @domains
@@ -18,7 +17,6 @@ defmodule Service.Domo do
       "pull"], event.type)
   end
 
-
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, state)do
     {model, new_events} = Enum.filter(events, fn(event) -> correct_type?(event) end)
@@ -26,16 +24,13 @@ defmodule Service.Domo do
     %State{model: model, new_events: new_events}
   end
 
-
   def domo_service_recursive([], {model, new_events}), do: {model, new_events}
   def domo_service_recursive([event | remaining_events], {model, new_events}) do
     domo_service_recursive(remaining_events, domo_service(event, {model, new_events}))
   end
 
-
-  def domo_service(event, {state, new_events}) do
+  def domo_service(event, {model, new_events}) do
     store_ids = get_store_ids()
-    model = state.model
     meta = event.meta
     dataset_id = meta["dataset_id"]
     client_id = meta["client_id"]
@@ -46,8 +41,6 @@ defmodule Service.Domo do
     domo_dataset(dataset_id, client_id, client_secret)
       |> hash_file(model, type, store_ids)
       |> return_model_and_events(last_played)
-
-
   end
 
   def domo_dataset(dataset_id, client_id, client_secret) do
@@ -57,38 +50,43 @@ defmodule Service.Domo do
 
   def get_access_token(client_id, client_secret) do
     url = "https://api.domo.com/oauth/token?grant_type=client_credentials&scope=data"
-
     case HTTPoison.get(url, %{}, [hackney: [basic_auth: {client_id, client_secret}]]) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         response = Poison.Parser.parse!(body)
         response["access_token"]
       {:ok, %HTTPoison.Response{status_code: code}} ->
         Logger.error("token error, status_code#{code}")
+        :error
       {:error, %HTTPoison.Error{reason: reason}} ->
         Logger.error("token error, #{reason}")
+        :error
     end
-
   end
 
   def get_dataset(access_token, dataset_id) do
     url = "https://api.domo.com/v1/datasets/#{dataset_id}/data?includeHeader=true&fileName=data_dump.csv"
-
     case HTTPoison.get(url, [{"Authorization", "bearer #{access_token}"}]) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         body
         {:ok, %HTTPoison.Response{status_code: code}} ->
           Logger.error("dataset error, status_code#{code}")
+          :error
         {:error, %HTTPoison.Error{reason: reason}} ->
           Logger.error("dataset error, #{reason}")
+          :error
     end
-
   end
 
   def hash_file(body, model, type, store_ids) do
-    hash_state = is_empty?(model)
-    [col_heads | values] = String.split(body, "\n", parts: 2)
-    file = String.split(to_string(values), "\n")
-    file |> Enum.reduce({[], col_heads, type, hash_state, store_ids}, &reducer/2)
+    case body do
+      :error ->
+        {}
+      _ ->
+        hash_state = is_empty?(model)
+        [col_heads | values] = String.split(body, "\n", parts: 2)
+        file = String.split(to_string(values), "\n")
+        file |> Enum.reduce({[], col_heads, type, hash_state, store_ids}, &reducer/2)
+    end
   end
 
   def reducer(row, {events, col_heads, type, hash_state, store_ids}) when row != "" do
@@ -170,6 +168,10 @@ end
     event_id
   end
 
+  def return_model_and_events({}, last_played) do
+    model = Map.put(%{}, :last_played, last_played)
+    {model, []}
+  end
   def return_model_and_events({new_events, _col_heads, _type, new_hash_state, store_ids}, last_played) do
     model = Map.put(%{}, :last_played, last_played)
       |> Map.put(:hash_state, new_hash_state)
