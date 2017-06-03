@@ -20,7 +20,7 @@ defmodule Service.Domo do
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, state)do
     {model, new_events} = Enum.filter(events, fn(event) -> correct_type?(event) end)
-     |> domo_service_recursive({state, []})
+     |> domo_service_recursive({state.model, []})
     %State{model: model, new_events: new_events}
   end
 
