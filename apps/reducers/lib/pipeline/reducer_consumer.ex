@@ -94,7 +94,7 @@ defmodule Reducer.Consumer do
         {domain, entity_id, _} = RS.split_key(reducer_state_key)
         indexed_events = case Event.find_by_entity_domain(entity_id, domain) do
           :not_found -> []
-          events -> events |> Event.find() |> Enum.map(&(&1.model))
+          events -> events |> Event.find() |> Enum.filter(&(&1 != :not_found)) |> Enum.map(&(&1.model))
         end
         reducer_events_all = (reducer_events ++ indexed_events) |> Enum.uniq
         {reducer_events_all, %State{}}
@@ -108,8 +108,9 @@ defmodule Reducer.Consumer do
     rescue
       error ->
         Logger.error("Problem calling reducer: #{inspect(reducer)}, #{inspect(error)},
-                      with events: #{inspect(reducer_events)}
-                      and state: #{reducer_state_key}|#{inspect(reducer_state)}")
+          trace: #{inspect(:erlang.get_stacktrace())},
+          with events: #{inspect(reducer_events)},
+          and state: #{reducer_state_key}|#{inspect(reducer_state)}")
         :error
     end
   end
