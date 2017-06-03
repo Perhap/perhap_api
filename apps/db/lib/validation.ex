@@ -6,7 +6,7 @@ defmodule DB.Validation do
 
   @spec valid_event(Event.t) :: true|false
   def valid_event(%Event{event_id: event_id, entity_id: entity_id} = event) do
-    is_uuid_v1(event.event_id) and is_uuid_v4(event.entity_id)
+    is_uuid_v1(event_id) and is_uuid_v4(entity_id)
   end
 
   @spec is_uuid_v1(charlist()|binary()) :: true|false
