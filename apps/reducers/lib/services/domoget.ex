@@ -122,19 +122,19 @@ defmodule Service.Domo do
         {:ok, v} -> %{acc | k => v}
         :error -> acc
       end
+    end
   end
-end
 
   def make_event(col_heads, type, row, store_ids) do
     [store | _t] = String.split(row, ",", parts: 2)
     meta = build_meta_map(col_heads, row)
     event = %Event{domain: "stats",
-                      meta: meta,
-                      entity_id: get_entity_id(meta["STORE"] || meta["Store"], store_ids),
-                      event_id: gen_event_id(),
-                      realm: "nike",
-                      remote_ip: "127.0.0.1",
-                      type: type}
+                   meta: meta,
+                   entity_id: get_entity_id(meta["STORE"] || meta["Store"], store_ids),
+                   event_id: gen_event_id(),
+                   realm: "nike",
+                   remote_ip: "127.0.0.1",
+                   type: type}
     event
   end
 
