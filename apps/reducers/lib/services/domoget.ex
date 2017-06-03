@@ -92,8 +92,6 @@ defmodule Service.Domo do
   end
 
   def reducer(row, {events, col_heads, type, hash_state, store_ids}) when row != "" do
-    IO.inspect(row)
-    IO.inspect(hash_state)
     {new_events, col_heads, type, new_hash_state, store_ids} =
       case Donethat.new?(row, hash_state) do
         {true, new_hash_state} ->
@@ -113,8 +111,18 @@ defmodule Service.Domo do
   end
 
   def is_empty?(model) do
-    model[:hash_state]
+    to_struct(HashState, model["hash_state"])
   end
+
+  def to_struct(kind, attrs) do
+  struct = struct(kind)
+  Enum.reduce Map.to_list(struct), struct, fn {k, _}, acc ->
+    case Map.fetch(attrs, Atom.to_string(k)) do
+      {:ok, v} -> %{acc | k => v}
+      :error -> acc
+    end
+  end
+end
 
   def make_event(col_heads, type, row, store_ids) do
     [store | _t] = String.split(row, ",", parts: 2)
