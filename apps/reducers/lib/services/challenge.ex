@@ -192,15 +192,6 @@ defmodule Service.Challenge do
       |> Map.put("percentage", percentage)
     }
   end
-
-  defp normalize_units(units0) when is_binary(units0) do
-    {units, _} = Float.parse(units0)
-    units
-  end
-  defp normalize_units(units0) when is_number(units0) do
-    units0
-  end
-
   def edit_user(user, event, user_model, benchmark) do
     units = normalize_units(event.data["units"])
     actual_units= units / length(event.data["users"])
@@ -216,11 +207,14 @@ defmodule Service.Challenge do
     }
   end
 
-  def edit({:edit, _event}, model, new_events ) when model == %{} do
+  def edit({:edit, _event}, model, new_events) when model == %{} do
     {model, new_events}
   end
   def edit({:edit, event}, model, new_events) do
-    user_models = Enum.map(event.data["users"], fn(user) -> edit_user(to_string(user), event, model["users"][to_string(user)], model["challenge_benchmark"]) end)
+    user_models = Enum.map(event.data["users"], fn(user_raw) ->
+      user = to_string(user_raw)
+      edit_user(user, event, model["users"][user], model["challenge_benchmark"])
+    end)
     |> Enum.into(model["users"])
     new_model = model
     |> Map.put("users", user_models)
@@ -260,7 +254,6 @@ defmodule Service.Challenge do
     {user, new_model}
   end
 
-
   def delete({:delete, _event}, model, new_events ) when model == %{} do
     {model, new_events}
   end
@@ -273,6 +266,12 @@ defmodule Service.Challenge do
     {new_model, create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
   end
 
-
+  defp normalize_units(units0) when is_binary(units0) do
+    {units, _} = Float.parse(units0)
+    units
+  end
+  defp normalize_units(units0) when is_number(units0) do
+    units0
+  end
 
 end

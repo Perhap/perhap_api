@@ -29,7 +29,7 @@ defmodule Service.Domo do
     domo_service_recursive(remaining_events, domo_service(event, {model, new_events}))
   end
 
-  def domo_service(event, {model, new_events}) do
+  def domo_service(event, {model, _new_events}) do
     store_ids = get_store_ids()
     meta = event.meta
     dataset_id = meta["dataset_id"]
@@ -100,7 +100,7 @@ defmodule Service.Domo do
     {new_events, col_heads, type, new_hash_state, store_ids}
   end
 
-  def reducer(row, {events, col_heads, type, hash_state, store_ids}) do
+  def reducer(_row, {events, col_heads, type, hash_state, store_ids}) do
     {events, col_heads, type, hash_state, store_ids}
   end
 
@@ -126,7 +126,6 @@ defmodule Service.Domo do
   end
 
   def make_event(col_heads, type, row, store_ids) do
-    [store | _t] = String.split(row, ",", parts: 2)
     meta = build_meta_map(col_heads, row)
     event = %Event{domain: "stats",
                    meta: meta,
@@ -176,7 +175,7 @@ defmodule Service.Domo do
     model = Map.put(%{}, :last_played, last_played)
     {model, []}
   end
-  def return_model_and_events({new_events, _col_heads, _type, new_hash_state, store_ids}, last_played) do
+  def return_model_and_events({new_events, _col_heads, _type, new_hash_state, _store_ids}, last_played) do
     model = Map.put(%{}, :last_played, last_played)
       |> Map.put(:hash_state, new_hash_state)
     {model, new_events}
