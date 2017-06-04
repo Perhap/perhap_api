@@ -2,7 +2,8 @@ defmodule Service.Domo do
   @behaviour Reducer
 
   import DB.Validation, only: [flip_v1_uuid: 1]
-
+  import Reducer.Utils
+  
   alias DB.Event
   alias Reducer.State
   require Logger
@@ -165,9 +166,7 @@ defmodule Service.Domo do
   end
 
   def gen_event_id() do
-    {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))
-    event_id = :uuid.uuid_to_string(uuid_v1)
-    event_id
+    gen_uuidv1()
   end
 
   # case when hash_file doesn't work right, should we just record last played?

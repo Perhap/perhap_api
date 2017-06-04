@@ -2,6 +2,7 @@ defmodule Service.Challenge do
   @behaviour Reducer
 
   import DB.Validation, only: [flip_v1_uuid: 1]
+  import Reducer.Utils
 
   alias DB.Event
   alias Reducer.State
@@ -16,11 +17,6 @@ defmodule Service.Challenge do
     {new_model, new_events} = events |> validate()
       |> challenge_reducer_recursive({state.model, []})
     %State{state | model: new_model, new_events: new_events}
-  end
-
-  def gen_uuidv1()do
-    {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))
-    to_string(:uuid.uuid_to_string(uuid_v1))
   end
 
   def validate(event_list) do

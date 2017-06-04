@@ -1,3 +1,5 @@
+import Reducer.Utils
+
 defmodule Reducer.State.Test do
   use ExUnit.Case, async: true
   import Reducer.Test.Helper
