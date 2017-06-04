@@ -1,15 +1,27 @@
+alias DB.Event
+
 defmodule ValidationTest do
   use ExUnit.Case, async: true
   alias DB.Validation, as: V
 
   setup do
     {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))
-    uuid_v1_string = :uuid.uuid_to_string(uuid_v1)
-    uuid_v4_string = :uuid.uuid_to_string(:uuid.get_v4(:strong))
+    uuid_v1_string = to_string(:uuid.uuid_to_string(uuid_v1))
+    uuid_v4_string = to_string(:uuid.uuid_to_string(:uuid.get_v4(:strong)))
     on_exit fn ->
       :ok
     end
     [uuid_v1: uuid_v1_string, uuid_v4: uuid_v4_string]
+  end
+
+  test "event is valid", ctx do
+    e = %Event{event_id: ctx[:uuid_v1], entity_id: ctx[:uuid_v4]}
+    assert true == V.valid_event(e)
+  end
+
+  test "event is not valid", ctx do
+    e = %Event{event_id: ctx[:uuid_v1], entity_id: nil}
+    assert false == V.valid_event(e)
   end
 
   test "nil is not a valid uuid" do

@@ -4,7 +4,6 @@ defmodule DB do
     import Supervisor.Spec, warn: false
 
     children = [
-      # supervisor(Phoenix.PubSub.PG2, [DB.PubSub, []])
     ]
 
     opts = [strategy: :one_for_one, name: DB.Supervisor]

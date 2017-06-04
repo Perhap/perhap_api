@@ -16,7 +16,7 @@ defmodule DB.Reducer.State do
   @bucket "reducer_state"
 
   @spec save(State.t) :: State.t | :error
-  def save(%State{state_id: state_id} = state) do
+  def save(%State{state_id: state_id} = state) when is_binary(state_id) do
     bucket = namespace(@bucket)
     key = state_id
     kv_info = "#{bucket}/#{key}"
@@ -42,7 +42,7 @@ defmodule DB.Reducer.State do
   end
 
   @spec delete(String.t) :: :ok | :error
-  def delete(state_id) do
+  def delete(state_id) when is_binary(state_id)  do
     case Riak.delete(namespace(@bucket), state_id) do
       :ok -> :ok
       error ->
@@ -52,7 +52,7 @@ defmodule DB.Reducer.State do
   end
 
   @spec find(String.t, boolean()) :: DB.Common.r_json_t | :not_found | :error
-  def find(key, include_db_attrs \\ false) do
+  def find(key, include_db_attrs \\ false) when is_binary(key) do
     result = try do
       Riak.find(namespace(@bucket), key)
     rescue
@@ -77,7 +77,7 @@ defmodule DB.Reducer.State do
   end
 
   @spec split_key(String.t) :: {String.t, String.t, String.t}
-  def split_key(reducer_state_key) do
+  def split_key(reducer_state_key) when is_binary(reducer_state_key) do
     [domain, entity_id, service] = String.split(reducer_state_key, Common.unit_separator)
     {domain, entity_id, service}
   end
