@@ -36,7 +36,8 @@ defmodule DB.Reducer.State do
       state
     rescue
       error ->
-        Logger.error("Problem writing reducer state: #{inspect(error)}")
+        Logger.error("Problem writing reducer state: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
   end
@@ -46,7 +47,8 @@ defmodule DB.Reducer.State do
     case Riak.delete(namespace(@bucket), state_id) do
       :ok -> :ok
       error ->
-        Logger.error("Problem deleting reducer state: #{inspect(error)}")
+        Logger.error("Problem deleting reducer state: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
   end
@@ -57,7 +59,8 @@ defmodule DB.Reducer.State do
       Riak.find(namespace(@bucket), key)
     rescue
       error ->
-        Logger.error("Problem reading reducer state: #{inspect(error)}")
+        Logger.error("Problem reading reducer state: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
     case result do

@@ -43,7 +43,8 @@ defmodule DB.Event do
       event
     rescue
       error ->
-        Logger.error("Problem writing event: #{inspect(error)}")
+        Logger.error("Problem writing event: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
   end
@@ -53,7 +54,8 @@ defmodule DB.Event do
     case Riak.delete(namespace(@bucket), event_id) do
       :ok -> :ok
       error ->
-        Logger.error("Problem deleting event: #{inspect(error)}")
+        Logger.error("Problem deleting event: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
   end
@@ -84,7 +86,8 @@ defmodule DB.Event do
       Riak.find("set", namespace_index(:bucket), namespace_index(:key, entity_id, domain)) |> RS.value
     rescue
       error ->
-        Logger.error("Problem reading events by entity: #{inspect(error)}")
+        Logger.error("Problem reading events by entity: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
     case result do
@@ -107,7 +110,8 @@ defmodule DB.Event do
       Riak.find("hll", namespace(@hll_bucket), key) |> HLL.value
     rescue
       error ->
-        Logger.error("Problem reading HLL Stat: #{inspect(error)}")
+        Logger.error("Problem reading HLL Stat: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
     case result do
@@ -163,7 +167,8 @@ defmodule DB.Event do
       Riak.find(namespace(@bucket), key)
     rescue
       error ->
-        Logger.error("Problem reading event: #{inspect(error)}")
+        Logger.error("Problem reading event: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
     case result do
