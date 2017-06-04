@@ -1,28 +1,27 @@
+require Logger
+
 defmodule API.Response do
-  import Plug.Conn
 
   alias API.Error, as: E
 
-  def send(conn, %API.Error{} = error) do
-    conn |> send(error.http_code, E.format(error))
+  def send(req0, %API.Error{} = error) do
+    req0 |> send(error.http_code, E.format(error))
   end
-  def send(conn, 204) do
-    send_resp(conn, 204, "")
+  def send(req0, 204) do
+    :cowboy_req.reply(204, %{}, "", req0)
   end
 
-  def send(conn, 200, "") do
-    conn |>
-      put_resp_header("access-control-allow-origin", "*") |>
-      put_resp_header("access-control-allow-headers", "content-type") |>
-      send_resp(200, "")
+  def send(req0, 200, "") do
+    :cowboy_req.reply(200,
+      %{"access-control-allow-origin" => "*",
+        "access-control-allow-headers" => "content-type"}, "", req0)
   end
-  def send(conn, status, response_term) do
+  def send(req0, status, response_term) do
     {:ok, json, crc32} = make(response_term)
-    conn |>
-      put_resp_header("content-type", "application/json") |>
-      put_resp_header("access-control-allow-origin", "*") |>
-      put_resp_header("x-bigsquid-crc32", Integer.to_string(crc32)) |>
-      send_resp(status, json)
+    :cowboy_req.reply(status,
+      %{"content-type" => "application/json",
+        "access-control-allow-origin" => "*",
+        "x-bigsquid-crc32" => Integer.to_string(crc32)}, json, req0)
   end
 
   defp make(map) when is_map(map) do

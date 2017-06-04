@@ -41,10 +41,10 @@ defmodule Service.Domo do
     client_id = meta["client_id"]
     client_secret = meta["client_secret"]
     type = meta["out_going_type"]
-    last_played = event.event_id |> flipper
+    last_played = flip_v1_uuid(event.event_id)
 
     domo_dataset(dataset_id, client_id, client_secret)
-      |> hash_file(model["hash_state"], type, store_ids)
+      |> hash_file(model, type, store_ids)
       |> return_model_and_events(last_played)
 
 
@@ -111,8 +111,18 @@ defmodule Service.Domo do
   end
 
   def is_empty?(model) do
-    model[:hash_state]
+    to_struct(HashState, model["hash_state"])
   end
+
+  def to_struct(kind, attrs) do
+  struct = struct(kind)
+  Enum.reduce Map.to_list(struct), struct, fn {k, _}, acc ->
+    case Map.fetch(attrs, Atom.to_string(k)) do
+      {:ok, v} -> %{acc | k => v}
+      :error -> acc
+    end
+  end
+end
 
   def make_event(col_heads, type, row, store_ids) do
     [store | _t] = String.split(row, ",", parts: 2)

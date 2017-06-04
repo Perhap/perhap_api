@@ -1,3 +1,5 @@
+require Logger
+
 defmodule Service.Stats do
   @behaviour Reducer
 
