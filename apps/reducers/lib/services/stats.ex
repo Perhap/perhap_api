@@ -299,11 +299,11 @@ defmodule Service.Stats do
     end
   end
 
-  def add_actuals(%{data: %{"Count" => count}} = event, meta) when count == "" do
+  def add_actuals(%{data: %{"Count" => count}} = _event, meta) when count == "" do
     meta
   end
   def add_actuals(%{data: %{"Count" => count}} = event, meta) do
-    {count, _} = Float.parse(event.data["Count"])
+    {count, _} = Float.parse(count)
     meta
     |> Map.put(event.event_id, count)
   end
@@ -312,11 +312,11 @@ defmodule Service.Stats do
     Enum.reduce(meta, 0, fn({_k, score}, acc) -> score + acc end)
   end
 
-  def accuracy(app_units, actual_units) when actual_units == 0 do
+  def accuracy(_app_units, actual_units) when actual_units == 0 do
     {0, 0}
   end
 
-  def accuracy(app_units, actual_units) when actual_units == "0" do
+  def accuracy(_app_units, actual_units) when actual_units == "0" do
     {0, 0}
   end
 
@@ -337,13 +337,12 @@ defmodule Service.Stats do
     {percentage, score}
   end
 
-  def accuracy(app_units, actual_units) when is_number(app_units) do
+  def accuracy(app_units, _actual_units) when is_number(app_units) do
     {actual_units_float, _} = Float.parse(app_units)
     percentage = app_units / actual_units_float
     score = accuracy_score(percentage)
     {percentage, score}
   end
-
 
   def pre_actual({_type, event}, {%{"pre" => %{"pre_units" => pre_units}} = period_model, new_events}) do
     meta = add_actuals(event, period_model["pre"]["actuals_meta"] || %{})

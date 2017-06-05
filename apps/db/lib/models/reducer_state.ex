@@ -15,6 +15,11 @@ defmodule DB.Reducer.State do
 
   @bucket "reducer_state"
 
+  @spec key(String.t, String.t) :: String.t
+  def key(e_ctx, domain) do
+    e_ctx <> Common.unit_separator() <> "service.#{domain}"
+  end
+
   @spec save(State.t) :: State.t | :error
   def save(%State{state_id: state_id} = state) when is_binary(state_id) do
     bucket = namespace(@bucket)
