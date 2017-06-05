@@ -33,12 +33,12 @@ defmodule ServiceDomoTest do
 
 
   test "hash file and build event with non-empty state" do
-      state = %{last_played: "1234", hash_state: %HashState{hashes: [
+      state = %{"last_played" => "1234", "hash_state"=> %{"hashes" => [
         "CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
         "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
         "3DCDA24350A7219C75A34CB4F0079978D4B63E95"
         ],
-        lines: ["w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []}}
+        "lines"=> ["w,x,y,z", "d,c,b,a", "a,b,c,d"], "missing" => []}}
       type = "actuals"
       store_ids = %{
         "1"=> "517539dc-f3e0-47b0-9f1e-559df39eaeda",
@@ -67,10 +67,10 @@ defmodule ServiceDomoTest do
   end
 
   test "is_empty? returns given hash state" do
-    model = %{last_played: "1234", hash_state: %HashState{hashes: ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
+    model = %{"last_played" => "1234", "hash_state"=> %{"hashes" => ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
                                                                    "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
                                                                    "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                                                          lines: ["w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []}}
+                                                          "lines" => ["w,x,y,z", "d,c,b,a", "a,b,c,d"], "missing"=> []}}
     expected = %HashState{hashes: ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
                                    "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
                                    "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
