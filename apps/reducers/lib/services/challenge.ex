@@ -129,21 +129,6 @@ defmodule Service.Challenge do
     |> Map.put("last_played", event.ordered_id), new_events}
   end
 
-  def actual_units_user(user, %{:data => %{"units" => units}} = event, %{"status" => "stopped"} = user_model, benchmark) do
-    units = normalize_units(units)
-    users = length(event.data["users"])
-    actual_units = units / users
-    uph = actual_units / (user_model["active_seconds"] / 3600)
-    percentage = uph/ benchmark
-
-    new_model = user_model
-      |> Map.put("status", "completed")
-      |> Map.put("actual_units", actual_units)
-      |> Map.put("uph", uph)
-      |> Map.put("percentage", percentage)
-      {user, new_model}
-  end
-
   def actual_units_user(user, event, %{"status" => "stopped"} = user_model, benchmark) do
     units = normalize_units(event.data["units"])
     users = length(event.data["users"])
@@ -158,7 +143,6 @@ defmodule Service.Challenge do
       |> Map.put("percentage", percentage)
       {user, new_model}
   end
-
   def actual_units_user(user, _event, user_model, _benchmark), do: {user, user_model}
 
   def actual_units({:actual_units, _event}, model, new_events ) when model == %{} do
@@ -175,19 +159,6 @@ defmodule Service.Challenge do
   end
 
   def edit_user(user, _event, %{"status" => "deleted"} = user_model, _benchmark), do: {user, user_model}
-  def edit_user(user, %{:data => %{"units" => units}} = event, %{"status" => "stopped"} = user_model, benchmark) when is_number(units) do
-    actual_units = normalize_units(event.data["units"]) / length(event.data["users"])
-    uph = actual_units / (event.data["duration_min"] / 60)
-    percentage = uph/ benchmark
-
-    {user, user_model
-      |> Map.put("status", "editted")
-      |> Map.put("active_seconds", event.data["duration_min"] * 60)
-      |> Map.put("actual_units", actual_units)
-      |> Map.put("uph", uph)
-      |> Map.put("percentage", percentage)
-    }
-  end
   def edit_user(user, event, user_model, benchmark) do
     units = normalize_units(event.data["units"])
     actual_units= units / length(event.data["users"])
@@ -203,10 +174,7 @@ defmodule Service.Challenge do
     }
   end
 
-  def edit({:edit, _event}, model, new_events) when model == %{} do
-    {model, new_events}
-  end
-  def edit({:edit, %{:data => %{"duration_min" => mins}}}, model, new_events) when mins == 0 do
+  def edit({:edit, %{:data => %{"duration_min" => mins}}}, model, new_events) when mins == 0  or model == %{} do
     {model, new_events}
   end
   def edit({:edit, event}, model, new_events) do
