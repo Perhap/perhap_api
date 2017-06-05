@@ -51,6 +51,17 @@ defmodule ServiceChallengeTest do
           "users" => ["338897", "338998", "338904"]}
         }
       },
+      edit_event_zero: {:edit, %{
+        ordered_id: "11e7-25ff-9d16b16c-93ae-92361f002671",
+        timestamp: 1492712820833,
+        domain: "challenges",
+        entity_id: "uuid-v4",
+        data: %{
+          "duration_min" => 0,
+          "units" => "45",
+          "users" => ["338897", "338998", "338904"]}
+        }
+      },
       delete_event: {:delete, %{
         ordered_id: "11e7-25ff-9d17b16c-93ae-92361f002671",
         timestamp: 1492712820833,
@@ -387,6 +398,13 @@ defmodule ServiceChallengeTest do
     {context[:state_after_units], []}
     )) ==
       {context[:state_after_edit], [context[:stats_edit_event]]})
+  end
+
+  test "edit zero", context do
+    assert(uuid_stripper(Service.Challenge.challenge_reducer_recursive([context[:edit_event_zero]],
+    {context[:state_after_units], []}
+    )) ==
+      {context[:state_after_units], []})
   end
 
   test "delete", context do

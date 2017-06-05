@@ -206,6 +206,9 @@ defmodule Service.Challenge do
   def edit({:edit, _event}, model, new_events) when model == %{} do
     {model, new_events}
   end
+  def edit({:edit, %{:data => %{"duration_min" => mins}}}, model, new_events) when mins == 0 do
+    {model, new_events}
+  end
   def edit({:edit, event}, model, new_events) do
     user_models = Enum.map(event.data["users"], fn(user_raw) ->
       user = to_string(user_raw)
