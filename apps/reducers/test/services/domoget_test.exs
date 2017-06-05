@@ -124,5 +124,4 @@ defmodule ServiceDomoTest do
   end
 
 
-
 end

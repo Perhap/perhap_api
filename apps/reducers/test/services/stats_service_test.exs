@@ -26,8 +26,8 @@ defmodule Service.StatsTest do
       domain: "stats",
       entity_id: "uuid-v4",
       meta: %{
-        "Metrics" => "05/10/2017",
-        "Metrics2" => "Actual Receipts",
+        "Week" => "05/10/2017",
+        "Metrics" => "Actual Receipts",
         "C5_Store" => 93242,
         "Count"=> "1968"},
       event_id: "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33",
@@ -125,8 +125,8 @@ defmodule Service.StatsTest do
       entity_id: "uuid-v4",
       data: %{
         "timestamp" => 1493769600000,
-        "Metrics" => "05/10/2017",
-        "Metrics2" => "Actual Receipts",
+        "Week" => "05/10/2017",
+        "Metrics" => "Actual Receipts",
         "C5_Store" => "93242",
         "Count"=> "1968"},
       event_id: "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33",
@@ -138,8 +138,8 @@ defmodule Service.StatsTest do
       entity_id: "uuid-v4",
       data: %{
         "timestamp" => 1493769600000,
-        "Metrics" => "05/14/2017",
-        "Metrics2" => "Actual Units Sold",
+        "Week" => "05/14/2017",
+        "Metrics" => "Actual Units Sold",
         "C5_Store" => "93242",
         "Count"=> "1968"},
       event_id: "fb2ebbdc-3b3c-11e7-a919-92ebcb67fe33",
@@ -504,6 +504,18 @@ test "out of season with begining state", context do
           }
         }
       }, new_events: []})
+end
+
+test "date 2017-05-06" do
+  assert(Service.Stats.date("2017-05-06")== 1494086400000)
+end
+
+test "date 0" do
+  assert(Service.Stats.date("0")== 1494287000000)
+end
+
+test "date 05/23/2017" do
+  assert(Service.Stats.date("05/23/2017")== 1495555200000)
 end
 
 # test "actaul event from perhap" do
