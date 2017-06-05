@@ -33,31 +33,29 @@ defmodule ServiceDomoTest do
 
 
   test "hash file and build event with non-empty state" do
-      state = %{"last_played" => "1234", "hash_state"=> %{"hashes" => [
+      state = %{"last_played" => "1234", "hash_state" => [
         "CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
         "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
         "3DCDA24350A7219C75A34CB4F0079978D4B63E95"
         ],
-        "lines"=> ["w,x,y,z", "d,c,b,a", "a,b,c,d"], "missing" => []}}
+        }
       type = "actuals"
       store_ids = %{
         "1"=> "517539dc-f3e0-47b0-9f1e-559df39eaeda",
         "3"=> "48b76a2c-ead3-48e9-acf8-2d87adbc17b1"
       }
-      body = "1,2,3,4\na,b,c,d\nd,c,b,a\nw,x,y,z\nz,y,x,w"
-      expected = {[%Event{domain: "stats", remote_ip: "127.0.0.1", kv: "", kv_time: "", entity_id: nil, event_id: "",
-                 meta: %{"1" => "z", "2" => "y", "3" => "x", "4" => "w"},
-                 realm: "nike", type: "actuals"}],
-                "1,2,3,4",
+      body = "STORE,2,3,4\na,b,c,d\nd,c,b,a\nw,x,y,z\nz,y,x,w"
+      expected = {[],
+                "STORE,2,3,4",
                 "actuals",
                 %HashState{hashes: ["973534CEA1CB3C8502A5599CCFCBC2A103DC0A21",
                 "CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
                 "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
                 "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                          lines: ["z,y,x,w", "w,x,y,z", "d,c,b,a", "a,b,c,d", "w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []},
+                          lines: ["z,y,x,w", "w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []},
                           %{"1" => "517539dc-f3e0-47b0-9f1e-559df39eaeda", "3" => "48b76a2c-ead3-48e9-acf8-2d87adbc17b1"}}
 
-      assert Service.Domo.hash_file(body, state, type, store_ids) |> uuid_stripper == expected
+      assert Service.Domo.hash_file(body, state, type, store_ids)  == expected
     end
 
   test "build a meta map" do
@@ -67,14 +65,14 @@ defmodule ServiceDomoTest do
   end
 
   test "is_empty? returns given hash state" do
-    model = %{"last_played" => "1234", "hash_state"=> %{"hashes" => ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
+    model = %{"last_played" => "1234", "hash_state"=> ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
                                                                    "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
                                                                    "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                                                          "lines" => ["w,x,y,z", "d,c,b,a", "a,b,c,d"], "missing"=> []}}
+                                                        }
     expected = %HashState{hashes: ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
                                    "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
                                    "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                          lines: ["w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []}
+                          lines: [], missing: []}
 
     assert Service.Domo.is_empty?(model) == expected
   end
@@ -105,12 +103,11 @@ defmodule ServiceDomoTest do
     hash_state = %HashState{hashes: ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
                                      "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
                                      "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                            lines: ["w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []}
+                            lines: [], missing: []}
 
-    expected = {%{hash_state: %HashState{hashes: ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
+    expected = {%{hash_state: ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
                                                            "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
                                                            "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                                                  lines: ["w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []},
                           last_played: 'bbdfb95c-3fee-11e7-a4cc-c5b7000000f1'},
                 [%{domain: "stats", entity_id: "w", event_id: "",
                     meta: %{"1" => "w", "2" => "x", "3" => "y", "4" => "z"},

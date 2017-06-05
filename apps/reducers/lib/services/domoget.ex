@@ -3,7 +3,7 @@ defmodule Service.Domo do
 
   import DB.Validation, only: [flip_v1_uuid: 1]
   import Reducer.Utils
-  
+
   alias DB.Event
   alias Reducer.State
   require Logger
@@ -94,7 +94,11 @@ defmodule Service.Domo do
     {new_events, col_heads, type, new_hash_state, store_ids} =
       case Donethat.new?(row, hash_state) do
         {true, new_hash_state} ->
-          {[make_event(col_heads, type, row, store_ids) | events], col_heads, type, new_hash_state, store_ids}
+          event = make_event(col_heads, type, row, store_ids)
+          case event do
+            :ok -> {events, col_heads, type, new_hash_state, store_ids}
+            _ -> {[event | events], col_heads, type, new_hash_state, store_ids}
+          end
         {_, new_hash_state} ->
           {events, col_heads, type, new_hash_state, store_ids}
       end
@@ -112,7 +116,7 @@ defmodule Service.Domo do
   def is_empty?(model) do
     case is_nil(model) or is_nil(model["hash_state"]) do
       true -> Donethat.empty_state
-      false -> to_struct(HashState, model["hash_state"])
+      false -> to_struct(HashState, %{"hashes" =>model["hash_state"]})
     end
   end
 
@@ -128,14 +132,17 @@ defmodule Service.Domo do
 
   def make_event(col_heads, type, row, store_ids) do
     meta = build_meta_map(col_heads, row)
-    event = %Event{domain: "stats",
-                   meta: meta,
-                   entity_id: get_entity_id(meta["STORE"] || meta["Store"], store_ids),
-                   event_id: gen_event_id(),
-                   realm: "nike",
-                   remote_ip: "127.0.0.1",
-                   type: type}
-    event
+    entity_id = get_entity_id(meta["STORE"] || meta["Store"], store_ids)
+    case is_nil(entity_id) do
+      true -> Logger.error("Domo get #{type} event with out valid entity_id, store #{inspect(meta["STORE"])} or #{inspect(meta["Store"])}")
+      false ->  %Event{domain: "stats",
+                       meta: meta,
+                       entity_id: entity_id,
+                       event_id: gen_event_id(),
+                       realm: "nike",
+                       remote_ip: "127.0.0.1",
+                       type: type}
+    end
   end
 
   def build_meta_map(col_heads, row) do
@@ -176,7 +183,7 @@ defmodule Service.Domo do
   end
   def return_model_and_events({new_events, _col_heads, _type, new_hash_state, _store_ids}, last_played) do
     model = Map.put(%{}, :last_played, last_played)
-      |> Map.put(:hash_state, new_hash_state)
+      |> Map.put(:hash_state, new_hash_state.hashes)
     {model, new_events}
   end
 
