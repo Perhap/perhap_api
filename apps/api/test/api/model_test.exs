@@ -27,7 +27,7 @@ defmodule ModelTest do
   end
 
   test "query model, :not_found" do
-    %{status: status, headers: headers} = get("/v1/model/not_found_domain/fake_entity_id")
+    %{status: status, headers: _headers} = get("/v1/model/not_found_domain/fake_entity_id")
     assert status == 404
   end
 
