@@ -134,7 +134,8 @@ defmodule Service.Domo do
     meta = build_meta_map(col_heads, row)
     entity_id = get_entity_id(meta["STORE"] || meta["Store"], store_ids)
     case is_nil(entity_id) do
-      true -> Logger.error("Domo get #{type} event with out valid entity_id, store #{inspect(meta["STORE"])} or #{inspect(meta["Store"])}")
+      # this occurs when a store id isn't in the store index
+      true -> Logger.warn("Domo get #{type} event with out valid entity_id, store #{inspect(meta["STORE"])} or #{inspect(meta["Store"])}")
       false ->  %Event{domain: "stats",
                        meta: meta,
                        entity_id: entity_id,
