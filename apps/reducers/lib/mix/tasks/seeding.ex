@@ -1,5 +1,5 @@
 defmodule Mix.Tasks.Seeding do
-  use Mix.Task
+  # use Mix.Task
 
   @shortdoc "Initialize bracket with seeding"
 
@@ -306,9 +306,9 @@ defmodule Mix.Tasks.Seeding do
       "store/" <> store_entity_id)
 
       case response do
-        {:ok, %HTTPoison.Response{status_code: 200, body: data}} ->
-          {:ok, decoded_data} = Poison.decode(data)
-          [store_entity_id => decoded_data]
+        #{:ok, %HTTPoison.Response{status_code: 200, body: data}} ->
+        #  {:ok, decoded_data} = Poison.decode(data)
+        #  [store_entity_id => decoded_data]
         {:ok, %HTTPoison.Response{status_code: code}} ->
           Logger.info("couldn't get store info with status code #{code}")
         {:error, %HTTPoison.Error{reason: reason}} ->
