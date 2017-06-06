@@ -197,7 +197,7 @@ defmodule Service.Stats do
     end
   end
 
-  def pre_challenge({_type, event}, {%{"pre" => %{"actual_units" => _actual_units}} = period_model, new_events}) do
+  def pre_challenge({_type, event}, {%{"pre" => %{"actual_units" => _actual_units, "pre_meta" => _meta}} = period_model, new_events}) do
     meta = add_meta(event, period_model["pre"]["pre_meta"])
     {_count, sum} = count_sum(meta, "actual_units")
     average = average(meta, "percentage")
@@ -213,7 +213,7 @@ defmodule Service.Stats do
     |> put_in(["pre", "pre_units"], sum), new_events}
   end
 
-  def pre_challenge({_type, event}, {%{"pre" => _pre} = period_model, new_events}) do
+  def pre_challenge({_type, event}, {%{"pre" => %{"pre_meta" => _meta}} = period_model, new_events}) do
     meta = add_meta(event, period_model["pre"]["pre_meta"])
     {_count, sum} = count_sum(meta, "actual_units")
     average = average(meta, "percentage")
@@ -240,7 +240,7 @@ defmodule Service.Stats do
     |> put_in(["pre", "pre_units"], sum), new_events}
   end
 
-  def refill_challenge({_type, event}, {%{"refill" => %{"actual_units" => _actual_units}} = period_model, new_events}) do
+  def refill_challenge({_type, event}, {%{"refill" => %{"actual_units" => _actual_units, "refill_meta" => _meta}} = period_model, new_events}) do
     meta = add_meta(event, period_model["refill"]["refill_meta"])
     {_count, sum} = count_sum(meta, "actual_units")
     average = average(meta, "percentage")
@@ -256,7 +256,7 @@ defmodule Service.Stats do
     |> put_in(["refill", "refill_units"], sum), new_events}
   end
 
-  def refill_challenge({_type, event}, {%{"refill" => _refill} = period_model, new_events}) do
+  def refill_challenge({_type, event}, {%{"refill" => %{"refill_meta" => _meta}} = period_model, new_events}) do
     meta = add_meta(event, period_model["refill"]["refill_meta"])
     {_count, sum} = count_sum(meta, "actual_units")
     average = average(meta, "percentage")
