@@ -7,9 +7,8 @@ defmodule Mix.Tasks.Etl.Load do
 
   def run(argv) do
     Application.ensure_all_started(:db)
-    IO.puts ("MIX ENV: #{Mix.env}")
+    IO.puts ("MIX ENV: #{Mix.env}; #{inspect(self())}")
     [file|_] = argv
-    IO.puts ("Run: #{inspect(self())}")
     start_pool()
     tasks = file
     |> File.stream!

@@ -14,6 +14,14 @@ defmodule ETL.Loader do
     {:ok, state}
   end
 
+  def decode_chunk(chunk, function) do
+    # Do the Event Loading
+    results = chunk |> Enum.map(fn {line, i} ->
+      event = Poison.decode!(line, as: %Event{})
+      function.(event, i)
+    end)
+  end
+
   def handle_call(:stats, _, state) do
     {:reply, state, state}
   end
@@ -21,9 +29,7 @@ defmodule ETL.Loader do
   def handle_call(chunk, _from, [{:ok, oks},{:fail, fails}]) do
     start_time = :calendar.datetime_to_gregorian_seconds(:calendar.universal_time())
 
-    # Do the Event Loading
-    results = chunk |> Enum.map(fn {line, i} ->
-      event = Poison.decode!(line, as: %Event{})
+    results = decode_chunk(chunk, fn (event, i) ->
       case DB.Event.save(event) do
         :error ->
           Logger.warn "#{event.event_id}"
@@ -47,7 +53,7 @@ defmodule ETL.Loader do
   # def handle_info(_ref, state) do
   #   {:noreply, [], state}
   # end
-  
+
   def count_stats([], accum) do
     accum
   end
