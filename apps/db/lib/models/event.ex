@@ -24,7 +24,7 @@ defmodule DB.Event do
   @hll_bucket "distinct"
 
   @spec save(Event.t) :: Event.t | :error
-  def save(%Event{event_id: event_id} = event) do
+  def save(%Event{event_id: event_id} = event) when is_binary(event_id) do
     bucket = namespace(@bucket)
     key = event_id
     kv_info = "#{bucket}/#{key}"
@@ -43,17 +43,19 @@ defmodule DB.Event do
       event
     rescue
       error ->
-        Logger.error("Problem writing event: #{inspect(error)}")
+        Logger.error("Problem writing event: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
   end
 
   @spec delete(String.t) :: :ok | :error
-  def delete(event_id) do
+  def delete(event_id) when is_binary(event_id) do
     case Riak.delete(namespace(@bucket), event_id) do
       :ok -> :ok
       error ->
-        Logger.error("Problem deleting event: #{inspect(error)}")
+        Logger.error("Problem deleting event: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
   end
@@ -79,12 +81,13 @@ defmodule DB.Event do
   end
 
   @spec find_by_entity_domain(String.t, String.t) :: list(String.t) | :not_found | :error
-  def find_by_entity_domain(entity_id, domain) do
+  def find_by_entity_domain(entity_id, domain) when is_binary(entity_id) and is_binary(domain) do
     result = try do
       Riak.find("set", namespace_index(:bucket), namespace_index(:key, entity_id, domain)) |> RS.value
     rescue
       error ->
-        Logger.error("Problem reading events by entity: #{inspect(error)}")
+        Logger.error("Problem reading events by entity: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
     case result do
@@ -97,17 +100,18 @@ defmodule DB.Event do
 
   # this should be used for admin purposes only
   @spec delete_entity_domain_index(String.t, String.t) :: :ok
-  def delete_entity_domain_index(entity_id, domain) do
+  def delete_entity_domain_index(entity_id, domain) when is_binary(entity_id) and is_binary(domain) do
     Riak.delete("set", namespace_index(:bucket), namespace_index(:key, entity_id, domain))
   end
 
   @spec hll_stat(String.t) :: integer() | :not_found | :error
-  def hll_stat(key) do
+  def hll_stat(key) when is_binary(key) do
     result = try do
       Riak.find("hll", namespace(@hll_bucket), key) |> HLL.value
     rescue
       error ->
-        Logger.error("Problem reading HLL Stat: #{inspect(error)}")
+        Logger.error("Problem reading HLL Stat: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
     case result do
@@ -131,7 +135,8 @@ defmodule DB.Event do
 
   # called async, don't need a response
   @spec update_entity_domain_index(Event.t) :: :ok
-  defp update_entity_domain_index(%Event{domain: domain, entity_id: entity_id, event_id: event_id}) do
+  defp update_entity_domain_index(%Event{domain: domain, entity_id: entity_id, event_id: event_id})
+    when is_binary(domain) and is_binary(entity_id) and is_binary(event_id) do
     RS.new
       |> RS.put(event_id)
       |> Riak.update("set", namespace_index(:bucket), namespace_index(:key, entity_id, domain))
@@ -140,7 +145,8 @@ defmodule DB.Event do
   #called async, don't need a response
   @spec update_hll(Event.t) :: :ok | :error
   defp update_hll(%Event{realm: realm, domain: domain,
-                         entity_id: entity_id, event_id: event_id}) do
+                         entity_id: entity_id, event_id: event_id})
+    when is_binary(realm) and is_binary(domain) and is_binary(entity_id) and is_binary(event_id) do
     HLL.new
      |> HLL.add_element(event_id)
      |> Riak.update("hll", namespace(@hll_bucket), "events")
@@ -156,12 +162,13 @@ defmodule DB.Event do
   end
 
   @spec find_event(String.t, boolean()) :: Common.r_json_t | :not_found | :error
-  defp find_event(key, include_db_attrs) do
+  defp find_event(key, include_db_attrs) when is_binary(key) do
     result = try do
       Riak.find(namespace(@bucket), key)
     rescue
       error ->
-        Logger.error("Problem reading event: #{inspect(error)}")
+        Logger.error("Problem reading event: #{inspect(error)},
+                      trace: #{inspect(:erlang.get_stacktrace())}")
         :error
     end
     case result do

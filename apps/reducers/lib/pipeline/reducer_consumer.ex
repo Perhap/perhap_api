@@ -4,6 +4,7 @@ defmodule Reducer.Consumer do
   import DB.Common, only: [unit_separator: 0]
   alias DB.Event
   alias DB.Reducer.State, as: RS
+  alias DB.Validation, as: V
   alias Reducer.State
 
   require Logger
@@ -94,7 +95,7 @@ defmodule Reducer.Consumer do
         {domain, entity_id, _} = RS.split_key(reducer_state_key)
         indexed_events = case Event.find_by_entity_domain(entity_id, domain) do
           :not_found -> []
-          events -> events |> Event.find() |> Enum.map(&(&1.model))
+          events -> events |> Event.find() |> Enum.filter(&(&1 != :not_found)) |> Enum.map(&(&1.model))
         end
         reducer_events_all = (reducer_events ++ indexed_events) |> Enum.uniq
         {reducer_events_all, %State{}}
@@ -108,8 +109,9 @@ defmodule Reducer.Consumer do
     rescue
       error ->
         Logger.error("Problem calling reducer: #{inspect(reducer)}, #{inspect(error)},
-                      with events: #{inspect(reducer_events)}
-                      and state: #{reducer_state_key}|#{inspect(reducer_state)}")
+          trace: #{inspect(:erlang.get_stacktrace())},
+          with events: #{inspect(reducer_events |> Enum.map(&(&1).event_id))},
+          and state: #{reducer_state_key}|#{inspect(reducer_state)}")
         :error
     end
   end
@@ -117,11 +119,17 @@ defmodule Reducer.Consumer do
   # Save and dispatch new events
   defp process_new_events(events) when is_list(events) do
     Enum.each(events, fn(event) ->
-      case Event.save(event) do
-        %Event{} = event ->
-          EventCoordinator.async_notify(event)
-        _ ->
-          :error
+      case V.valid_event(event) do
+        false ->
+          Logger.error("Reducers generated invalid event #{inspect(event)}")
+          :invalid_event
+        true ->
+          case Event.save(event) do
+            %Event{} = event ->
+              EventCoordinator.async_notify(event)
+            _ ->
+              :error
+          end
       end
     end)
   end

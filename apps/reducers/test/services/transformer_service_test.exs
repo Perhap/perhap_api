@@ -17,7 +17,7 @@ defmodule ServiceTransformerTest do
         363 => "d9a3bf8c-23f5-46c9-bb6a-2c7ac7b8932f",
         364 => "cad583e8-cd49-4fd4-a86f-115d7110271b",
       },
-      stats_complete_event: %Event{
+      stats_complete_event: %DB.Event{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
@@ -44,6 +44,7 @@ defmodule ServiceTransformerTest do
           "store_id" => 93242},
         event_id: "",
         realm: "nike",
+        remote_ip: "127.0.0.1",
         type: "pre_challenge"},
       store_event: %Event{
         domain: "storeindex",
@@ -65,11 +66,19 @@ defmodule ServiceTransformerTest do
     end
 
 
+    def strip(event)do
+       Map.put(event, :event_id, "")
+    end
+
+    def uuid_stripper({state, events}) do
+      {state, Enum.map(events, fn(event) -> strip(event) end)}
+    end
+
   test "gets uuid from fake api", context do
     assert(Service.Transformer.get_entity_id(context[:stores], 360)== "d68e938f-c597-4ada-9f7a-5bcad3dbbaaf")
   end
 
   test "transformer", context do
-    assert(Service.Transformer.transform_event(context[:stats_complete_event], {"model", []}) == {"model", [context[:transformed_event]]} )
+    assert(uuid_stripper(Service.Transformer.transform_event(context[:stats_complete_event], {"model", []})) == {"model", [context[:transformed_event]]} )
   end
 end

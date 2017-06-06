@@ -8,6 +8,7 @@ defmodule Service.Transformer do
 
   alias DB.Event
   alias Reducer.State
+  import Reducer.Utils
 
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, state)do
@@ -49,6 +50,8 @@ defmodule Service.Transformer do
     {model, [event
     |> Map.put(:domain, "stats")
     |> Map.put(:type, "pre_challenge")
+    |> Map.put(:event_id, gen_uuidv1())
+    |> Map.put(:remote_ip, "127.0.0.1")
     |> Map.put(:entity_id, get_entity_id(stores(), event.meta["store_id"])) | new_events]}
   end
 
@@ -56,6 +59,8 @@ defmodule Service.Transformer do
     {model, [event
     |> Map.put(:domain, "stats")
     |> Map.put(:type, "refill_challenge")
+    |> Map.put(:event_id, gen_uuidv1())
+    |> Map.put(:remote_ip, "127.0.0.1")
     |> Map.put(:entity_id, get_entity_id(stores(), event.meta["store_id"])) | new_events]}
   end
 

@@ -1,33 +1,28 @@
 defmodule EventTest do
   use ExUnit.Case, async: true
-  use Plug.Test
   import API.Test.Helper
 
   doctest API
-
-  @api_router_opts API.Router.init([])
 
   setup do
     {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))
     event_id = :uuid.uuid_to_string(uuid_v1)
     entity_id = :uuid.uuid_to_string(:uuid.get_v4(:strong))
     on_exit fn ->
-      DB.Event.delete(event_id)
+      DB.Event.delete(to_string(event_id))
       :ok
     end
     [event_id: event_id, entity_id: entity_id]
   end
 
   test "create challenge event", context do
-    {realm, domain, entity_id, event_type} = {
+    {realm, domain, entity_id, type} = {
       "company", "challenge", context[:entity_id], "start"}
     event_id = context[:event_id]
     fixture = load_fixture("challenge_start.json")
-    conn = conn(:post, "https://example.com/v1/event/#{realm}/#{domain}/#{entity_id}/#{event_type}/#{event_id}", fixture)
-    |> put_req_header("content-type", "application/json")
-    conn = API.Router.call(conn, @api_router_opts)
-    assert conn.state == :sent
-    assert conn.status == 204
+
+    %{status: status} = post(fixture, "/v1/event/#{realm}/#{domain}/#{entity_id}/#{type}/#{event_id}")
+    assert status == 204
   end
 
 end

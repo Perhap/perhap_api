@@ -1,6 +1,7 @@
+import Reducer.Utils
+
 defmodule Reducer.State.Test do
   use ExUnit.Case, async: true
-  import Reducer.Test.Helper
   import DB.Validation, only: [flip_v1_uuid: 1]
 
   alias DB.Event

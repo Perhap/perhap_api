@@ -51,6 +51,17 @@ defmodule ServiceChallengeTest do
           "users" => ["338897", "338998", "338904"]}
         }
       },
+      edit_event_zero: {:edit, %{
+        ordered_id: "11e7-25ff-9d16b16c-93ae-92361f002671",
+        timestamp: 1492712820833,
+        domain: "challenges",
+        entity_id: "uuid-v4",
+        data: %{
+          "duration_min" => 0,
+          "units" => "45",
+          "users" => ["338897", "338998", "338904"]}
+        }
+      },
       delete_event: {:delete, %{
         ordered_id: "11e7-25ff-9d17b16c-93ae-92361f002671",
         timestamp: 1492712820833,
@@ -389,6 +400,13 @@ defmodule ServiceChallengeTest do
       {context[:state_after_edit], [context[:stats_edit_event]]})
   end
 
+  test "edit zero", context do
+    assert(uuid_stripper(Service.Challenge.challenge_reducer_recursive([context[:edit_event_zero]],
+    {context[:state_after_units], []}
+    )) ==
+      {context[:state_after_units], []})
+  end
+
   test "delete", context do
     assert(uuid_stripper(Service.Challenge.challenge_reducer_recursive([context[:delete_event]],
     {context[:state_after_units], []}
@@ -408,6 +426,9 @@ defmodule ServiceChallengeTest do
     context[:start_event]], {%{}, []})== {context[:state_after_start], []})
   end
 
+test "edit with empty state", context do
+  assert(Service.Challenge.challenge_reducer_recursive([context[:edit_event]], {%{}, []})== {%{}, []})
+end
 # test "actual units problem" do
 #   assert(Service.Challenge.call([%DB.Event{domain: "challenge", entity_id: "e6b598c9-9b44-4a0e-a024-f5da681c4414", event_id: "4026fb31-46de-11e7-94dd-eb30939b15a1", kv: <<112, 114, 111, 100, 31, 101, 118, 101, 110, 116, 115, 47, 52, 48, 50, 54, 102, 98, 51, 49, 45, 52, 54, 100, 101, 45, 49, 49, 101, 55, 45, 57, 52, 100, 100, 45, 101, 98, 51, 48, 57, 51, 57, 98, 49, 53>>, kv_time: "2017-06-01T15:23:23.107000Z", meta: %{"timestamp" => "1496330603107", "units" => "16", "users" => [133129, 155256]}, realm: "nike", remote_ip: "108.171.135.161", type: "ACTUAL_UNITS"}],
 #   %Reducer.State{deferred_events: [], model: %{"challenge_benchmark" => 1, "challenge_type" => "pre runner", "domain" => "challenge", "entity_id" => "e6b598c9-9b44-4a0e-a024-f5da681c4414", "last_played" => "11e7-46de-4026fb30-94dd-eb30939b15a1", "store_id" => 65, "users" => %{"133129" => %{"active_seconds" => 291.671, "start_time" => 1496330311436, "status" => "stopped"}}}, new_events: []})== %{})

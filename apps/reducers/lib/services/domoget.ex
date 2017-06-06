@@ -2,11 +2,11 @@ defmodule Service.Domo do
   @behaviour Reducer
 
   import DB.Validation, only: [flip_v1_uuid: 1]
+  import Reducer.Utils
 
   alias DB.Event
   alias Reducer.State
   require Logger
-
 
   @domains [:domo]
   @types [:pull]
@@ -18,36 +18,30 @@ defmodule Service.Domo do
       "pull"], event.type)
   end
 
-
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, state)do
     {model, new_events} = Enum.filter(events, fn(event) -> correct_type?(event) end)
-     |> domo_service_recursive({state, []})
+     |> domo_service_recursive({state.model, []})
     %State{model: model, new_events: new_events}
   end
-
 
   def domo_service_recursive([], {model, new_events}), do: {model, new_events}
   def domo_service_recursive([event | remaining_events], {model, new_events}) do
     domo_service_recursive(remaining_events, domo_service(event, {model, new_events}))
   end
 
-
-  def domo_service(event, {state, new_events}) do
+  def domo_service(event, {model, _new_events}) do
     store_ids = get_store_ids()
-    model = state.model
     meta = event.meta
     dataset_id = meta["dataset_id"]
     client_id = meta["client_id"]
     client_secret = meta["client_secret"]
     type = meta["out_going_type"]
-    last_played = event.event_id |> flipper
+    last_played = flip_v1_uuid(event.event_id)
 
     domo_dataset(dataset_id, client_id, client_secret)
-      |> hash_file(model["hash_state"], type, store_ids)
+      |> hash_file(model, type, store_ids)
       |> return_model_and_events(last_played)
-
-
   end
 
   def domo_dataset(dataset_id, client_id, client_secret) do
@@ -57,52 +51,61 @@ defmodule Service.Domo do
 
   def get_access_token(client_id, client_secret) do
     url = "https://api.domo.com/oauth/token?grant_type=client_credentials&scope=data"
-
     case HTTPoison.get(url, %{}, [hackney: [basic_auth: {client_id, client_secret}]]) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         response = Poison.Parser.parse!(body)
         response["access_token"]
       {:ok, %HTTPoison.Response{status_code: code}} ->
         Logger.error("token error, status_code#{code}")
+        :error
       {:error, %HTTPoison.Error{reason: reason}} ->
         Logger.error("token error, #{reason}")
+        :error
     end
-
   end
 
   def get_dataset(access_token, dataset_id) do
     url = "https://api.domo.com/v1/datasets/#{dataset_id}/data?includeHeader=true&fileName=data_dump.csv"
-
     case HTTPoison.get(url, [{"Authorization", "bearer #{access_token}"}]) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         body
         {:ok, %HTTPoison.Response{status_code: code}} ->
           Logger.error("dataset error, status_code#{code}")
+          :error
         {:error, %HTTPoison.Error{reason: reason}} ->
           Logger.error("dataset error, #{reason}")
+          :error
     end
-
   end
 
   def hash_file(body, model, type, store_ids) do
-    hash_state = is_empty?(model)
-    [col_heads | values] = String.split(body, "\n", parts: 2)
-    file = String.split(to_string(values), "\n")
-    file |> Enum.reduce({[], col_heads, type, hash_state, store_ids}, &reducer/2)
+    case body do
+      :error ->
+        {}
+      _ ->
+        hash_state = is_empty?(model)
+        [col_heads | values] = String.split(body, "\n", parts: 2)
+        file = String.split(to_string(values), "\n")
+        file |> Enum.reduce({[], col_heads, type, hash_state, store_ids}, &reducer/2)
+    end
   end
 
   def reducer(row, {events, col_heads, type, hash_state, store_ids}) when row != "" do
     {new_events, col_heads, type, new_hash_state, store_ids} =
       case Donethat.new?(row, hash_state) do
         {true, new_hash_state} ->
-          {[make_event(col_heads, type, row, store_ids) | events], col_heads, type, new_hash_state, store_ids}
+          event = make_event(col_heads, type, row, store_ids)
+          case event do
+            :ok -> {events, col_heads, type, new_hash_state, store_ids}
+            _ -> {[event | events], col_heads, type, new_hash_state, store_ids}
+          end
         {_, new_hash_state} ->
           {events, col_heads, type, new_hash_state, store_ids}
       end
     {new_events, col_heads, type, new_hash_state, store_ids}
   end
 
-  def reducer(row, {events, col_heads, type, hash_state, store_ids}) do
+  def reducer(_row, {events, col_heads, type, hash_state, store_ids}) do
     {events, col_heads, type, hash_state, store_ids}
   end
 
@@ -111,20 +114,35 @@ defmodule Service.Domo do
   end
 
   def is_empty?(model) do
-    model[:hash_state]
+    case is_nil(model) or is_nil(model["hash_state"]) do
+      true -> Donethat.empty_state
+      false -> to_struct(HashState, %{"hashes" =>model["hash_state"]})
+    end
+  end
+
+  def to_struct(kind, attrs) do
+    struct = struct(kind)
+    Enum.reduce Map.to_list(struct), struct, fn {k, _}, acc ->
+      case Map.fetch(attrs, Atom.to_string(k)) do
+        {:ok, v} -> %{acc | k => v}
+        :error -> acc
+      end
+    end
   end
 
   def make_event(col_heads, type, row, store_ids) do
-    [store | _t] = String.split(row, ",", parts: 2)
     meta = build_meta_map(col_heads, row)
-    event = %Event{domain: "stats",
-                      meta: meta,
-                      entity_id: get_entity_id(meta["STORE"] || meta["Store"], store_ids),
-                      event_id: gen_event_id(),
-                      realm: "nike",
-                      remote_ip: "127.0.0.1",
-                      type: type}
-    event
+    entity_id = get_entity_id(meta["STORE"] || meta["Store"], store_ids)
+    case is_nil(entity_id) do
+      true -> Logger.error("Domo get #{type} event with out valid entity_id, store #{inspect(meta["STORE"])} or #{inspect(meta["Store"])}")
+      false ->  %Event{domain: "stats",
+                       meta: meta,
+                       entity_id: entity_id,
+                       event_id: gen_event_id(),
+                       realm: "nike",
+                       remote_ip: "127.0.0.1",
+                       type: type}
+    end
   end
 
   def build_meta_map(col_heads, row) do
@@ -155,14 +173,17 @@ defmodule Service.Domo do
   end
 
   def gen_event_id() do
-    {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))
-    event_id = :uuid.uuid_to_string(uuid_v1)
-    event_id
+    gen_uuidv1()
   end
 
-  def return_model_and_events({new_events, _col_heads, _type, new_hash_state, store_ids}, last_played) do
+  # case when hash_file doesn't work right, should we just record last played?
+  def return_model_and_events({}, last_played) do
     model = Map.put(%{}, :last_played, last_played)
-      |> Map.put(:hash_state, new_hash_state)
+    {model, []}
+  end
+  def return_model_and_events({new_events, _col_heads, _type, new_hash_state, _store_ids}, last_played) do
+    model = Map.put(%{}, :last_played, last_played)
+      |> Map.put(:hash_state, new_hash_state.hashes)
     {model, new_events}
   end
 

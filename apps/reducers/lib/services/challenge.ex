@@ -2,6 +2,7 @@ defmodule Service.Challenge do
   @behaviour Reducer
 
   import DB.Validation, only: [flip_v1_uuid: 1]
+  import Reducer.Utils
 
   alias DB.Event
   alias Reducer.State
@@ -16,11 +17,6 @@ defmodule Service.Challenge do
     {new_model, new_events} = events |> validate()
       |> challenge_reducer_recursive({state.model, []})
     %State{state | model: new_model, new_events: new_events}
-  end
-
-  def gen_uuidv1()do
-    {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))
-    to_string(:uuid.uuid_to_string(uuid_v1))
   end
 
   def validate(event_list) do
@@ -133,21 +129,6 @@ defmodule Service.Challenge do
     |> Map.put("last_played", event.ordered_id), new_events}
   end
 
-  def actual_units_user(user, %{:data => %{"units" => units}} = event, %{"status" => "stopped"} = user_model, benchmark) do
-    units = normalize_units(units)
-    users = length(event.data["users"])
-    actual_units = units / users
-    uph = actual_units / (user_model["active_seconds"] / 3600)
-    percentage = uph/ benchmark
-
-    new_model = user_model
-      |> Map.put("status", "completed")
-      |> Map.put("actual_units", actual_units)
-      |> Map.put("uph", uph)
-      |> Map.put("percentage", percentage)
-      {user, new_model}
-  end
-
   def actual_units_user(user, event, %{"status" => "stopped"} = user_model, benchmark) do
     units = normalize_units(event.data["units"])
     users = length(event.data["users"])
@@ -162,7 +143,6 @@ defmodule Service.Challenge do
       |> Map.put("percentage", percentage)
       {user, new_model}
   end
-
   def actual_units_user(user, _event, user_model, _benchmark), do: {user, user_model}
 
   def actual_units({:actual_units, _event}, model, new_events ) when model == %{} do
@@ -179,28 +159,6 @@ defmodule Service.Challenge do
   end
 
   def edit_user(user, _event, %{"status" => "deleted"} = user_model, _benchmark), do: {user, user_model}
-  def edit_user(user, %{:data => %{"units" => units}} = event, %{"status" => "stopped"} = user_model, benchmark) when is_number(units) do
-    actual_units = normalize_units(event.data["units"]) / length(event.data["users"])
-    uph = actual_units / (event.data["duration_min"] / 60)
-    percentage = uph/ benchmark
-
-    {user, user_model
-      |> Map.put("status", "editted")
-      |> Map.put("active_seconds", event.data["duration_min"] * 60)
-      |> Map.put("actual_units", actual_units)
-      |> Map.put("uph", uph)
-      |> Map.put("percentage", percentage)
-    }
-  end
-
-  defp normalize_units(units0) when is_binary(units0) do
-    {units, _} = Float.parse(units0)
-    units
-  end
-  defp normalize_units(units0) when is_number(units0) do
-    units0
-  end
-
   def edit_user(user, event, user_model, benchmark) do
     units = normalize_units(event.data["units"])
     actual_units= units / length(event.data["users"])
@@ -216,11 +174,14 @@ defmodule Service.Challenge do
     }
   end
 
-  def edit({:edit, _event}, model, new_events ) when model == %{} do
+  def edit({:edit, %{:data => %{"duration_min" => mins}}}, model, new_events) when mins == 0  or model == %{} do
     {model, new_events}
   end
   def edit({:edit, event}, model, new_events) do
-    user_models = Enum.map(event.data["users"], fn(user) -> edit_user(to_string(user), event, model["users"][to_string(user)], model["challenge_benchmark"]) end)
+    user_models = Enum.map(event.data["users"], fn(user_raw) ->
+      user = to_string(user_raw)
+      edit_user(user, event, model["users"][user], model["challenge_benchmark"])
+    end)
     |> Enum.into(model["users"])
     new_model = model
     |> Map.put("users", user_models)
@@ -233,7 +194,7 @@ defmodule Service.Challenge do
       "equipment" -> "pre_challenge_transform"
       "apparel" -> "pre_challenge_transform"
       "footwear" -> "pre_challenge_transform"
-      "product_refill" -> "refill_challenge_transform"
+      "product refill" -> "refill_challenge_transform"
       _ -> :reject
     end
   end
@@ -260,7 +221,6 @@ defmodule Service.Challenge do
     {user, new_model}
   end
 
-
   def delete({:delete, _event}, model, new_events ) when model == %{} do
     {model, new_events}
   end
@@ -273,6 +233,12 @@ defmodule Service.Challenge do
     {new_model, create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
   end
 
-
+  defp normalize_units(units0) when is_binary(units0) do
+    {units, _} = Float.parse(units0)
+    units
+  end
+  defp normalize_units(units0) when is_number(units0) do
+    units0
+  end
 
 end
