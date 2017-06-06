@@ -110,7 +110,7 @@ defmodule Reducer.Consumer do
       error ->
         Logger.error("Problem calling reducer: #{inspect(reducer)}, #{inspect(error)},
           trace: #{inspect(:erlang.get_stacktrace())},
-          with events: #{inspect(reducer_events)},
+          with events: #{inspect(reducer_events |> Enum.map(&(&1).event_id))},
           and state: #{reducer_state_key}|#{inspect(reducer_state)}")
         :error
     end
