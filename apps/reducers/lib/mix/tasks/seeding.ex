@@ -21,7 +21,7 @@ defmodule Mix.Tasks.Seeding do
   end
 
   def request_store_info(store_number_map) when is_map(store_number_map) do
-    Enum.map(store_number_map, fn {k, v} -> request_store_info(v) end)
+    Enum.map(store_number_map, fn {_k, id} -> request_store_info(id) end)
   end
   def request_store_info(store_entity_id) do
     perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
@@ -32,7 +32,7 @@ defmodule Mix.Tasks.Seeding do
         {:ok, decoded_data} = Poison.decode(data)
         Map.put(decoded_data, "entity_id", store_entity_id)
       {:ok, %HTTPoison.Response{status_code: code}} ->
-        Logger.info("couldn't get store #{store_entity_id} info with status code #{code}")
+        Logger.error("couldn't get store #{store_entity_id} info with status code #{code}")
       {:error, %HTTPoison.Error{reason: reason}} ->
         Logger.error("couldn't get store #{store_entity_id} info with error #{reason}")
     end
@@ -40,6 +40,7 @@ defmodule Mix.Tasks.Seeding do
 
   def request_store_stats(store_info_list) when is_list(store_info_list) do
     Enum.map(store_info_list, fn store -> request_store_stats(store) end)
+    |> Enum.reject(fn store -> store == :ok end)
   end
   def request_store_stats(store) do
     perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
@@ -48,17 +49,17 @@ defmodule Mix.Tasks.Seeding do
     case response do
       {:ok, %HTTPoison.Response{status_code: 200, body: data}} ->
         {:ok, decoded_data} = Poison.decode(data)
-        Map.put(store, "stats", clean_up_stats(decoded_data["stats"]))
+        Map.put(store, "score", calculate_score(decoded_data["stats"]))
       {:ok, %HTTPoison.Response{status_code: code}} ->
-        Logger.info("couldn't get store #{inspect(store["entity_id"])} stats with status code #{code}")
+        Logger.error("couldn't get store #{inspect(store["entity_id"])} #{inspect(store["number"])} stats with status code #{code}")
       {:error, %HTTPoison.Error{reason: reason}} ->
         Logger.error("couldn't get store #{inspect(store["entity_id"])} stats with error #{reason}")
     end
   end
 
-  def clean_up_stats(stats) do
+  def calculate_score(stats) do
     Enum.map(stats, fn{week, week_stats} -> {week, total_week(week_stats)} end)
-    |> Map.new()
+    |> Enum.reduce(0, fn({_week, score}, acc) -> score + acc end)
   end
 
   def total_week(week_stats) do
@@ -81,12 +82,47 @@ defmodule Mix.Tasks.Seeding do
     end
   end
 
-
-  def sort_stores_into_districts(store_info_list) do
-    Enum.sort_by(store_info_list, fn store-> store["district"] end)
-    |> Enum.chunk_by(fn store-> store["district"] end)
+  def sort_stores_into_districts(store_stats_list) do
+    # Enum.map(store_stats_list, fn store -> IO.inspect(store)end)
+    store_stats_list
+    |> Enum.sort_by(fn store -> store["district"] end)
+    |> Enum.chunk_by(fn store -> store["district"] end)
     |> Enum.map(fn district -> {hd(district)["district"], district} end)
     |> Map.new()
+  end
+
+  def top_store_per_district(district_map)do
+    {Enum.map(district_map, fn {district, stores} -> {district, Enum.max_by(stores, fn(store)-> store["score"] end )} end)
+    |> Enum.reject(fn {district, _stores} -> district == "test" end)
+    |> Map.new(),
+
+    Enum.map(district_map, fn {district, stores} -> Enum.max_by(stores, fn(store)-> store["score"] end ) end)}
+  end
+
+  def sort_stores_by_score(store_stats_list) do
+    store_stats_list
+    |> Enum.sort_by(fn store -> store["score"] end, &>=/2)
+  end
+
+  def find_wildcards(store_stats_list, {district_map, district_list}) when length(district_list) < 32 and length(district_list) > 27 do
+    wildcard_num = case length(district_list) do
+      28 -> "wildcard1"
+      29 -> "wildcard2"
+      30 -> "wildcard3"
+      31 -> "wildcard4"
+    end
+    [hd | tail] = store_stats_list
+    cond do
+      Enum.member?(district_list, hd) ->
+        find_wildcards(tail, {district_map, district_list})
+      true -> find_wildcards(tail, {Map.put(district_map, wildcard_num, hd), Enum.concat(district_list, [hd])})
+    end
+  end
+  def find_wildcards(store_stats_list, {district_map, district_list}) when length(district_list) == 32 do
+    district_map
+  end
+  def find_wildcards(store_stats_list, {district_map, district_list}) do
+    Logger.error("error getting stores by district, number of districts not 28 - 32")
   end
 
 
