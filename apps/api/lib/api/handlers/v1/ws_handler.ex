@@ -12,7 +12,7 @@ defmodule API.WSHandler do
   end
 
   def websocket_handle({:text, message}, state) do
-    %{"domain" => domain, "entity" => entity} = JSON.decode!(message)
+    %{"domain" => domain, "entity" => entity_id} = JSON.decode!(message)
     :gproc.reg({:p, :l, "ws-#{domain}-#{entity_id}"}, %{open_time: System.monotonic_time(), pid: self()})
     {:reply, {:text, "OK"}, state}
   end
