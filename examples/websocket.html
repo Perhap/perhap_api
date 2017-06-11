@@ -8,8 +8,8 @@ function send()
 {
     /* @todo: subscribe to model changes using domain and entity_id */
     var json = JSON.stringify({
-      "domain":"challenge",
-      "entity_id":"37a2e8d4-20d7-4875-aab6-8d40e621c542"
+      "domain":"domo",
+      "entity_id":"ea43de77-366f-4758-a8cc-f27bf9f622b9"
     })
     ws.send(json);
     console.log('Message sent');
@@ -22,7 +22,7 @@ function open()
         return;
     }
     /* @todo: Change to your own server IP address */
-    ws = new WebSocket("ws://localhost:4500/v1/ws");
+    ws = new WebSocket("wss://perhap.bigsquidapp.com/v1/ws");
     ws.onopen = function() {
         console.log('Connected');
     };
