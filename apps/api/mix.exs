@@ -19,6 +19,7 @@ defmodule API.Mixfile do
       :logger,
       :cowboy,
       :exometer_core,
+      :gproc,
       :snappy],
       mod: {API, []}
     ]
@@ -27,7 +28,7 @@ defmodule API.Mixfile do
   defp deps do
     [
       {:cowboy, github: "ninenines/cowboy", ref: "2.0.0-pre.9"},
-      # {:httpoison, "~> 0.11.1"},
+      {:gproc, "~> 0.6.1"},
       {:ranch, github: "ninenines/ranch", ref: "1.3.0", override: true},
       {:gun, github: "ninenines/gun", ref: "1.0.0-pre.3"},
       {:reducers, in_umbrella: true},

@@ -18,6 +18,7 @@ defmodule Reducer.Mixfile do
     [applications: [
       :quantum,
       :timex,
+      :gproc,
       :logger],
       mod: {Reducers, []}
     ]
@@ -26,6 +27,7 @@ defmodule Reducer.Mixfile do
   defp deps do
     [
       {:db, in_umbrella: true},
+      {:gproc, "~> 0.6.1"},
       {:poison, "~> 3.1"},
       {:quantum, github: "c-rack/quantum-elixir"},
       {:httpoison, "~> 0.11.1"},

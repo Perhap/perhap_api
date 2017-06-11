@@ -6,7 +6,12 @@ var ws = new Object;
 
 function send()
 {
-    ws.send("hello world!");
+    /* @todo: subscribe to model changes using domain and entity_id */
+    var json = JSON.stringify({
+      "domain":"challenge",
+      "entity_id":"37a2e8d4-20d7-4875-aab6-8d40e621c542"
+    })
+    ws.send(json);
     console.log('Message sent');
 }
 
@@ -24,7 +29,7 @@ function open()
     ws.onmessage = function (evt) {
         var received_msg = evt.data;
         console.log("Received: " + received_msg);
-        var txt = document.createTextNode("Simon says: " + received_msg);
+        var txt = document.createTextNode("Event Data: " + received_msg);
         document.getElementById('msgs').appendChild(txt);
     };
     ws.onclose = function() {

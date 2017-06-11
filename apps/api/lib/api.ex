@@ -83,7 +83,8 @@ defmodule API do
   defp get_ssl_opts() do
     [{:cacertfile, Config.get_ssl_cacertfile()},
      {:certfile, Config.get_ssl_certfile()},
-     {:keyfile, Config.get_ssl_keyfile()}]
+     {:keyfile, Config.get_ssl_keyfile()},
+     {:versions, [:'tlsv1.2', :'tlsv1.1', :'tlsv1']}]
   end
 
 end
