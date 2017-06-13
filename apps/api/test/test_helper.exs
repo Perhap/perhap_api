@@ -7,6 +7,18 @@ defmodule API.Test.Helper do
     binary
   end
 
+  @spec generate_event(String.t) :: DB.Event.t
+  def generate_event(fixture_file) do
+    {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))
+    event_id = to_string(:uuid.uuid_to_string(uuid_v1))
+    entity_id = to_string(:uuid.uuid_to_string(:uuid.get_v4(:strong)))
+    meta = load_fixture(fixture_file) |> JSON.decode!
+    generated = %{
+      realm: "test_company", type: "start",
+      domain: "challenge", event_id: event_id, entity_id: entity_id, meta: meta}
+    struct(DB.Event, generated)
+  end
+
   def get(url) do
     :application.ensure_all_started(:gun)
     {:ok, pid} = :gun.open('localhost', 8443, %{:transport => :ssl})
