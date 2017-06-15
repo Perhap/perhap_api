@@ -36,7 +36,18 @@ defmodule ServiceChallengeTest do
         entity_id: "uuid-v4",
         data: %{
           "timestamp" => "1492712820833",
-          "units" => "15",
+          "units" => "33",
+          "users" => ["338897", "338998", "338904"]}
+        }
+      },
+      large_actual_units_event: {:actual_units, %{
+        ordered_id: "11e7-25ef-9d16b16c-93ae-92361f002671",
+        timestamp: 1492712820833,
+        domain: "challenges",
+        entity_id: "uuid-v4",
+        data: %{
+          "timestamp" => "1492712820833",
+          "units" => "120",
           "users" => ["338897", "338998", "338904"]}
         }
       },
@@ -77,9 +88,9 @@ defmodule ServiceChallengeTest do
         meta: %{
           "challenge_id" => "uuid-v4",
             "users" => %{
-          "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
-          "338904" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
-          "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
+          "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 11.0, "uph" => 396.0, "percentage" => 1.584},
+          "338904" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 11.0, "uph" => 396.0, "percentage" => 1.584},
+          "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 11.0, "uph" => 396.0, "percentage" => 1.584},
         },
           "challenge_benchmark" => 250,
           "challenge_type" => "equipment",
@@ -94,8 +105,8 @@ defmodule ServiceChallengeTest do
         meta: %{
           "challenge_id" => "uuid-v4",
             "users" => %{
-          "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
-          "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
+          "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 11.0, "uph" => 396.0, "percentage" => 1.584},
+          "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 11.0, "uph" => 396.0, "percentage" => 1.584},
           "338904" => %{"start_time" => 1492712720633, "status" => "running"},
         },
           "challenge_benchmark" => 250,
@@ -169,22 +180,31 @@ defmodule ServiceChallengeTest do
         "entity_id" => "uuid-v4",
         "domain" => "challenges",
         "users" => %{
-          "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
-          "338904" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
-          "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
-      },
+          "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 11.0, "uph" => 396.0, "percentage" => 1.584},
+          "338904" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 11.0, "uph" => 396.0, "percentage" => 1.584},
+          "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 11.0, "uph" => 396.0, "percentage" => 1.584}},
         "challenge_benchmark" => 250,
         "challenge_type" => "equipment",
-        "store_id" => 93242,
-      },
+        "store_id" => 93242},
+      state_after_large_units: %{
+        "last_played" => "11e7-25ef-9d16b16c-93ae-92361f002671",
+        "entity_id" => "uuid-v4",
+        "domain" => "challenges",
+        "users" => %{
+          "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 40.0, "uph" => 1440.0, "percentage" => 5.76},
+          "338904" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 40.0, "uph" => 1440.0, "percentage" => 5.76},
+          "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 40.0, "uph" => 1440.0, "percentage" => 5.76}},
+        "challenge_benchmark" => 250,
+        "challenge_type" => "equipment",
+        "store_id" => 93242},
       state_after_unfinished: %{
         "last_played" => "11e7-25ef-9d16b16c-93ae-92361f002671",
         "entity_id" => "uuid-v4",
         "domain" => "challenges",
         "users" => %{
-          "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
+          "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 11.0, "uph" => 396.0, "percentage" => 1.584},
           "338904" => %{"start_time" => 1492712720633, "status" => "running"},
-          "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
+          "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 11.0, "uph" => 396.0, "percentage" => 1.584},
       },
         "challenge_benchmark" => 250,
         "challenge_type" => "equipment",
@@ -374,6 +394,12 @@ defmodule ServiceChallengeTest do
     assert(uuid_stripper(Service.Challenge.challenge_reducer_recursive([context[:start_event],
     context[:stop_event], context[:actual_units_event]], {%{}, []})) ==
       {context[:state_after_units], [context[:stats_complete_event]]})
+  end
+
+  test "large percentage", context do
+    assert(uuid_stripper(Service.Challenge.challenge_reducer_recursive([context[:start_event],
+    context[:stop_event], context[:large_actual_units_event]], {%{}, []})) ==
+      {context[:state_after_large_units], []})
   end
 
   test "list of events unfinished", context do
