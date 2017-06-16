@@ -61,6 +61,12 @@ defmodule Mix.Tasks.Seeding do
     end
   end
 
+  # # generates test data
+  # def request_store_stats(store) do
+  #   Map.put(store, "accuracy_score", :rand.uniform(10))
+  #   |> Map.put("score", :rand.uniform(70))
+  # end
+
   def run(_args \\ []) do
     stats = get_store_stats_pipeline()
     top_stores_by_district_pipeline(stats)
@@ -95,18 +101,32 @@ defmodule Mix.Tasks.Seeding do
     |> recursive_add_seed(1, "east")
     west = west_bracket(list_of_32)
     |> recursive_add_seed(1, "west")
-    %{"bracket" => %{"season1round1" => east ++ west}}
+    %{get_season() <> "round1" => east ++ west}
   end
 
   def save_bracket(bracket_map) do
     e_ctx = DB.Common.event_context(%{domain: "bracket", entity_id: "ae597af6-9901-405a-827d-1989dfeea4a4"})
     state_key = DB.Reducer.State.key(e_ctx, "bracket")
+    old_state= DB.Reducer.State.find(state_key)
+    bracket_map =   case old_state do
+        :error -> %{"bracket" => bracket_map}
+        :not_found -> %{"bracket" => bracket_map}
+        _ -> Map.merge(old_state.model.data["bracket"], bracket_map)
+      end
     DB.Reducer.State.save(
       %DB.Reducer.State{
         state_id: state_key,
         data: bracket_map
       }
     )
+  end
+
+  def get_season()do
+    [_elixir_string, season] = Application.get_env(:reducers, :current_season)
+    |> to_string()
+    |> String.downcase()
+    |> String.split(".")
+    season
   end
 
   def weeks_to_include()do
@@ -249,8 +269,6 @@ defmodule Mix.Tasks.Seeding do
   end
 
   def add_seed_to_map(store_map, seed, bracket) do
-    IO.inspect(store_map)
-    IO.inspect(seed)
     Map.put(store_map, "seed", seed)
     |> Map.put("bracket", bracket)
     |> Map.put("position", positions_in_bracket(seed))

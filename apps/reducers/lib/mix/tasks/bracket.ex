@@ -6,18 +6,14 @@ defmodule Mix.Tasks.Bracket do
   require Logger
 
   def get_bracket_maps() do
-    perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
-    response = HTTPoison.get(perhap_base_url <> "/v1/model/" <>
-      "bracket/ae597af6-9901-405a-827d-1989dfeea4a4")
-    case response do
-      {:ok, %HTTPoison.Response{status_code: 200, body: data}} ->
-        {:ok, decoded_data} = Poison.decode(data)
-        decoded_data["bracket"]
-      {:ok, %HTTPoison.Response{status_code: code}} ->
-        Logger.info("couldn't get bracket list with status code #{code}")
-      {:error, reason} ->
-        Logger.error("couldn't get bracket list with error #{reason}")
-    end
+    e_ctx = DB.Common.event_context(%{domain: "bracket", entity_id: "ae597af6-9901-405a-827d-1989dfeea4a4"})
+    state_key = DB.Reducer.State.key(e_ctx, "bracket")
+    state= DB.Reducer.State.find(state_key)
+    bracket_map =   case state do
+        :error -> Logger.info("couldn't get bracket list")
+        :not_found -> Logger.info("couldn't get bracket list")
+        _ -> state.model.data["bracket"]
+      end
   end
 
   def request_store_stats(store, week) do
@@ -69,14 +65,18 @@ defmodule Mix.Tasks.Bracket do
   def run(_args \\ [])do
     bracket = get_bracket_maps()
     season = get_season()
-    determine_winners(bracket, season)
-    |> save_bracket()
+    case bracket do
+      :ok -> Logger.error("no bracket available")
+      _ -> determine_winners(bracket, season)
+        |> save_bracket()
+    end
   end
 
   def determine_winners(bracket, season)do
     {last_week, week_name, week_num} = which_week(bracket, season)
     bracket = case week_name do
       "final" -> bracket
+      "week0" -> bracket
       _ -> weekly_winners = Enum.map(bracket[season <> last_week], fn(store) -> request_store_stats(store, week_num) end )
         |> sort_by_a_then_b("position", "bracket", &<=/2, &<=/2)
         |> Enum.chunk(2)
@@ -124,6 +124,7 @@ defmodule Mix.Tasks.Bracket do
         Enum.all?([season <> "round1", season <> "sweet16", season <> "elite8"], fn(week) -> Enum.member?(weeks, week) end ) -> {"elite8", "final4", "tournament" <> season_num <> "week3"}
         Enum.all?([season <> "round1", season <> "sweet16"], fn(week) -> Enum.member?(weeks, week) end ) -> {"sweet16", "elite8", "tournament" <> season_num <> "week2"}
         Enum.all?([season <> "round1"], fn(week) -> Enum.member?(weeks, week) end ) -> {"round1", "sweet16", "tournament" <> season_num <> "week1"}
+        true -> {"not in tournament play", "week0", ""}
       end
   end
 
