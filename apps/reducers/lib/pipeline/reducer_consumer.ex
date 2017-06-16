@@ -34,7 +34,7 @@ defmodule Reducer.Consumer do
     run_results = Enum.map(all_context, fn({reducer_context, reducer_events}) ->
       _reducer_states = Enum.reduce(all_reducers, Map.new(), fn(reducer, acc) ->
         # Setup
-        [target_domain, _] = String.split(reducer_context, unit_separator())
+        [target_domain, target_entity] = String.split(reducer_context, unit_separator())
         [_|rest] = String.split(Atom.to_string(reducer), ".")
         reducer_name = rest |> Enum.map(&String.downcase(&1)) |> Enum.join(".")
         reducer_domains = apply(reducer, :domains, [])
@@ -52,7 +52,10 @@ defmodule Reducer.Consumer do
               _ ->
                 reducer_state = (result |> Map.fetch!(reducer_state_key))
                 %RS{state_id: reducer_state_key, data: reducer_state.model} |> RS.save
-                process_new_events(reducer_state.new_events)
+                Task.Supervisor.async(Perhap.TaskSupervisor, fn ->
+                  process_new_events(reducer_state.new_events)
+                  :gproc.send({:p, :l, "ws-#{target_domain}-#{target_entity}"}, reducer_state.model)
+                end)
                 result
             end
         end

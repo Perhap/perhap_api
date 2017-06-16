@@ -6,7 +6,12 @@ var ws = new Object;
 
 function send()
 {
-    ws.send("hello world!");
+    /* @todo: subscribe to model changes using domain and entity_id */
+    var json = JSON.stringify({
+      "domain":"domo",
+      "entity_id":"ea43de77-366f-4758-a8cc-f27bf9f622b9"
+    })
+    ws.send(json);
     console.log('Message sent');
 }
 
@@ -17,14 +22,14 @@ function open()
         return;
     }
     /* @todo: Change to your own server IP address */
-    ws = new WebSocket("ws://localhost:4500/v1/ws");
+    ws = new WebSocket("wss://perhap.bigsquidapp.com/v1/ws");
     ws.onopen = function() {
         console.log('Connected');
     };
     ws.onmessage = function (evt) {
         var received_msg = evt.data;
         console.log("Received: " + received_msg);
-        var txt = document.createTextNode("Simon says: " + received_msg);
+        var txt = document.createTextNode("Event Data: " + received_msg);
         document.getElementById('msgs').appendChild(txt);
     };
     ws.onclose = function() {

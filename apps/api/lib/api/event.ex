@@ -25,7 +25,30 @@ defmodule API.Event do
 
   @spec post(:cowboy_req.req(), DB.Event.t) :: :cowboy_req.req()
   def post(conn, %DB.Event{} = event) do
-    {:ok, body, _} = :cowboy_req.read_body(conn)
+    case read_body(conn, "") do
+      {:ok, body, conn2} -> handle_body(conn2, event, body)
+      {:more, _, conn2} -> handle_badlength(conn2)
+    end
+  end
+
+  # Event Body Handling
+  defp read_body(conn, acc) do
+    read_body_opts = %{
+      length: 1048576,
+      period: 10,
+      timeout: 11
+    }
+    case :cowboy_req.read_body(conn, read_body_opts) do
+      {:ok, data, conn2} -> {:ok, acc <> data, conn2};
+      {:more, data, conn2} -> read_body(conn2, acc <> data)
+    end
+  end
+
+  defp handle_badlength(conn) do
+    Response.send(conn, E.make(:request_too_large))
+  end
+
+  defp handle_body(conn, event, body) do
     {remote_ip, _remote_port} = :cowboy_req.peer(conn)
     json_map = JSON.decode!(body)
     ip_addr = remote_ip |> Tuple.to_list |> Enum.join(".")

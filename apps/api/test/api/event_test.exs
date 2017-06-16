@@ -5,24 +5,33 @@ defmodule EventTest do
   doctest API
 
   setup do
-    {uuid_v1, _} = :uuid.get_v1(:uuid.new(self(), :erlang))
-    event_id = :uuid.uuid_to_string(uuid_v1)
-    entity_id = :uuid.uuid_to_string(:uuid.get_v4(:strong))
+    event = generate_event("challenge_start.json")
     on_exit fn ->
-      DB.Event.delete(to_string(event_id))
+      DB.Event.delete(event.event_id)
+      DB.Event.delete_entity_domain_index(event.entity_id, event.domain)
       :ok
     end
-    [event_id: event_id, entity_id: entity_id]
+    [event: event]
   end
 
-  test "create challenge event", context do
-    {realm, domain, entity_id, type} = {
-      "company", "challenge", context[:entity_id], "start"}
-    event_id = context[:event_id]
-    fixture = load_fixture("challenge_start.json")
+  test "create & read an event", context do
+    e = context[:event]
+    meta_raw = JSON.encode!(e.meta)
 
-    %{status: status} = post(fixture, "/v1/event/#{realm}/#{domain}/#{entity_id}/#{type}/#{event_id}")
+    %{status: status} = post(meta_raw, "/v1/event/#{e.realm}/#{e.domain}/#{e.entity_id}/#{e.type}/#{e.event_id}")
     assert status == 204
+
+    %{status: status, body: _body} = get("/v1/event/#{e.event_id}")
+    assert status == 200
+  end
+
+  test "lookup events by entity_id", context do
+    e = context[:event]
+    DB.Event.save(e)
+    %{status: status, headers: _, body: body} = get("/v1/events/#{e.domain}/#{e.entity_id}")
+    assert status == 200
+    assert (JSON.decode!(body) |> List.first) == e.event_id
+    DB.Event.delete(e.event_id)
   end
 
 end

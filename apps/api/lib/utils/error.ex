@@ -50,6 +50,12 @@ defmodule API.Error do
         "Please try again later.")
   end
 
+  def make(:request_too_large) do
+    build_error(413,
+        "RequestEntityTooLarge",
+        "Please send < 1 MB.")
+  end
+
   @spec format(atom) :: iodata
   def format(atom) when is_atom(atom) do
     error = make(atom)
