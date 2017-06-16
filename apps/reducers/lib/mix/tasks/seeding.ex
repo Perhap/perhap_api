@@ -1,3 +1,5 @@
+
+
 defmodule Mix.Tasks.Seeding do
   use Mix.Task
 
@@ -68,6 +70,7 @@ defmodule Mix.Tasks.Seeding do
   # end
 
   def run(_args \\ []) do
+    Application.ensure_all_started(:db)
     stats = get_store_stats_pipeline()
     top_stores_by_district_pipeline(stats)
     |> wildcard_pipeline(stats)

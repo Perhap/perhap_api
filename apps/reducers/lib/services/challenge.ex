@@ -199,13 +199,15 @@ defmodule Service.Challenge do
     end
   end
 
-  def should_create_event({user, %{"percentage" => percentage, "active_seconds" => active_seconds}}) when percentage >= 5.0 and active_seconds <= 300, do: false
-  def should_create_event(model), do: true
+  def should_create_event({user, %{"percentage" => percentage, "active_seconds" => active_seconds}}, num_of_users) when percentage >= 5.0 and active_seconds <= 300, do: false #less than 5 mins and over 500%
+  def should_create_event({user, %{"active_seconds" => active_seconds}}, num_of_users) when active_seconds >= 28800, do: false # over 8 hours
+  def should_create_event({user, %{"actual_units" => actual_units}}, num_of_users) when actual_units * num_of_users >= 9999, do: false # over 10,000 units
+  def should_create_event(model, num_of_users), do: true
 
   def create_stats_event(:reject, _, new_events), do: new_events
   def create_stats_event(type, model, new_events) do
     user_models = model["users"]
-    case Enum.any?(user_models, fn(user_model) -> should_create_event(user_model) end) do
+    case Enum.any?(user_models, fn(user_model) -> should_create_event(user_model, map_size(user_models)) end) do
       true ->
         meta = Map.drop(model, ["last_played", "domain", "entity_id"])
         |> Map.put("challenge_id", model["entity_id"])

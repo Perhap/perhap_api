@@ -1,3 +1,4 @@
+
 defmodule Mix.Tasks.Bracket do
   use Mix.Task
 
@@ -63,6 +64,7 @@ defmodule Mix.Tasks.Bracket do
 
 
   def run(_args \\ [])do
+    Application.ensure_all_started(:db)
     bracket = get_bracket_maps()
     season = get_season()
     case bracket do

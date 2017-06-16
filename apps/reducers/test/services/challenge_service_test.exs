@@ -73,6 +73,28 @@ defmodule ServiceChallengeTest do
           "users" => ["338897", "338998", "338904"]}
         }
       },
+      edit_event_huge: {:edit, %{
+        ordered_id: "11e7-25ff-9d16b16c-93ae-92361f002671",
+        timestamp: 1492712820833,
+        domain: "challenges",
+        entity_id: "uuid-v4",
+        data: %{
+          "duration_min" => 50,
+          "units" => "10001",
+          "users" => ["338897", "338998", "338904"]}
+        }
+      },
+      edit_event_long: {:edit, %{
+        ordered_id: "11e7-25ff-9d16b16c-93ae-92361f002671",
+        timestamp: 1492712820833,
+        domain: "challenges",
+        entity_id: "uuid-v4",
+        data: %{
+          "duration_min" => 488,
+          "units" => "45",
+          "users" => ["338897", "338998", "338904"]}
+        }
+      },
       delete_event: {:delete, %{
         ordered_id: "11e7-25ff-9d17b16c-93ae-92361f002671",
         timestamp: 1492712820833,
@@ -218,6 +240,32 @@ defmodule ServiceChallengeTest do
           "338897" => %{"start_time" => 1492712720633, "status" => "editted", "active_seconds" => 120, "actual_units" => 15.0, "uph" => 450.0, "percentage" => 1.8},
           "338904" => %{"start_time" => 1492712720633, "status" => "editted", "active_seconds" => 120, "actual_units" => 15.0, "uph" => 450.0, "percentage" => 1.8},
           "338998" => %{"start_time" => 1492712720633, "status" => "editted", "active_seconds" => 120, "actual_units" => 15.0, "uph" => 450.0, "percentage" => 1.8},
+      },
+        "challenge_benchmark" => 250,
+        "challenge_type" => "equipment",
+        "store_id" => 93242,
+      },
+      state_after_edit_huge: %{
+        "last_played" => "11e7-25ff-9d16b16c-93ae-92361f002671",
+        "entity_id" => "uuid-v4",
+        "domain" => "challenges",
+        "users" => %{
+          "338897" => %{"start_time" => 1492712720633, "status" => "editted", "active_seconds" => 3000, "actual_units" => 3333.6666666666665, "uph" => 4000.3999999999996, "percentage" => 16.0016},
+          "338904" => %{"start_time" => 1492712720633, "status" => "editted", "active_seconds" => 3000, "actual_units" => 3333.6666666666665, "uph" => 4000.3999999999996, "percentage" => 16.0016},
+          "338998" => %{"start_time" => 1492712720633, "status" => "editted", "active_seconds" => 3000, "actual_units" => 3333.6666666666665, "uph" => 4000.3999999999996, "percentage" => 16.0016},
+      },
+        "challenge_benchmark" => 250,
+        "challenge_type" => "equipment",
+        "store_id" => 93242,
+      },
+      state_after_edit_long: %{
+        "last_played" => "11e7-25ff-9d16b16c-93ae-92361f002671",
+        "entity_id" => "uuid-v4",
+        "domain" => "challenges",
+        "users" => %{
+          "338897" => %{"start_time" => 1492712720633, "status" => "editted", "active_seconds" => 29280, "actual_units" => 15.0, "uph" => 1.8442622950819674, "percentage" => 0.007377049180327869},
+          "338904" => %{"start_time" => 1492712720633, "status" => "editted", "active_seconds" => 29280, "actual_units" => 15.0, "uph" => 1.8442622950819674, "percentage" => 0.007377049180327869},
+          "338998" => %{"start_time" => 1492712720633, "status" => "editted", "active_seconds" => 29280, "actual_units" => 15.0, "uph" => 1.8442622950819674, "percentage" => 0.007377049180327869},
       },
         "challenge_benchmark" => 250,
         "challenge_type" => "equipment",
@@ -424,6 +472,20 @@ defmodule ServiceChallengeTest do
     {context[:state_after_units], []}
     )) ==
       {context[:state_after_edit], [context[:stats_edit_event]]})
+  end
+
+  test "edit huge", context do
+    assert(uuid_stripper(Service.Challenge.challenge_reducer_recursive([context[:edit_event_huge]],
+    {context[:state_after_units], []}
+    )) ==
+      {context[:state_after_edit_huge], []})
+  end
+
+  test "edit long", context do
+    assert(uuid_stripper(Service.Challenge.challenge_reducer_recursive([context[:edit_event_long]],
+    {context[:state_after_units], []}
+    )) ==
+      {context[:state_after_edit_long], []})
   end
 
   test "edit zero", context do
