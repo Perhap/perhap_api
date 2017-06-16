@@ -9,12 +9,12 @@ defmodule Mix.Tasks.Bracket do
   def get_bracket_maps() do
     e_ctx = DB.Common.event_context(%{domain: "bracket", entity_id: "ae597af6-9901-405a-827d-1989dfeea4a4"})
     state_key = DB.Reducer.State.key(e_ctx, "bracket")
-    state= DB.Reducer.State.find(state_key)
-    bracket_map =   case state do
-        :error -> Logger.info("couldn't get bracket list")
-        :not_found -> Logger.info("couldn't get bracket list")
-        _ -> state.model.data["bracket"]
-      end
+    state = DB.Reducer.State.find(state_key)
+    _bracket_map = case state do
+      :error -> Logger.info("couldn't get bracket list")
+      :not_found -> Logger.info("couldn't get bracket list")
+      _ -> state.model.data["bracket"]
+    end
   end
 
   def request_store_stats(store, week) do

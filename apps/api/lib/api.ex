@@ -35,11 +35,10 @@ defmodule API do
       ]}
     ])
     {cowboy_start_fun, protocol_opts} = case Config.get_protocol do
-      :http ->  {&:cowboy.start_clear/4, nil}
-      :https -> {&:cowboy.start_tls/4, get_ssl_opts()}
+      :http ->  {&:cowboy.start_clear/3, nil}
+      :https -> {&:cowboy.start_tls/3, get_ssl_opts()}
     end
-    num_acceptors = Config.get_num_acceptors()
-    {:ok, _} = cowboy_start_fun.(:api_listener, num_acceptors, ranch_tcp_opts(protocol_opts), cowboy_opts(dispatch))
+    {:ok, _} = cowboy_start_fun.(:api_listener, ranch_tcp_opts(protocol_opts), cowboy_opts(dispatch))
   end
 
   def start_link() do
@@ -57,6 +56,7 @@ defmodule API do
     tcp_options = [
       {:ip, ip},
       {:port, port},
+      {:num_acceptors, Config.get_num_acceptors()},
       {:max_connections, 16_384},
       {:backlog, 32_768},
     ]

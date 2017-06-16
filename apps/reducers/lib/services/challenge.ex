@@ -199,10 +199,10 @@ defmodule Service.Challenge do
     end
   end
 
-  def should_create_event({user, %{"percentage" => percentage, "active_seconds" => active_seconds}}, num_of_users) when percentage >= 5.0 and active_seconds <= 300, do: false #less than 5 mins and over 500%
-  def should_create_event({user, %{"active_seconds" => active_seconds}}, num_of_users) when active_seconds >= 28800, do: false # over 8 hours
-  def should_create_event({user, %{"actual_units" => actual_units}}, num_of_users) when actual_units * num_of_users >= 9999, do: false # over 10,000 units
-  def should_create_event(model, num_of_users), do: true
+  def should_create_event({_user, %{"percentage" => percentage, "active_seconds" => active_seconds}}, _num_of_users) when percentage >= 5.0 and active_seconds <= 300, do: false #less than 5 mins and over 500%
+  def should_create_event({_user, %{"active_seconds" => active_seconds}}, _num_of_users) when active_seconds >= 28800, do: false # over 8 hours
+  def should_create_event({_user, %{"actual_units" => actual_units}}, num_of_users) when actual_units * num_of_users >= 9999, do: false # over 10,000 units
+  def should_create_event(_model, _num_of_users), do: true
 
   def create_stats_event(:reject, _, new_events), do: new_events
   def create_stats_event(type, model, new_events) do

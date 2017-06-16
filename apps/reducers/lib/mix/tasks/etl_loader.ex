@@ -16,7 +16,7 @@ defmodule ETL.Loader do
 
   def decode_chunk(chunk, function) do
     # Do the Event Loading
-    results = chunk |> Enum.map(fn {line, i} ->
+    _results = chunk |> Enum.map(fn {line, i} ->
       event = Poison.decode!(line, as: %Event{})
       function.(event, i)
     end)
@@ -64,13 +64,4 @@ defmodule ETL.Loader do
     count_stats(rest, {oks, fails+1})
   end
 
-  defp log_results(results, file) do
-    {:ok, file} = File.open(file, [:append])
-    save_results(file, results)
-    File.close(file)
-  end
-  defp save_results(file, %Event{} = event) do
-    json = Poison.encode!(event)
-    IO.binwrite(file, "#{json}\n")
-  end
 end

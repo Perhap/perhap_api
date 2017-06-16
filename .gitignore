@@ -25,4 +25,8 @@ erl_crash.dump
 # Ignore mix.lock for now
 mix.lock
 
+# Ignore vim swap files
 *.swp
+
+# Ignore ERLN8 Config
+erln8.config
