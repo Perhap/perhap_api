@@ -31,9 +31,11 @@ config :reducers, :domo_creds,
   bin_audit_type: "bin_audit",
   actuals_type: "actuals"
 
+
+
 config :reducers, Season1periods,
 season1preseason:
-  %{:start_time => 14976332800000, #Jun 16 2017
+  %{:start_time => 1497633280000, #Jun 16 2017
   :end_time => 1497855599000 #Jun 18
   },
   season1week1:
