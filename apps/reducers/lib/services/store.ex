@@ -68,7 +68,7 @@ defmodule Service.Store do
     {model, new_events}
   end
 
-  def play({type, event}, {model, new_events}) do
+  def play({type, event}, {model, _new_events}) do
     {new_model, newer_events} =
       case type do
         "add" -> add_store(event, model)

@@ -1,327 +1,314 @@
+
+
 defmodule Mix.Tasks.Seeding do
-  # use Mix.Task
+  use Mix.Task
 
   @shortdoc "Initialize bracket with seeding"
 
   require Logger
 
 
-  # defp get_store_list() do
-
-  #   perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
-  #   response = HTTPoison.get!(perhap_base_url <> "/v1/model/" <>
-  #     "storeindex/100077bd-5b34-41ac-b37b-62adbf86c1a5")
-  #
-  #     case response do
-  #       {:ok, %HTTPoison.Response{status_code: 200, body: data}} ->
-  #         {:ok, decoded_data} = Poison.decode(data)
-  #         decoded_data["stores"]
-  #       {:ok, %HTTPoison.Response{status_code: code}} ->
-  #         Logger.info("couldn't get store list with status code #{code}")
-          # {:error, reason} ->
-          #   Logger.error("couldn't get store list with error #{reason}")
-  #     end
-  # end
-  #
-
-  defp get_store_list() do
-    %{
-    "2": "13bbba9d-559c-4b43-aa6b-4a1b20355175",
-    "3": "32d757f6-4827-4c03-845e-fd9a17340b60",
-    "4": "a81b0719-6769-49ff-9627-03f0141d5fc3",
-    "5": "77a48378-87f5-46e6-a592-faca8bf541d8",
-    "6": "3d0540e7-fc7f-4aff-b502-ee110fbf0656",
-    "7": "6d9aa640-3e03-46c5-b289-fc24fe96f66e",
-    "8": "5b2121d0-d739-4ba7-9777-445980f9b0b7",
-    "9": "0701ee1c-cc57-4e47-982f-492cc4872376",
-    "14": "6066c1c9-3c24-4ce9-97fa-2c4bf28e13f0",
-    "15": "c3d8d9ac-b3f5-4099-857b-9e7c24fd11af",
-    "16": "0bcefd79-1dbf-41be-8185-0950ba743199",
-    "17": "7c033e4d-6cd1-4a1e-8011-b67266b71aac",
-    "19": "9109924a-1a5d-4d99-9bfd-9ece3b0f9acb",
-    "21": "15f263e7-cfb0-49a6-9cb4-1e8c028b31f7",
-    "22": "210e0b8d-8eec-465e-a8ca-e9f6f38888c1",
-    "23": "e59f923f-a833-49a2-b496-fff55ebe8178",
-    "24": "4dc821d7-eb8c-4fa8-8722-85c36aac93d7",
-    "25": "b57fed99-997f-44d0-ab2e-75b444c36ba0",
-    "26": "368c9e5d-2ef8-4693-991f-57dc776df0f1",
-    "27": "3180f196-ac45-48ae-a6ef-fb804dca29b1",
-    "28": "02a7f57c-6f98-4b7f-b6b5-8a33d0de04d8",
-    "30": "556d228f-342f-4e43-b313-191ea4d1415a",
-    "32": "7a62c596-d07d-4bcd-a935-c6865dfbd9eb",
-    "33": "988ceae0-9db4-4135-b2ce-92e69410e558",
-    "34": "ed591a92-e645-4cc5-b4ee-619efe53c1d2",
-    "35": "b6bd5079-b36b-4a25-a3cd-47b34140fa6e",
-    "36": "21db8c96-ec24-47d0-ac6a-8d40badfb6c7",
-    "37": "2ec0037c-f2e6-414e-85b0-2e92bd1396cb",
-    "38": "fbd8b9d1-44d8-47f2-ae7f-79e0c563c0c6",
-    "39": "68eb2a41-3c17-467e-bfb3-4391b829546d",
-    "40": "ceb78b3c-7c3a-4050-aa5c-6b9bb45923e9",
-    "41": "62303fc3-4b04-494b-9f9b-c9c8ede16972",
-    "42": "a5a74a23-11da-4b11-a909-45873bfb61f7",
-    "44": "e27bb168-6976-45ac-81d4-668388ac9dae",
-    "46": "f69c7202-034d-45f7-973d-da6bdfe18595",
-    "50": "97fc668a-2fb6-454f-925b-77e672a53516",
-    "51": "956a3d3d-4d35-4350-8cce-4248d084f7e2",
-    "53": "90d900a6-43d7-4764-bf5a-b576a30ce969",
-    "55": "714e5755-cc0d-48fd-a9d8-a8e3e3715ba2",
-    "58": "d7cd3e54-a7c7-4fd5-9e94-21ed1090a9d1",
-    "59": "3a8ad940-e538-465e-b306-566dede6ffab",
-    "60": "6519b734-1bdb-4bbf-927c-9c8293c4ec62",
-    "61": "785d02a4-3191-461a-92fc-eee9a2e17e73",
-    "62": "b204ea66-5b38-4629-80c2-2bab8ffdfa0a",
-    "63": "2e7398af-694e-49e3-85c7-e978d0f9e6de",
-    "64": "3f620f90-8827-4dd7-9619-99af64e40493",
-    "65": "9471ed2d-4989-4a4c-bd14-c414a3f809e5",
-    "66": "1b044863-b503-460a-b2ce-b60f46ac7459",
-    "67": "a3807313-ad52-4a00-ae28-a9880a23e709",
-    "68": "c54b756d-b7c8-438f-b3f0-2b14b3650a42",
-    "69": "006acc64-b6a5-4296-aaec-4e54302fdb25",
-    "70": "8b153c32-d2f3-463b-9d83-bffc42c28bc9",
-    "71": "49f7681a-4fc5-4983-8829-d03be577c0dd",
-    "72": "f43795fe-55b6-4a61-82f4-392320786172",
-    "73": "74ab7be1-d438-4045-8dc5-9c107856f1ad",
-    "74": "10a8b289-94cb-4928-a1a5-19697c5c6819",
-    "76": "e8843ef7-e436-4000-8f61-046c009a9d13",
-    "77": "3e2220d2-cbfd-4f4e-a850-c5fc9c25a553",
-    "78": "8f90ee2a-225a-4b65-8405-56196f8d2f1a",
-    "79": "d9e46fc2-6966-4b28-8441-cf77b20faeb2",
-    "81": "9cf08b7c-b0a7-4810-8178-ef1119edf155",
-    "82": "4488daee-75d1-41d7-8861-34a369c1d17b",
-    "84": "88773d4d-4c44-4804-ba23-276c09343238",
-    "86": "91a0685f-ea83-4995-84f0-c03a40439af8",
-    "88": "2010bc44-6f7b-4c0b-ae4a-2f6e1ab9acab",
-    "89": "018ee4ce-be63-4867-af28-e9cc19fb62b2",
-    "90": "7200ad99-c0b4-4396-9e72-f0a90347941b",
-    "92": "786a3a23-478f-4414-b864-d7d6ce423a7c",
-    "93": "ecc11c0b-2921-47f2-bac9-ea8c27539681",
-    "95": "ed0a6621-0029-439a-abf1-e5960421d6ad",
-    "96": "2010bc44-6f7b-4c0b-ae4a-2f6e1ab9acab",
-    "97": "b56b0479-7d17-4527-8f7d-3769b8baee76",
-    "101": "42f019a8-9f4c-448a-95a8-b5c3d178de39",
-    "102": "d1500c52-0067-4562-b700-2d3b40314703",
-    "106": "1c4c568b-55d2-4710-aeef-7b495d27482f",
-    "107": "ec9c6fab-6685-4133-84d8-8043badc89d2",
-    "108": "29e7f231-8deb-47bd-b9f3-b18dc5421709",
-    "109": "1d519578-1518-405a-a0a2-9b8b7a3c02f7",
-    "110": "f2894d2a-a388-4817-9388-77c7129afb85",
-    "115": "3033fbca-51e4-4afb-ad48-4d5cc3102011",
-    "116": "f30c94d1-f8a7-4a2a-aba0-d39462f58958",
-    "118": "776f2ea8-5b2d-44f5-8c8f-ce30aa257ae0",
-    "119": "c795a736-09d2-4d33-8d19-c57f29612930",
-    "120": "23aa202a-28d6-48c6-a652-435eeccf4840",
-    "121": "2b735224-f8e3-410e-a759-d69904b8b888",
-    "122": "1f12dc35-c524-47ca-a238-3f157b680fa5",
-    "123": "7fe3c55f-d84c-46d6-81e3-0ba796bca4fe",
-    "125": "92e815e7-1867-4e9b-9943-dcbca5d6bdae",
-    "128": "bc889db7-17a1-4967-9161-8d425f679b7a",
-    "129": "f068d565-2588-4819-bdaa-42ab537a3e82",
-    "130": "a071c5c7-4979-4b2b-9d0c-246261516e5e",
-    "131": "a2c81204-6bbb-44ac-83c2-dd115c0f9f3a",
-    "132": "15a12d51-c14d-4231-b9ce-900a57d46a89",
-    "133": "9a608faf-f98d-45da-9d9e-ea45196337c5",
-    "134": "976e29cc-5dce-4822-b0ef-d413a8abbff1",
-    "135": "c9a417aa-fe8c-43c5-8178-225fc18dda82",
-    "136": "1acefe5f-3763-4f87-89d3-f5184d69fb7c",
-    "137": "f9efe0b5-637c-442e-ac0f-61c8efc887bf",
-    "138": "d1e0f6bb-9572-4358-96b7-a2f3aabacaa3",
-    "139": "1352e103-aa8f-4a4d-aa0b-e4c9e16d337a",
-    "140": "6932541c-0c87-42d0-97e1-f36189fdb639",
-    "141": "556b3ac6-0b7c-4ebe-95d0-6e896bbb4b3f",
-    "142": "42c1a6ab-74d3-4d79-85e7-1c7bb8613120",
-    "143": "6244c1c6-88c3-4c6f-b8fb-4204c1df4210",
-    "144": "4488ae2d-bc2e-4eaa-92c7-eada01564c47",
-    "145": "b43a03a8-2306-4b49-899f-4674c8650d61",
-    "146": "02a646b0-0ace-4881-9f96-cca8c64192da",
-    "147": "f6755a0b-bc42-4364-a9f9-f4d684288bb0",
-    "148": "f846d0de-9ca5-4859-bc01-3d37217d3fcd",
-    "149": "491c7e83-9b0a-45e9-bf8b-8d4f350fce99",
-    "160": "9d141a13-a7f9-4d82-b9a7-3ae379ddbcd4",
-    "161": "1a109595-71c4-482c-bfa6-90f1abe9806f",
-    "162": "05758ce1-753f-4c70-b456-3e65753dcc00",
-    "163": "a269c1af-5700-4c72-befb-89e22760ba3a",
-    "164": "49432473-7245-40f4-8e78-8b9974f94998",
-    "165": "edbf29a0-3b15-444a-8af7-0196aa8d695f",
-    "166": "78445020-6661-4253-bc68-6b8d6a4eb398",
-    "167": "e49fbbab-642e-47ff-a1a2-75737dda76d2",
-    "168": "61654b95-20f2-4343-8d65-e21603a55f9f",
-    "169": "606a7123-214a-4378-84c4-edefee3cc4ee",
-    "172": "d8667e64-2c96-4b46-ad98-5d4c0953fca4",
-    "173": "7730e56b-25bb-46d7-8308-f123e0e7a53e",
-    "174": "5c308d00-f4ba-46ab-81f8-276f9da0cdfb",
-    "175": "25a521a8-09f3-4b3f-8314-032b5dbae1eb",
-    "178": "ff914123-58b9-460a-81f3-22cbcf9b481b",
-    "179": "e22ec9aa-4db1-4011-816b-65c6cd719dda",
-    "181": "087545fd-1cab-4957-9485-7ca6c85a32f2",
-    "182": "7d0c16ec-fd38-441b-a102-a5c617f35798",
-    "183": "a3076f04-7f75-4b4a-a136-6b55c320cae3",
-    "184": "d03f21d6-fb71-43c0-ba01-1931a84f7fdf",
-    "185": "b1698e48-fae8-447a-ac29-8e71ca779a5d",
-    "186": "6f12264f-e845-4163-9834-09ef2b9a317b",
-    "188": "d6b4b649-1be6-41b9-9fde-a16da7869836",
-    "189": "1a7c4953-f6e6-4e9f-a19f-7f700ff91661",
-    "194": "0a751414-e90d-49d4-a72c-42c10dad2d10",
-    "195": "eaa3d526-a234-40db-9c18-a2281f5d326a",
-    "197": "e88e008b-7f57-41bf-9790-07d697953985",
-    "200": "1b126b57-819f-4ef8-b88b-077a689d678e",
-    "201": "9d303b67-a33b-4895-b61b-5b5de47c2ddc",
-    "202": "c259037a-b98b-4624-8b0c-024f2abec6df",
-    "203": "eb47d853-d11f-44b8-9bb7-67ee1df315c3",
-    "204": "87049070-4054-4a12-874e-83955a8fe286",
-    "205": "fcdaf219-cd7f-4b48-a927-8d15bc37a381",
-    "206": "3681d122-4408-4aa3-aaca-7b401c2990e6",
-    "207": "f9fdbbf6-9134-48ca-bb50-8eb9c46d57a6",
-    "208": "75060874-e297-42b8-b498-ba938631b4ca",
-    "209": "72d19ca6-cc7d-406e-9fbd-5f8bd6198dd2",
-    "210": "01fcbf05-fa9d-4b41-a06e-b8948d708a22",
-    "211": "f079546f-f31f-4a7c-8d75-a151a8adae37",
-    "212": "7cdb5c53-be2a-407e-a3b8-fcc49870deda",
-    "213": "c0232c96-6449-4da1-83da-770f13bcb5e9",
-    "214": "6a922f46-3102-477c-8bdf-1a19ab1c09f6",
-    "215": "b73cdf87-5e13-452c-a548-6559cc6d2b60",
-    "216": "38b63ddc-ea59-4e90-9b9a-600bac503763",
-    "217": "a3a3c5b5-0b18-489a-bc24-ddb93c693228",
-    "218": "25838536-b3f0-4eb1-9ac4-a10f490b71df",
-    "219": "3070bd6a-4c13-423d-acb8-29f558d712b9",
-    "220": "4138c095-d12e-44de-886d-30fa9b9449ce",
-    "221": "98e7a2e9-0a6e-47bb-bdfd-d9015211c935",
-    "222": "3c775ee4-672c-4f9c-af7b-392b01fe1133",
-    "223": "9768c86a-8490-450a-83f6-66f07f982def",
-    "224": "9d031d88-c7c0-438f-8682-2df6a53a1502",
-    "225": "d4c4b8ab-4b94-4fce-a3f6-c62694791f6a",
-    "226": "54d52dd3-5262-423e-99ca-63bb72fd5b93",
-    "227": "d8b3112b-2909-4cc4-aee1-0640cd957b1a",
-    "228": "f55c8251-b598-4bd0-87b1-78ba004a4cdb",
-    "232": "929ef886-3602-42fb-bf2e-54f648e48a0a",
-    "233": "c80a3105-f52c-4cf0-9fc9-0eb16cfac8f2",
-    "234": "d3df9fb5-913c-45d5-96af-36fc3f59e7a8",
-    "235": "e727db35-3bab-40e7-83f7-10a0bc1481d1",
-    "237": "5d3ff4f9-7562-4567-8238-37f14076a537",
-    "238": "aa4db565-cca8-4ec2-8b3d-7a5a9f069dd6",
-    "239": "f0a575b8-ac36-4929-b251-506be823d7dd",
-    "240": "7676d83d-5a9a-4180-a322-f3628f91b0f6",
-    "241": "cca37cf7-b977-4b00-be2c-3791b90765dc",
-    "242": "7b97abe5-8d16-4b5f-a2c6-d182153835d6",
-    "243": "5f0a6bff-4f4d-4fc0-a977-3be419e89499",
-    "244": "0b1cb096-4492-49f8-8d46-2a4c97d31d79",
-    "245": "4c03dd19-cc83-4f9d-b00d-a237dbbd0939",
-    "246": "ad4093d1-6519-498e-898c-0fac6d3ed0ae",
-    "247": "ab197c1d-a4be-491e-adbd-fa5cbcdf3188",
-    "248": "b5eeadb8-df3b-4711-b4e0-4f78aba954cd",
-    "249": "bdf0d947-e3de-44f9-bd29-e28835e14031",
-    "250": "8dc9ced6-d5b5-4b68-8bf5-b8bbb5ce5e92",
-    "251": "26e5bf33-fc95-4700-85b4-1ab8f3719c4a",
-    "254": "5fd08bd8-269d-4cd3-bcd8-8723f712b1d2",
-    "256": "46a2455f-0ba3-4f06-8c42-4cbbe6fe79e3",
-    "257": "a225c6a5-cab2-4c5f-98c6-146b17258cac",
-    "262": "1ff56cbd-f2a0-49d1-8b5d-7acac8dcbc4d",
-    "265": "ec2735fe-bb70-494b-9c70-e90bb8439557",
-    "269": "ede09b03-59d1-49a8-8319-1e41c4273bff",
-    "273": "da6e5496-0e2c-4270-9b22-8e2f722f0de7",
-    "274": "052dd55c-3f20-49d3-ac66-2fbefd114d48",
-    "275": "084f4b36-57c1-453b-bd69-1d1bca34145c",
-    "297": "9109924a-1a5d-4d99-9bfd-9ece3b0f9acb",
-    "298": "3a8ad940-e538-465e-b306-566dede6ffab",
-    "299": "2010bc44-6f7b-4c0b-ae4a-2f6e1ab9acab",
-    "301": "60ed6744-6a83-43bb-9d64-59a751690414",
-    "303": "9a024079-bfd9-4265-aba7-056960b83319",
-    "305": "812673db-d55c-44a0-9463-2c7652e1d843",
-    "307": "950a5179-35d0-480b-a20e-527513d0480b",
-    "316": "9b3ccbc4-269b-4050-9a4d-ad4cf9d1a68c",
-    "317": "dd51b2c7-1055-42e9-9374-0946195e60b6",
-    "321": "b84c251b-1867-43a3-90e5-418c4cdfe5dd",
-    "322": "23eb58dc-da4e-437b-8f93-62b2e02562c6",
-    "323": "6028b892-35e0-464a-8612-555778d4fdf1",
-    "325": "750490eb-3db4-489e-9fa5-53b56b0647c2",
-    "331": "6375e67a-5f40-4979-a5f8-bc513dcbf38e",
-    "333": "d31ce5ee-9c67-4e2f-9a3b-dcb5103e91d4",
-    "334": "9fbd0cf1-f12c-4bba-8508-c70cb6ca7e1a",
-    "335": "7bdf49f5-aae5-4f8c-9305-b1d40cfe9f56",
-    "336": "704555a7-4833-4486-b8ce-b7007b4e22ea",
-    "337": "33140b84-a857-479e-a617-1e892844d521",
-    "338": "2e4d61d2-4289-4550-b751-cc00b354a3d4",
-    "339": "c57b765e-c793-4a25-9bf7-16c28fb75d90",
-    "340": "ec547026-27a1-4898-b660-6022d576e5eb",
-    "341": "7bdba13c-57a0-4f3d-bfb3-43e73b073009",
-    "342": "fdb5e40e-b984-4e68-8634-0b7a04e3975d",
-    "343": "06dbab34-5229-4471-8a86-2102ff1ceef1",
-    "345": "51018153-92c5-454c-8307-b66958de241f",
-    "346": "e19789cc-5ba0-4eaa-a847-814593644d13",
-    "347": "79c53413-b07b-49ff-b5b3-910b1d360d5c",
-    "349": "4c244b8c-3d4b-4bf9-b6b7-0932e3bf7ca3",
-    "350": "15436eab-187b-4773-870b-389512c2e658",
-    "351": "f989c1a7-eed0-44c1-ab2d-89a8e322acdd",
-    "352": "cf6eccbf-fa77-4bd0-9bec-4c8b40cef69a",
-    "353": "83782865-38dc-4b4d-94f7-fb661626b8d7",
-    "354": "97db2255-b6ed-4bdf-9e25-b0b0d8092017",
-    "355": "e3dc0bb1-253b-43aa-b04a-d153bdfde9e1",
-    "356": "4ee1286d-f217-4dd1-bfff-beec591f3458",
-    "357": "68deaef6-6239-4f72-a506-2d11d6602fe0",
-    "358": "8d9651c5-3300-4a73-977a-09f89e513406",
-    "359": "922dbb8a-076e-44c6-b6b2-d9ea66eaf06f",
-    "360": "73b64340-778f-47be-9d6d-ffd0fae26e45",
-    "364": "7bedda55-6ec8-4683-8cb4-7329b99bc21c",
-    "367": "8e257450-fc50-4f86-a884-441d7be8c7b0",
-    "368": "4482a2ba-685c-4fc3-9d21-0f299c9d1fd5",
-    "370": "f97b2ba7-189e-4458-88ad-4665a83c03aa",
-    "375": "c51e82fc-806d-4c44-aeba-3471ab104993",
-    "376": "1314ef26-0b86-4e77-aae9-379a815e0dae",
-    "377": "23bb53da-e64a-46c9-bacb-3a7ba1d5cdd6",
-    "378": "9bae741d-f693-46a2-9564-00b8d1579484",
-    "379": "c2c1b9bc-5bfa-483b-bb40-82986fa75bca",
-    "380": "ee6c0e28-0e45-4a07-a07a-4ff1ec857736",
-    "381": "409bedb3-a81b-4927-8369-4452d927664a",
-    "382": "eceb0cc0-103e-4808-9ca6-2019e914cd95",
-    "385": "687b376f-613c-4179-aada-ecdc198042a5",
-    "386": "6342939c-8008-40ad-b5f1-7588caa61f53",
-    "93242": "e4d07d34-dc72-41ed-88f2-035c650702ee",
-    "100049": "90362d63-a6db-40e9-8589-638205f5b972",
-    "100050": "0312996a-b501-4c3d-9657-3ab6372eae8b",
-    "100052": "c9b187f5-3a5a-4d08-a302-a180853af46a",
-    "100053": "3041f968-db0d-4326-9e0f-f64c3e940e85",
-    "100088": "cb0d80ee-e89a-494c-a8f6-143706500279",
-    "120002": "6016d936-404b-4209-9d76-c36ba29f051c",
-    "120010": "ddf08072-1bfc-4a2a-b1e3-3c48cfd9eb87",
-    "120018": "2eabab96-e624-4604-8712-2bf4e07b3700",
-    "120022": "93778ed4-32a3-4863-a850-bf8b4ab17a66",
-    "120026": "79b68c43-025f-4c52-b6ab-d0e27795d4cf",
-    "120027": "8008ebde-eaa1-4d44-b906-45daa4557313",
-    "120029": "3340a34d-153b-4efc-b84f-96ef52a98904",
-    "120030": "d2aaca3a-3e6b-4af1-b851-a6fbc4689896",
-    "120031": "a022de7e-49fd-4ac9-b934-8faf14650f76",
-    "120032": "f828d5a3-04d0-4611-bcab-ba6544df2c7c",
-    "120034": "79ab01cd-2b95-4382-98dc-be770f62581a",
-    "120035": "093b4fd5-41ed-45c2-baab-f4d244ff2376",
-    "120039": "619179f5-181b-498b-b8db-eee5d68ef449"
-  }
+  def get_store_list() do
+    perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
+    response = HTTPoison.get(perhap_base_url <> "/v1/model/" <>
+      "storeindex/100077bd-5b34-41ac-b37b-62adbf86c1a5")
+    case response do
+      {:ok, %HTTPoison.Response{status_code: 200, body: data}} ->
+        {:ok, decoded_data} = Poison.decode(data)
+        decoded_data["stores"]
+      {:ok, %HTTPoison.Response{status_code: code}} ->
+        Logger.info("couldn't get store list with status code #{code}")
+      {:error, reason} ->
+        Logger.error("couldn't get store list with error #{reason}")
+    end
   end
 
   def request_store_info(store_number_map) when is_map(store_number_map) do
-    Enum.map(store_number_map, fn {k, v} -> request_store_info(v) end)
+    Enum.map(store_number_map, fn {_k, id} -> request_store_info(id) end)
   end
-
   def request_store_info(store_entity_id) do
     perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
     response = HTTPoison.get(perhap_base_url <> "/v1/model/" <>
       "store/" <> store_entity_id)
+    case response do
+      {:ok, %HTTPoison.Response{status_code: 200, body: data}} ->
+        {:ok, decoded_data} = Poison.decode(data)
+        Map.put(decoded_data, "entity_id", store_entity_id)
+      {:ok, %HTTPoison.Response{status_code: code}} ->
+        Logger.error("couldn't get store #{store_entity_id} info with status code #{code}")
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        Logger.error("couldn't get store #{store_entity_id} info with error #{reason}")
+    end
+  end
 
-      case response do
-        #{:ok, %HTTPoison.Response{status_code: 200, body: data}} ->
-        #  {:ok, decoded_data} = Poison.decode(data)
-        #  [store_entity_id => decoded_data]
-        {:ok, %HTTPoison.Response{status_code: code}} ->
-          Logger.info("couldn't get store info with status code #{code}")
-        {:error, %HTTPoison.Error{reason: reason}} ->
-          Logger.error("couldn't get store info with error #{reason}")
+  def request_store_stats(store_info_list) when is_list(store_info_list) do
+    Enum.map(store_info_list, fn store -> request_store_stats(store) end)
+    |> Enum.reject(fn store -> store == :ok end)
+  end
+  def request_store_stats(store) do
+    perhap_base_url = Application.get_env(:reducers, :perhap_base_url)
+    response = HTTPoison.get(perhap_base_url <> "/v1/model/" <>
+      "stats/" <> store["entity_id"])
+    case response do
+      {:ok, %HTTPoison.Response{status_code: 200, body: data}} ->
+        {:ok, decoded_data} = Poison.decode(data)
+        {score, accuracy} = calculate_score(decoded_data["stats"])
+
+        Map.put(store, "accuracy_score", accuracy)
+        |> Map.put("score", score)
+      {:ok, %HTTPoison.Response{status_code: code}} ->
+        Logger.error("couldn't get store #{inspect(store["entity_id"])} #{inspect(store["number"])} stats with status code #{code}")
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        Logger.error("couldn't get store #{inspect(store["entity_id"])} stats with error #{reason}")
+    end
+  end
+
+  # # generates test data
+  # def request_store_stats(store) do
+  #   Map.put(store, "accuracy_score", :rand.uniform(10))
+  #   |> Map.put("score", :rand.uniform(70))
+  # end
+
+  def run(_args \\ []) do
+    Application.ensure_all_started(:db)
+    stats = get_store_stats_pipeline()
+    top_stores_by_district_pipeline(stats)
+    |> wildcard_pipeline(stats)
+    |> set_up_bracket()
+    |> save_bracket()
+  end
+
+  def get_store_stats_pipeline()do
+    get_store_list()
+    |> request_store_info
+    |> request_store_stats
+  end
+
+  def top_stores_by_district_pipeline(store_stats_list) do
+    store_stats_list
+    |> sort_stores_into_districts
+    |> top_store_per_district
+    |> assign_rank_number
+  end
+
+  def wildcard_pipeline(district_tuple, store_stats_list) do
+    store_stats_list
+    |> sort_stores_by_score
+    |> find_wildcards(district_tuple, 28)
+    |> Map.values
+  end
+
+  def set_up_bracket(top_32) do
+    list_of_32 = sort_top_32(top_32)
+    east = east_bracket(list_of_32)
+    |> recursive_add_seed(1, "east")
+    west = west_bracket(list_of_32)
+    |> recursive_add_seed(1, "west")
+    %{get_season() <> "round1" => east ++ west}
+  end
+
+  def save_bracket(bracket_map) do
+    e_ctx = DB.Common.event_context(%{domain: "bracket", entity_id: "ae597af6-9901-405a-827d-1989dfeea4a4"})
+    state_key = DB.Reducer.State.key(e_ctx, "bracket")
+    old_state= DB.Reducer.State.find(state_key)
+    bracket_map =   case old_state do
+        :error -> %{"bracket" => bracket_map}
+        :not_found -> %{"bracket" => bracket_map}
+        _ -> Map.merge(old_state.model.data["bracket"], bracket_map)
       end
+    DB.Reducer.State.save(
+      %DB.Reducer.State{
+        state_id: state_key,
+        data: bracket_map
+      }
+    )
   end
 
-  def sort_stores_into_districts(store_info_list) do
+  def get_season()do
+    [_elixir_string, season] = Application.get_env(:reducers, :current_season)
+    |> to_string()
+    |> String.downcase()
+    |> String.split(".")
+    season
+  end
 
+  def weeks_to_include()do
+    [_elixir_string, season] = Application.get_env(:reducers, :current_season)
+    |> to_string()
+    |> String.downcase()
+    |> String.split(".")
+    number_of_weeks = Application.get_env(:reducers, :current_season_length)
 
+    week_string(season, number_of_weeks)
+  end
+
+  def week_string(season, number) when number > 1 do
+    [season <> "week" <> to_string(number) | week_string(season, number-1)]
+  end
+  def week_string(season, number) when number == 1 do
+    [season <> "week" <> to_string(number)]
+  end
+
+  def calculate_score(stats) do
+    weeks_scores = Enum.filter(stats, fn{week, _stats} -> Enum.member?(weeks_to_include(), week)end)
+    |> Enum.map(fn{week, week_stats} -> {week, total_week(week_stats)} end)
+    {Enum.reduce(weeks_scores, 0, fn({_week, {score, _accuracy}}, acc) -> score + acc end),
+    Enum.reduce(weeks_scores, 0, fn({_week, {_score, accuracy}}, acc) -> accuracy + acc end)}
+  end
+
+  def total_week(week_stats) do
+    bin_score = get_score(week_stats, "bin_audit", "bin_score")
+    pre_score = get_score(week_stats, "pre", "pre_score")
+    pre_accuracy = get_score(week_stats, "pre", "accuracy_score")
+    refill_score = get_score(week_stats, "refill", "refill_score")
+    refill_accuracy = get_score(week_stats, "refill", "accuracy_score")
+    pre_accuracy_percentage = get_score(week_stats, "pre", "accuracy_percentage")
+    refill_accuracy_percentage = get_score(week_stats, "refill", "accuracy_percentage")
+    {bin_score + pre_score + pre_accuracy + refill_score + refill_accuracy, (abs(pre_accuracy_percentage - 1) + abs(refill_accuracy_percentage - 1))}
+  end
+
+  def get_score(week_stats, metric, score)do
+    cond  do
+      Map.has_key?(week_stats, metric) ->
+        cond do
+          Map.has_key?(week_stats[metric], score) -> week_stats[metric][score]
+          true -> 0
+        end
+      true -> 0
+    end
+  end
+
+  def sort_stores_into_districts(store_stats_list) do
+    store_stats_list
+    |> Enum.sort_by(fn store -> store["district"] end)
+    |> Enum.chunk_by(fn store -> store["district"] end)
+    |> Enum.map(fn district -> {hd(district)["district"], district} end)
+    |> Enum.reject(fn {district, _stores} -> district == "test" || district == "East Canada" end)
+    |> Map.new()
+  end
+
+  def top_store_per_district(district_map)do
+    {Enum.map(district_map,
+    fn
+      {"West Canada", stores} -> {"West Canada",
+        Enum.filter(stores, fn(store) -> Enum.member?([120034], store["number"]) end)
+        |> max_by_a_then_b("accuracy_score", "score", &<=/2, &>=/2)
+        }
+      {district, stores} -> {district, max_by_a_then_b(stores, "accuracy_score", "score", &<=/2, &>=/2)}
+  end),
+    Enum.map(district_map, fn {_district, stores} -> Enum.max_by(stores, fn(store)-> store["score"] end ) end)}
+  end
+
+  def sort_stores_by_score(store_stats_list) do
+    store_stats_list
+    |> sort_by_a_then_b("accuracy_score", "score", &<=/2, &>=/2)
+  end
+
+  def max_by_a_then_b(list, a, b, order_a, order_b) do
+    sort_by_a_then_b(list, a, b, order_a, order_b)
+    |> hd
+  end
+
+  def sort_by_a_then_b(list, a, b, order_a, order_b) do
+    sort_by_key(list, a, order_a)
+    |> sort_by_key(b, order_b)
+  end
+
+  def sort_by_key(list, key, order) do
+    Enum.sort_by(list, fn
+      {_district, item} -> item[key]
+      item -> item[key]
+    end, order)
+  end
+
+  def assign_rank_number({district_tuple_list, district_list}) do
+    ranked_district_map = sort_by_a_then_b(district_tuple_list, "accuracy_score", "score", &<=/2, &>=/2)
+    |> recursive_add_rank(1)
+    |> Map.new()
+
+    {ranked_district_map, district_list}
+  end
+
+  def recursive_add_rank([hd | tail], rank) do
+    [add_rank_to_map(hd, rank) | recursive_add_rank(tail, rank + 1)]
+  end
+  def recursive_add_rank([], _rank) do
+    []
   end
 
 
+  def add_rank_to_map({district, store_map}, rank) do
+    {district, Map.put(store_map, "rank", rank)}
+  end
 
+
+  def find_wildcards(store_stats_list, {district_map, district_list}, rank) when length(district_list) < 32 and length(district_list) > 26 do
+    wildcard_num = case length(district_list) do
+      27 -> "wildcard1"
+      28 -> "wildcard2"
+      29 -> "wildcard3"
+      30 -> "wildcard4"
+      31 -> "wildcard5"
+    end
+    [hd | tail] = store_stats_list
+    cond do
+      Enum.member?(district_list, hd) ->
+        find_wildcards(tail, {district_map, district_list}, rank)
+      true -> find_wildcards(tail, {Map.put(district_map, wildcard_num, Map.put(hd, "rank", rank)), [HD | district_list]}, rank + 1)
+    end
+  end
+  def find_wildcards(_store_stats_list, {district_map, district_list}, _rank) when length(district_list) == 32 do
+    district_map
+  end
+  def find_wildcards(_store_stats_list, {_district_map, district_list}, _rank) do
+    Logger.error("error getting stores by district, number of districts #{inspect(length(district_list))} must be between 27 and 32")
+  end
+
+  def recursive_add_seed([hd | tail], rank, bracket) do
+    [add_seed_to_map(hd, rank, bracket) | recursive_add_seed(tail, rank + 1, bracket)]
+  end
+  def recursive_add_seed([], _rank, _bracket) do
+    []
+  end
+
+  def add_seed_to_map(store_map, seed, bracket) do
+    Map.put(store_map, "seed", seed)
+    |> Map.put("bracket", bracket)
+    |> Map.put("position", positions_in_bracket(seed))
+  end
+
+
+  def sort_top_32(list_of_32)do
+    Enum.sort_by(list_of_32, fn store -> store["rank"] end)
+  end
+
+  def east_bracket(list_of_32) do
+    Enum.filter(list_of_32, fn store -> rem(store["rank"], 2)==0 end)
+  end
+
+  def west_bracket(list_of_32) do
+    Enum.filter(list_of_32, fn store -> rem(store["rank"], 2)==1 end)
+  end
+
+  def positions_in_bracket(seed)do
+    case seed do
+      1-> "a"
+      16-> "b"
+      8-> "c"
+      9-> "d"
+      5-> "e"
+      12-> "f"
+      4-> "g"
+      13-> "h"
+      6-> "i"
+      11-> "j"
+      3-> "k"
+      14-> "l"
+      7-> "m"
+      10-> "n"
+      2-> "o"
+      15-> "p"
+    end
+  end
 
 end

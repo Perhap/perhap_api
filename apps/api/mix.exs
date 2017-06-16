@@ -27,10 +27,10 @@ defmodule API.Mixfile do
 
   defp deps do
     [
-      {:cowboy, github: "ninenines/cowboy", ref: "2.0.0-pre.9"},
+      {:cowboy, github: "ninenines/cowboy"},
       {:gproc, "~> 0.6.1"},
-      {:ranch, github: "ninenines/ranch", ref: "1.3.0", override: true},
-      {:gun, github: "ninenines/gun", ref: "1.0.0-pre.3"},
+      {:ranch, github: "ninenines/ranch", ref: "1.4.0", override: true},
+      {:gun, github: "ninenines/gun", ref: "1.0.0-pre.3", runtime: false},
       {:reducers, in_umbrella: true},
       {:json, "~> 1.0"},
       {:snappy, github: "fdmanana/snappy-erlang-nif"},

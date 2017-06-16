@@ -197,7 +197,7 @@ defmodule Service.Stats do
     end
   end
 
-  def pre_challenge({_type, event}, {%{"pre" => %{"actual_units" => _actual_units, "pre_meta" => _meta}} = period_model, new_events}) do
+  def pre_challenge({type, event}, {%{"pre" => %{"actual_units" => _actual_units, "pre_meta" => _meta}} = period_model, new_events}) do
     meta = add_meta(event, period_model["pre"]["pre_meta"])
     {_count, sum} = count_sum(meta, "actual_units")
     average = average(meta, "percentage")
@@ -210,10 +210,12 @@ defmodule Service.Stats do
     |> put_in(["pre", "pre_percentage"], average)
     |> put_in(["pre", "accuracy_score"], accuracy_score)
     |> put_in(["pre", "accuracy_percentage"], accuracy_percentage)
-    |> put_in(["pre", "pre_units"], sum), new_events}
+    |> put_in(["pre", "pre_units"], sum)
+    |> calculate_bin_audit({type, event}),
+    new_events}
   end
 
-  def pre_challenge({_type, event}, {%{"pre" => %{"pre_meta" => _meta}} = period_model, new_events}) do
+  def pre_challenge({type, event}, {%{"pre" => %{"pre_meta" => _meta}} = period_model, new_events}) do
     meta = add_meta(event, period_model["pre"]["pre_meta"])
     {_count, sum} = count_sum(meta, "actual_units")
     average = average(meta, "percentage")
@@ -223,10 +225,12 @@ defmodule Service.Stats do
     |> put_in(["pre", "pre_meta"], meta)
     |> put_in(["pre", "pre_score"], score)
     |> put_in(["pre", "pre_percentage"], average)
-    |> put_in(["pre", "pre_units"], sum), new_events}
+    |> put_in(["pre", "pre_units"], sum)
+    |> calculate_bin_audit({type, event}),
+    new_events}
   end
 
-  def pre_challenge({_type, event}, {period_model, new_events}) do
+  def pre_challenge({type, event}, {period_model, new_events}) do
     meta = add_meta(event, %{})
     {_count, sum} = count_sum(meta, "actual_units")
     average = average(meta, "percentage")
@@ -237,10 +241,12 @@ defmodule Service.Stats do
     |> put_in(["pre", "pre_meta"], meta)
     |> put_in(["pre", "pre_score"], score)
     |> put_in(["pre", "pre_percentage"], average)
-    |> put_in(["pre", "pre_units"], sum), new_events}
+    |> put_in(["pre", "pre_units"], sum)
+    |> calculate_bin_audit({type, event}),
+    new_events}
   end
 
-  def refill_challenge({_type, event}, {%{"refill" => %{"actual_units" => _actual_units, "refill_meta" => _meta}} = period_model, new_events}) do
+  def refill_challenge({type, event}, {%{"refill" => %{"actual_units" => _actual_units, "refill_meta" => _meta}} = period_model, new_events}) do
     meta = add_meta(event, period_model["refill"]["refill_meta"])
     {_count, sum} = count_sum(meta, "actual_units")
     average = average(meta, "percentage")
@@ -253,10 +259,12 @@ defmodule Service.Stats do
     |> put_in(["refill", "refill_percentage"], average)
     |> put_in(["refill", "accuracy_score"], accuracy_score)
     |> put_in(["refill", "accuracy_percentage"], accuracy_percentage)
-    |> put_in(["refill", "refill_units"], sum), new_events}
+    |> put_in(["refill", "refill_units"], sum)
+    |> calculate_bin_audit({type, event}),
+    new_events}
   end
 
-  def refill_challenge({_type, event}, {%{"refill" => %{"refill_meta" => _meta}} = period_model, new_events}) do
+  def refill_challenge({type, event}, {%{"refill" => %{"refill_meta" => _meta}} = period_model, new_events}) do
     meta = add_meta(event, period_model["refill"]["refill_meta"])
     {_count, sum} = count_sum(meta, "actual_units")
     average = average(meta, "percentage")
@@ -266,10 +274,12 @@ defmodule Service.Stats do
     |> put_in(["refill", "refill_meta"], meta)
     |> put_in(["refill", "refill_score"], score)
     |> put_in(["refill", "refill_percentage"], average)
-    |> put_in(["refill", "refill_units"], sum), new_events}
+    |> put_in(["refill", "refill_units"], sum)
+    |> calculate_bin_audit({type, event}),
+    new_events}
   end
 
-  def refill_challenge({_type, event}, {period_model, new_events}) do
+  def refill_challenge({type, event}, {period_model, new_events}) do
     meta = add_meta(event, %{})
     {_count, sum} = count_sum(meta, "actual_units")
     average = average(meta, "percentage")
@@ -280,7 +290,9 @@ defmodule Service.Stats do
     |> put_in(["refill", "refill_meta"], meta)
     |> put_in(["refill", "refill_score"], score)
     |> put_in(["refill", "refill_percentage"], average)
-    |> put_in(["refill", "refill_units"], sum), new_events}
+    |> put_in(["refill", "refill_units"], sum)
+    |> calculate_bin_audit({type, event}),
+    new_events}
   end
 
 
@@ -344,7 +356,7 @@ defmodule Service.Stats do
     {percentage, score}
   end
 
-  def pre_actual({_type, event}, {%{"pre" => %{"pre_units" => pre_units}} = period_model, new_events}) do
+  def pre_actual({type, event}, {%{"pre" => %{"pre_units" => pre_units}} = period_model, new_events}) do
     meta = add_actuals(event, period_model["pre"]["actuals_meta"] || %{})
     sum =  sum_actuals(meta)
     {percentage, score} = accuracy(pre_units, sum)
@@ -353,32 +365,35 @@ defmodule Service.Stats do
     |> put_in(["pre", "actuals_meta"], meta)
     |> put_in(["pre", "actual_units"], sum)
     |> put_in(["pre", "accuracy_score"], score)
-    |> put_in(["pre", "accuracy_percentage"], percentage),
+    |> put_in(["pre", "accuracy_percentage"], percentage)
+    |> calculate_bin_audit({type, event}),
     new_events}
   end
 
-  def pre_actual({_type, event}, {%{"pre" => _pre} = period_model, new_events}) do
+  def pre_actual({type, event}, {%{"pre" => _pre} = period_model, new_events}) do
     meta = add_actuals(event, period_model["pre"]["actuals_meta"] || %{})
     sum =  sum_actuals(meta)
 
     {period_model
     |> put_in(["pre", "actuals_meta"], meta)
-    |> put_in(["pre", "actual_units"], sum),
+    |> put_in(["pre", "actual_units"], sum)
+    |> calculate_bin_audit({type, event}),
     new_events}
   end
 
-  def pre_actual({_type, event}, {period_model, new_events}) do
+  def pre_actual({type, event}, {period_model, new_events}) do
     meta = add_actuals(event, period_model["pre"]["actuals_meta"] || %{})
     sum =  sum_actuals(meta)
 
     {period_model
     |> Map.put("pre", %{})
     |> put_in(["pre", "actuals_meta"], meta)
-    |> put_in(["pre", "actual_units"], sum),
+    |> put_in(["pre", "actual_units"], sum)
+    |> calculate_bin_audit({type, event}),
     new_events}
   end
 
-  def refill_actual({_type, event}, {%{"refill" => %{"refill_units" => refill_units}} = period_model, new_events})  when is_nil(refill_units) != true do
+  def refill_actual({type, event}, {%{"refill" => %{"refill_units" => refill_units}} = period_model, new_events})  when is_nil(refill_units) != true do
     meta = add_actuals(event, period_model["refill"]["actuals_meta"] || %{})
     sum =  sum_actuals(meta)
     {percentage, score} = accuracy(refill_units, sum)
@@ -387,11 +402,12 @@ defmodule Service.Stats do
     |> put_in(["refill", "actuals_meta"], meta)
     |> put_in(["refill", "actual_units"], sum)
     |> put_in(["refill", "accuracy_score"], score)
-    |> put_in(["refill", "accuracy_percentage"], percentage),
+    |> put_in(["refill", "accuracy_percentage"], percentage)
+    |> calculate_bin_audit({type, event}),
     new_events}
   end
 
-  def refill_actual({_type, event}, {%{"refill" => _refill} = period_model, new_events}) do
+  def refill_actual({type, event}, {%{"refill" => _refill} = period_model, new_events}) do
     meta = add_actuals(event, period_model["refill"]["actuals_meta"] || %{})
     sum =  sum_actuals(meta)
     {percentage, score} = accuracy(period_model["refill"]["refill_units"], sum)
@@ -400,18 +416,81 @@ defmodule Service.Stats do
     |> put_in(["refill", "actuals_meta"], meta)
     |> put_in(["refill", "actual_units"], sum)
     |> put_in(["refill", "accuracy_score"], score)
-    |> put_in(["refill", "accuracy_percentage"], percentage),
+    |> put_in(["refill", "accuracy_percentage"], percentage)
+    |> calculate_bin_audit({type, event}),
     new_events}
   end
 
-  def refill_actual({_type, event}, {period_model, new_events}) do
+  def refill_actual({type, event}, {period_model, new_events}) do
     meta = add_actuals(event, period_model["refill"]["actuals_meta"] || %{})
     sum =  sum_actuals(meta)
 
     {period_model
     |> Map.put("refill", %{})
     |> put_in(["refill", "actuals_meta"], meta)
-    |> put_in(["refill", "actual_units"], sum),
+    |> put_in(["refill", "actual_units"], sum)
+    |> calculate_bin_audit({type, event}),
     new_events}
   end
+
+
+
+
+# Calculates bin_audit_score for stores that do not do bin_audits, Clearance stores and Canada stores
+
+  def calculate_bin_audit(period_model, {type, event}) do
+    calc? = get_store_num({type, event})
+    |> needs_bin_audit_calc
+
+    case calc? do
+      true ->
+        percentage = calculate(period_model)
+        period_model
+        |> Map.put("bin_audit", %{})
+        |> put_in(["bin_audit", "bin_percentage"], percentage)
+        |> put_in(["bin_audit", "bin_score"], bin_audit_score(percentage))
+      false -> period_model
+    end
+  end
+
+  def get_store_num({type, event})do
+    store_num = case type do
+      :refill_actual -> String.to_integer(event.data["Store"])
+      :pre_actual -> String.to_integer(event.data["Store"])
+      :bin_audit -> String.to_integer(event.data["STORE"])
+      :pre_challenge -> event.data["store_id"]
+      :refill_challenge -> event.data["store_id"]
+    end
+    store_num
+  end
+
+  def needs_bin_audit_calc(store_num) do
+    clearance_stores = [4, 21, 23, 24, 36, 44, 50, 66, 109, 134, 148, 161, 174, 204, 218, 340, 347, 377]
+    canada_stores = [100049, 100050, 100052, 100053, 100088, 120002, 120010, 120018, 120022, 120026, 120027, 120029, 120030, 120031, 120032, 120034, 120035, 120039]
+    Enum.member?(clearance_stores, store_num) || Enum.member?(canada_stores, store_num)
+  end
+
+  def calculate(period_model)do
+    (week_percentage(period_model) / 70) * 100
+  end
+
+  def week_percentage(period_model) do
+    pre_score = get_score(period_model, "pre", "pre_score")
+    pre_accuracy = get_score(period_model, "pre", "accuracy_score")
+    refill_score = get_score(period_model, "refill", "refill_score")
+    refill_accuracy = get_score(period_model, "refill", "accuracy_score")
+    pre_score + pre_accuracy + refill_score + refill_accuracy
+  end
+
+  def get_score(period_model, metric, score)do
+    cond  do
+      Map.has_key?(period_model, metric) ->
+        cond do
+          Map.has_key?(period_model[metric], score) -> period_model[metric][score]
+          true -> 0
+        end
+      true -> 0
+    end
+  end
+
 end

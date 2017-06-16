@@ -1,12 +1,15 @@
 defmodule PerhapAPI.Mixfile do
   use Mix.Project
 
+  require Logger
+
   @version "0.0.1-dev"
 
   {:ok, system_version} = Version.parse(System.version)
   @elixir_version {system_version.major, system_version.minor, system_version.patch}
 
   def project do
+    Logger.debug("Perhap #{@version}: using Elixir: #{inspect(@elixir_version)}")
     [apps_path: "apps",
      version: @version,
      elixir: "~> 1.4",

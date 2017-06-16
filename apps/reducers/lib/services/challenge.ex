@@ -199,19 +199,29 @@ defmodule Service.Challenge do
     end
   end
 
+  def should_create_event({_user, %{"percentage" => percentage, "active_seconds" => active_seconds}}, _num_of_users) when percentage >= 5.0 and active_seconds <= 300, do: false #less than 5 mins and over 500%
+  def should_create_event({_user, %{"active_seconds" => active_seconds}}, _num_of_users) when active_seconds >= 28800, do: false # over 8 hours
+  def should_create_event({_user, %{"actual_units" => actual_units}}, num_of_users) when actual_units * num_of_users >= 9999, do: false # over 10,000 units
+  def should_create_event(_model, _num_of_users), do: true
+
   def create_stats_event(:reject, _, new_events), do: new_events
   def create_stats_event(type, model, new_events) do
-    meta = Map.drop(model, ["last_played", "domain", "entity_id"])
-    |> Map.put("challenge_id", model["entity_id"])
-    [%Event{
-      type: type,
-      domain: "transformer",
-      realm: "nike",
-      entity_id: model["entity_id"],
-      meta: meta,
-      event_id: gen_uuidv1(),
-      remote_ip: "127.0.0.1"
-    } | new_events]
+    user_models = model["users"]
+    case Enum.any?(user_models, fn(user_model) -> should_create_event(user_model, map_size(user_models)) end) do
+      true ->
+        meta = Map.drop(model, ["last_played", "domain", "entity_id"])
+        |> Map.put("challenge_id", model["entity_id"])
+        [%Event{
+          type: type,
+          domain: "transformer",
+          realm: "nike",
+          entity_id: model["entity_id"],
+          meta: meta,
+          event_id: gen_uuidv1(),
+          remote_ip: "127.0.0.1"
+        } | new_events]
+      false -> new_events
+     end
   end
 
   def delete_user(user, _event, user_model) do
