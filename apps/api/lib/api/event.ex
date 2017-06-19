@@ -27,20 +27,25 @@ defmodule API.Event do
   def post(conn, %DB.Event{} = event) do
     case read_body(conn, "") do
       {:ok, body, conn2} -> handle_body(conn2, event, body)
-      {:more, _, conn2} -> handle_badlength(conn2)
+      {:more, _, conn2} -> handle_badlength(conn2) # this typically won't happen
+      {:timeout, _, conn2} -> Response.send(conn2, E.make(:request_timeout))
     end
   end
 
   # Event Body Handling
   defp read_body(conn, acc) do
     read_body_opts = %{
-      length: 1048576,
+      length: 1048576, # chunks read in this size
       period: 10,
       timeout: 11
     }
-    case :cowboy_req.read_body(conn, read_body_opts) do
-      {:ok, data, conn2} -> {:ok, acc <> data, conn2};
-      {:more, data, conn2} -> read_body(conn2, acc <> data)
+    try do
+      case :cowboy_req.read_body(conn, read_body_opts) do
+        {:ok, data, conn2} -> {:ok, acc <> data, conn2};
+        {:more, data, conn2} -> read_body(conn2, acc <> data)
+      end
+    catch
+      :exit, _ -> {:timeout, acc, conn}
     end
   end
 
@@ -54,7 +59,10 @@ defmodule API.Event do
     ip_addr = remote_ip |> Tuple.to_list |> Enum.join(".")
     case DB.Event.save(%{event | meta: json_map, remote_ip: ip_addr}) do
       %DB.Event{} = event ->
-        EventCoordinator.async_notify(event)
+        # coordinate: (hash & ship to self | other connected API node)
+        nodes = Node.list() ++ [Node.self]
+        node = :erlang.phash2({event.domain, event.entity_id}, length(nodes))
+        GenServer.cast({EventCoordinator, Enum.at(nodes, node)}, {:notify, event})
         Response.send(conn, 204)
       :error ->
         Response.send(conn, E.make(:service_unavailable))

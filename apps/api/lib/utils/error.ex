@@ -32,6 +32,18 @@ defmodule API.Error do
         "Resource Not Found")
   end
 
+  def make(:request_timeout) do
+    build_error(408,
+        "RequestTimeout",
+        "Please Try Again.")
+  end
+
+  def make(:request_too_large) do
+    build_error(413,
+        "RequestEntityTooLarge",
+        "Please send < 1 MB.")
+  end
+
   def make(:model_not_implemented) do
     build_error(500,
         "InternalServerError",
@@ -48,12 +60,6 @@ defmodule API.Error do
     build_error(503,
         "ServiceUnavailable",
         "Please try again later.")
-  end
-
-  def make(:request_too_large) do
-    build_error(413,
-        "RequestEntityTooLarge",
-        "Please send < 1 MB.")
   end
 
   @spec format(atom) :: iodata
