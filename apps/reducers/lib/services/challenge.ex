@@ -158,8 +158,23 @@ defmodule Service.Challenge do
     {new_model, create_stats_event(stats_type(new_model["challenge_type"]), new_model, new_events)}
   end
 
-  def edit_user(user, _event, %{"status" => "deleted"} = user_model, _benchmark), do: {user, user_model}
-  def edit_user(user, event, user_model, benchmark) do
+  def edit_user(user, _event, %{"status" => "deleted"} = user_model, _benchmark, _start_time), do: {user, user_model}
+  def edit_user(user, event, nil, benchmark, start_time) do
+    units = normalize_units(event.data["units"])
+    actual_units= units / length(event.data["users"])
+    uph = actual_units / (event.data["duration_min"] / 60)
+    percentage = uph/ benchmark
+
+    {user, %{}
+      |> Map.put("status", "editted")
+      |> Map.put("active_seconds", event.data["duration_min"] * 60)
+      |> Map.put("actual_units", actual_units)
+      |> Map.put("uph", uph)
+      |> Map.put("percentage", percentage)
+      |> Map.put("start_time", start_time)
+    }
+  end
+  def edit_user(user, event, user_model, benchmark, _start_time) do
     units = normalize_units(event.data["units"])
     actual_units= units / length(event.data["users"])
     uph = actual_units / (event.data["duration_min"] / 60)
@@ -178,9 +193,11 @@ defmodule Service.Challenge do
     {model, new_events}
   end
   def edit({:edit, event}, model, new_events) do
+    users = Map.keys(model["users"])
+    start_time = model["users"][hd(users)]["start_time"]
     user_models = Enum.map(event.data["users"], fn(user_raw) ->
       user = to_string(user_raw)
-      edit_user(user, event, model["users"][user], model["challenge_benchmark"])
+      edit_user(user, event, model["users"][user], model["challenge_benchmark"], start_time)
     end)
     |> Enum.into(model["users"])
     new_model = model

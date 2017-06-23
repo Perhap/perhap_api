@@ -62,6 +62,17 @@ defmodule ServiceChallengeTest do
           "users" => ["338897", "338998", "338904"]}
         }
       },
+      edit_event_extra_user: {:edit, %{
+        ordered_id: "11e7-25ff-9d16b16c-93ae-92361f002671",
+        timestamp: 1492712820833,
+        domain: "challenges",
+        entity_id: "uuid-v4",
+        data: %{
+          "duration_min" => 2,
+          "units" => "45",
+          "users" => ["338897", "338998", "338904", "456789"]}
+        }
+      },
       edit_event_zero: {:edit, %{
         ordered_id: "11e7-25ff-9d16b16c-93ae-92361f002671",
         timestamp: 1492712820833,
@@ -472,6 +483,42 @@ defmodule ServiceChallengeTest do
     {context[:state_after_units], []}
     )) ==
       {context[:state_after_edit], [context[:stats_edit_event]]})
+  end
+
+  test "edit with extra user", context do
+    assert(uuid_stripper(Service.Challenge.challenge_reducer_recursive([context[:edit_event_extra_user]],
+    {context[:state_after_units], []}
+    )) ==
+      {%{"challenge_benchmark" => 250,
+          "challenge_type" => "equipment",
+          "domain" => "challenges",
+          "entity_id" => "uuid-v4",
+          "last_played" => "11e7-25ff-9d16b16c-93ae-92361f002671",
+          "store_id" => 93242,
+          "users" => %{
+            "338897" => %{"active_seconds" => 120, "start_time" => 1492712720633, "status" => "editted", "actual_units" => 11.25, "percentage" => 1.35, "uph" => 337.5},
+            "338904" => %{"active_seconds" => 120, "start_time" => 1492712720633, "status" => "editted", "actual_units" => 11.25, "percentage" => 1.35, "uph" => 337.5},
+            "338998" => %{"active_seconds" => 120, "start_time" => 1492712720633, "status" => "editted", "actual_units" => 11.25, "percentage" => 1.35, "uph" => 337.5},
+            "456789" => %{"active_seconds" => 120, "start_time" => 1492712720633, "actual_units" => 11.25, "percentage" => 1.35, "status" => "editted", "uph" => 337.5}}},
+        [%DB.Event{
+          domain: "transformer",
+          entity_id: "uuid-v4",
+          event_id: "",
+          kv: "",
+          kv_time: "",
+          realm: "nike",
+          remote_ip: "127.0.0.1",
+          type: "pre_challenge_transform",
+          meta: %{
+            "challenge_benchmark" => 250,
+            "challenge_id" => "uuid-v4",
+            "challenge_type" => "equipment",
+            "store_id" => 93242,
+            "users" => %{
+              "338897" => %{"active_seconds" => 120, "start_time" => 1492712720633, "status" => "editted", "actual_units" => 11.25, "percentage" => 1.35, "uph" => 337.5},
+              "338904" => %{"active_seconds" => 120, "start_time" => 1492712720633, "status" => "editted", "actual_units" => 11.25, "percentage" => 1.35, "uph" => 337.5},
+              "338998" => %{"active_seconds" => 120, "start_time" => 1492712720633, "status" => "editted", "actual_units" => 11.25, "percentage" => 1.35, "uph" => 337.5},
+              "456789" => %{"active_seconds" => 120, "start_time" => 1492712720633, "actual_units" => 11.25, "percentage" => 1.35, "status" => "editted", "uph" => 337.5}}}}]})
   end
 
   test "edit huge", context do
