@@ -120,6 +120,40 @@ defmodule Service.StatsTest do
       ordered_id: "11e7-3b3c-fb2eb722-a919-92ebcb67fe33",
       realm: "nike",
       type: "bin_audit"},
+    stats_bin_audit_event_empty: %{
+      domain: "stats",
+      entity_id: "uuid-v4",
+      data: %{
+        "STORE" => "51",
+        "DATE" => "06/17/2017",
+        "NO_OF_AUDITS_PERFORMED" => 1,
+        "PASSED_BIN_COUNT" => 16,
+        "BIN_COUNT_TOTAL" => 20,
+        "BIN_PERCENTAGE" => "",
+        "_BATCH_ID_" => 7,
+        "_BATCH_LAST_RUN_" => "2017-03-13T18:10:26",
+        "Store Name" => "Airport",
+        "dimension" => "Nike Store",
+        "territory" => "Inline",
+        "district" => "NS01",
+        "store_id" => "93242"},
+      event_id: "fb2eb722-3b3c-11e7-a919-92ebcb67fe33",
+      ordered_id: "11e7-3b3c-fb2eb722-a919-92ebcb67fe33",
+      realm: "nike",
+      type: "bin_audit"},
+    stats_pre_actual_event_empty: %{
+      domain: "stats",
+      entity_id: "uuid-v4",
+      data: %{
+        "timestamp" => 1493769600000,
+        "Week" => "06/17/2017",
+        "Metrics" => "Actual Receipts",
+        "Store" => "93242",
+        "Count"=> ""},
+      event_id: "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33",
+      ordered_id: "11e7-3b3c-fb2eb7f4-a919-92ebcb67fe33",
+      realm: "nike",
+      type: "actuals"},
     stats_pre_actual_event: %{
       domain: "stats",
       entity_id: "uuid-v4",
@@ -129,6 +163,32 @@ defmodule Service.StatsTest do
         "Metrics" => "Actual Receipts",
         "Store" => "93242",
         "Count"=> "1968.0"},
+      event_id: "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33",
+      ordered_id: "11e7-3b3c-fb2eb7f4-a919-92ebcb67fe33",
+      realm: "nike",
+      type: "actuals"},
+    stats_pre_actual_event_nil: %{
+      domain: "stats",
+      entity_id: "uuid-v4",
+      data: %{
+        "timestamp" => 1493769600000,
+        "Week" => "06/17/2017",
+        "Metrics" => "Actual Receipts",
+        "Store" => "93242",
+        "Count"=> nil},
+      event_id: "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33",
+      ordered_id: "11e7-3b3c-fb2eb7f4-a919-92ebcb67fe33",
+      realm: "nike",
+      type: "actuals"},
+    stats_pre_actual_event_num: %{
+      domain: "stats",
+      entity_id: "uuid-v4",
+      data: %{
+        "timestamp" => 1493769600000,
+        "Week" => "06/17/2017",
+        "Metrics" => "Actual Receipts",
+        "Store" => "93242",
+        "Count"=> 1968},
       event_id: "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33",
       ordered_id: "11e7-3b3c-fb2eb7f4-a919-92ebcb67fe33",
       realm: "nike",
@@ -172,6 +232,23 @@ defmodule Service.StatsTest do
           "accuracy_percentage" => 0.007621951219512195,
           "actuals_meta" => %{"fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968.0}
           }},
+      state_after_complete_and_zero_actuals: %{
+        "pre" => %{
+          "pre_meta" => %{
+            "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
+            "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
+            "uuid-v4-challenge-complete-338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0}
+            },
+          "pre_percentage" => 0.7200000000000001,
+          "pre_score" => 0,
+          "pre_units" => 15.0,
+          "actual_units" => 0,
+          "accuracy_score" => 0,
+          "accuracy_percentage" => 0,
+          "actuals_meta" => %{}
+          }},
+
+
       state_after_bin: %{
         "pre" => %{
           "pre_meta" => %{
@@ -186,6 +263,22 @@ defmodule Service.StatsTest do
         "bin_audit" => %{
           "bin_score" => 5,
           "bin_percentage" => 80.0,
+        }
+          },
+      state_after_bin_zero: %{
+        "pre" => %{
+          "pre_meta" => %{
+            "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
+            "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
+            "uuid-v4-challenge-complete-338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0}
+            },
+          "pre_percentage" => 0.7200000000000001,
+          "pre_score" => 0,
+          "pre_units" => 15.0,
+          },
+        "bin_audit" => %{
+          "bin_score" => 0,
+          "bin_percentage" => 0,
         }
           },
     state_after_edit: %{
@@ -249,33 +342,28 @@ defmodule Service.StatsTest do
             "accuracy_percentage" => 0.3333333333333333
 
             },
-
-
           },
 
-          event_from_perhap:   {:pre_challenge, %{domain: "stats", entity_id: "f11f119c-fc2e-4638-a3d5-2c36337c971b", event_id: "4a24fd18-4237-11e7-9382-17570000028a", kv: "dev_events/4a24fd18-4237-11e7-9382-17570000028a", kv_time: "",
-            data: %{"challenge_benchmark" => 250, "challenge_id" => "d50c1de9-c34a-4bcc-ae94-85e704e727f1",
-            "challenge_type" => "equipment", "store_id" => 93242,
-            "users" => %{"338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
-            "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed",
-            "uph" => 180.0}, "338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
-             "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed",
-             "uph" => 180.0}, "338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
-              "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed",
-               "uph" => 180.0}}}, realm: "nike", remote_ip: "127.0.0.1", type: "pre_challenge"}},
-       out_of_season_event: %Event{domain: "stats", entity_id: "f11f119c-fc2e-4638-a3d5-2c36337c971b", event_id: "4a24fd18-4237-11e7-9382-17570000028a", kv: "dev_events/4a24fd18-4237-11e7-9382-17570000028a", kv_time: "",
-           meta: %{"challenge_benchmark" => 250, "challenge_id" => "d50c1de9-c34a-4bcc-ae94-85e704e727f1",
-           "challenge_type" => "equipment", "store_id" => 93242,
-           "users" => %{"338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
+      event_from_perhap:   {:pre_challenge, %{domain: "stats", entity_id: "f11f119c-fc2e-4638-a3d5-2c36337c971b", event_id: "4a24fd18-4237-11e7-9382-17570000028a", kv: "dev_events/4a24fd18-4237-11e7-9382-17570000028a", kv_time: "",
+        data: %{"challenge_benchmark" => 250, "challenge_id" => "d50c1de9-c34a-4bcc-ae94-85e704e727f1",
+        "challenge_type" => "equipment", "store_id" => 93242,
+        "users" => %{"338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
+        "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed",
+        "uph" => 180.0}, "338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
+         "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed",
+         "uph" => 180.0}, "338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
+          "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed",
+           "uph" => 180.0}}}, realm: "nike", remote_ip: "127.0.0.1", type: "pre_challenge"}},
+     out_of_season_event: %Event{domain: "stats", entity_id: "f11f119c-fc2e-4638-a3d5-2c36337c971b", event_id: "4a24fd18-4237-11e7-9382-17570000028a", kv: "dev_events/4a24fd18-4237-11e7-9382-17570000028a", kv_time: "",
+         meta: %{"challenge_benchmark" => 250, "challenge_id" => "d50c1de9-c34a-4bcc-ae94-85e704e727f1",
+         "challenge_type" => "equipment", "store_id" => 93242,
+         "users" => %{"338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
+         "percentage" => 0.72, "start_time" => 1497534860000, "status" => "completed",
+         "uph" => 180.0}, "338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
+          "percentage" => 0.72, "start_time" => 1497534860000, "status" => "completed",
+          "uph" => 180.0}, "338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
            "percentage" => 0.72, "start_time" => 1497534860000, "status" => "completed",
-           "uph" => 180.0}, "338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
-            "percentage" => 0.72, "start_time" => 1497534860000, "status" => "completed",
-            "uph" => 180.0}, "338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0,
-             "percentage" => 0.72, "start_time" => 1497534860000, "status" => "completed",
-              "uph" => 180.0}}}, realm: "nike", remote_ip: "127.0.0.1", type: "pre_challenge"}
-
-
-
+            "uph" => 180.0}}}, realm: "nike", remote_ip: "127.0.0.1", type: "pre_challenge"}
 
         ]}
     end
@@ -338,12 +426,29 @@ end
       {context[:state_after_bin], []})
   end
 
+  test "bin_audit_empty", context do
+    assert(Service.Stats.bin_audit({:bin_audit, context[:stats_bin_audit_event_empty]}, {context[:state_after_complete], []}) ==
+      {context[:state_after_bin_zero], []})
+  end
+
   test "pre_actual with no begining state", context do
     assert(Service.Stats.actuals({:actuals, context[:stats_pre_actual_event]}, {%{}, []}) == {%{"pre" => %{"actual_units" => 1968.0, "actuals_meta" => %{"fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968.0}}}, []})
   end
 
   test "pre_actual with exisiting begining state", context do
     assert(Service.Stats.actuals({:actuals, context[:stats_pre_actual_event]}, {context[:state_after_complete], []}) == {context[:state_after_complete_and_actuals], []})
+  end
+
+  test "pre_actual with empty string", context do
+    assert(Service.Stats.actuals({:actuals, context[:stats_pre_actual_event_empty]}, {context[:state_after_complete], []}) == {context[:state_after_complete_and_zero_actuals], []})
+  end
+
+  test "pre_actual with nil", context do
+    assert(Service.Stats.actuals({:actuals, context[:stats_pre_actual_event_nil]}, {context[:state_after_complete], []}) == {context[:state_after_complete_and_zero_actuals], []})
+  end
+
+  test "pre_actual with number instead of string", context do
+    assert(Service.Stats.actuals({:actuals, context[:stats_pre_actual_event_num]}, {context[:state_after_complete], []}) == {context[:state_after_complete_and_actuals], []})
   end
 
   test "refill_actual with no begining state", context do
@@ -518,7 +623,7 @@ test "date 05/23/2017" do
   assert(Service.Stats.date("05/23/2017")== 1495555200000)
 end
 
-test "actaul event from perhap" do
+test "actual event from perhap" do
   assert(Service.Stats.call( [%DB.Event{domain: "stats", entity_id: "53f97f3c-8174-42e6-a2e8-f8cd153715fb", event_id: "86008180-46de-11e7-b67d-abb60000017a", kv: <<112, 114, 111, 100, 31, 101, 118, 101, 110, 116, 115, 47, 56, 54, 48, 48, 56, 49, 56, 48, 45, 52, 54, 100, 101, 45, 49, 49, 101, 55, 45, 98, 54, 55, 100, 45, 97, 98, 98, 54, 48, 48, 48, 48, 48, 49>>, kv_time: "", meta: %{"challenge_benchmark" => 150, "challenge_id" => "c75d01af-57c9-475f-8a21-aa54aec6e031", "challenge_type" => "footwear", "store_id" => 39, "users" => %{"145083" => %{"start_time" => 1496329896784, "status" => "running"}}}, realm: "nike", remote_ip: "127.0.0.1", type: "pre_challenge"}],
               %Reducer.State{deferred_events: [], model: %{"last_played" => "11e7-46dc-b7c620d2-b9ae-abb40000017f", "season" => "Elixir.Season1", "stats" => %{"season1preseason" => %{"pre" => %{"pre_meta" => %{"222f5d9f-f835-4eae-83f1-10f263b2520f-311241" => %{"active_seconds" => 1895.457, "actual_units" => 77.0, "percentage" => 0.9749627662352667, "start_time" => 1496251037740, "status" => "completed", "uph" => 146.24441493529}, "75a0d82a-a5cc-4eff-9294-340d6e46d670-261536" => %{"active_seconds" => 53409.252, "actual_units" => 42.0, "percentage" => 0.03145522427462567, "start_time" => 1496276525382, "status" => "completed", "uph" => 2.830970184716311}, "b6f30a87-6180-49fc-bc90-078d6986da22-338121" => %{"active_seconds" => 1898.911, "actual_units" => 97.0, "percentage" => 1.2259658298888152, "start_time" => 1496251166125, "status" => "completed", "uph" => 183.89487448332227}}, "pre_percentage" => 0.7441279401329025, "pre_score" => 0, "pre_units" => 216.0}}}}, new_events: []})==
                 %Reducer.State{deferred_events: [],
