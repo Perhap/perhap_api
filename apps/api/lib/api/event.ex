@@ -60,7 +60,7 @@ defmodule API.Event do
     case DB.Event.save(%{event | meta: json_map, remote_ip: ip_addr}) do
       %DB.Event{} = event ->
         # coordinate: (hash & ship to self | other connected API node)
-        nodes = Node.list() ++ [Node.self]
+        nodes = Node.list() ++ [Node.self] |> Enum.sort
         node = :erlang.phash2({event.domain, event.entity_id}, length(nodes))
         GenServer.cast({EventCoordinator, Enum.at(nodes, node)}, {:notify, event})
         Response.send(conn, 204)
