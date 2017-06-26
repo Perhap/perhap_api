@@ -9,7 +9,7 @@ config :api,
 config :logger, :access_log,
   path: System.cwd <> "/log/access.log",
   metadata: [:function, :module],
-  level: :debug
+  level: :info
 
 config :logger, :error_log,
   path: System.cwd <> "/log/error.log",
