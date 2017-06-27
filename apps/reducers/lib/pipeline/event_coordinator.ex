@@ -5,6 +5,8 @@ defmodule EventCoordinator do
 
   @max_buffer_size 10
 
+  require Logger
+
   def start_link(state) do
     GenStage.start_link(__MODULE__, state, name: __MODULE__)
   end
@@ -57,6 +59,7 @@ defmodule EventCoordinator do
   end
 
   def handle_demand(incoming_demand, state) do
+    Logger.info("Handle Demand: #{inspect(incoming_demand)}")
     state = Map.put(state, :demand, Map.get(state, :demand) + incoming_demand)
     dispatch(state, [])
   end
@@ -72,14 +75,19 @@ defmodule EventCoordinator do
   defp dispatch(state, events) do
     queue = Map.get(state, :queue)
     demand = Map.get(state, :demand)
+    count = Map.get(state, :count)
     case :queue.out(queue) do
       {{:value, {:async, event}}, queue} ->
-        state = Map.put(state, :demand, demand - 1)
+        state = state
+             |> Map.put(:demand, demand - 1)
+             |> Map.put(:count, count + 1)
              |> Map.put(:queue, queue)
         dispatch(state, [event | events])
       {{:value, {from, event}}, queue} ->
         GenStage.reply(from, :ok)
-        state = Map.put(state, :demand, demand - 1)
+        state = state
+             |> Map.put(:demand, demand - 1)
+             |> Map.put(:count, count + 1)
              |> Map.put(:queue, queue)
         dispatch(state, [event | events])
       {:empty, queue} ->

@@ -23,11 +23,16 @@ defmodule Reducer.Consumer do
   end
 
   def init(%{partition: partition, reducers: reducers}) do
-    {:consumer, [reducers: reducers], subscribe_to: [{EventCoordinator, partition: partition}]}
+    {:consumer, [reducers: reducers], subscribe_to: [
+      {EventCoordinator,
+      partition: partition,
+      max_demand: 10,
+      min_demand: 3}]}
   end
 
   # time to reticulate splines
   def handle_events(events, _from, state) do
+    Logger.info("Reducers: #{inspect(self())}, #{length(events)}")
     all_reducers = Keyword.get(state, :reducers)
 
     all_context = RS.reducer_context(events)
@@ -63,6 +68,11 @@ defmodule Reducer.Consumer do
     end)
     Logger.debug("Reducer Results: #{inspect(run_results)}")
     {:noreply, [], state}
+  end
+
+  # get information on the broadcaster state
+  def handle_call(:state, _from, state) do
+    {:reply, state, [], state}
   end
 
   # there isn't really anything to do with these yet
