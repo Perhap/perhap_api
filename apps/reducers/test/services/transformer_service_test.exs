@@ -17,7 +17,7 @@ defmodule ServiceTransformerTest do
         363 => "d9a3bf8c-23f5-46c9-bb6a-2c7ac7b8932f",
         364 => "cad583e8-cd49-4fd4-a86f-115d7110271b",
       },
-      stats_complete_event: %DB.Event{
+      stats_complete_event: %Event{
         domain: "transformer",
         entity_id: "uuid-v4",
         meta: %{
@@ -26,14 +26,14 @@ defmodule ServiceTransformerTest do
           "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
           "challenge_benchmark" => 250,
           "challenge_type" => "equipment",
-          "store_id" => 93242,
+          "store_id" => 357,
           "challenge_id" => "uuid-v4-old"},
         event_id: "",
         realm: "nike",
         type: "pre_challenge_transform"},
       transformed_event: %Event{
         domain: "stats",
-        entity_id: nil,
+        entity_id: "62e36a89-7548-4fe0-8020-f059ce8549c2",
         meta: %{
           "challenge_id" => "uuid-v4-old",
           "338897" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
@@ -41,7 +41,7 @@ defmodule ServiceTransformerTest do
           "338998" => %{"start_time" => 1492712720633, "status" => "completed", "active_seconds" => 100.0, "actual_units" => 5.0, "uph" => 180.0, "percentage" => 0.72},
           "challenge_benchmark" => 250,
           "challenge_type" => "equipment",
-          "store_id" => 93242},
+          "store_id" => 357},
         event_id: "",
         realm: "nike",
         remote_ip: "127.0.0.1",
@@ -79,6 +79,8 @@ defmodule ServiceTransformerTest do
   end
 
   test "transformer", context do
-    assert(uuid_stripper(Service.Transformer.transform_event(context[:stats_complete_event], {"model", []})) == {"model", [context[:transformed_event]]} )
+    expected_transform = {"model", [context[:transformed_event]]}
+    actual_transform = uuid_stripper(Service.Transformer.transform_event(context[:stats_complete_event], {"model", []}, context[:stores]))
+    assert expected_transform == actual_transform
   end
 end

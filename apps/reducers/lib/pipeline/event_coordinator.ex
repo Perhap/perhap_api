@@ -3,7 +3,7 @@ defmodule EventCoordinator do
 
   alias DB.Event
 
-  @max_buffer_size 10
+  @max_buffer_size 20000
 
   require Logger
 
@@ -59,15 +59,10 @@ defmodule EventCoordinator do
   end
 
   def handle_demand(incoming_demand, state) do
-    Logger.info("Handle Demand: #{inspect(incoming_demand)}")
+    Logger.debug("Handle Demand: #{inspect(incoming_demand)}")
     state = Map.put(state, :demand, Map.get(state, :demand) + incoming_demand)
     dispatch(state, [])
   end
-
-  # @spec maybe_dispatch(:queue.t, %DB.Event.t) :: true|false
-  # defp maybe_dispatch?(queue, event) do
-  #   return true
-  # end
 
   defp dispatch(%{demand: 0} = state, events) do
     {:noreply, Enum.reverse(events), state}

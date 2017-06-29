@@ -13,12 +13,13 @@ defmodule Mix.Tasks.Etl.Load do
     tasks = file
     |> File.stream!
     |> Stream.with_index
-    |> Stream.chunk(2, 2, [])
+    |> Stream.chunk(50, 50, [])
     |> Enum.map(fn chunk ->
-      Task.async(fn() ->
-        IO.puts ("Task: #{inspect(self())}")
         pool_load(chunk)
-      end)
+      # Task.async(fn() ->
+      #   IO.puts ("Task: #{inspect(self())}")
+      #   pool_load(chunk)
+      # end)
     end)
     tasks |> Enum.map(&Task.await(&1)) |> IO.inspect
   end
