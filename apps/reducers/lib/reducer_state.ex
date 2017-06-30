@@ -20,7 +20,7 @@ defmodule Reducer.State do
   end
 
   @spec stale?(atom(), list(DB.Event.t), %Reducer.State{model: map()}) :: boolean()
-  def stale?(reducer \\ nil, events, %Reducer.State{model: model} = state) do
+  def stale?(reducer \\ nil, events, %Reducer.State{model: _model} = state) do
     reducer_is_orderable = apply(reducer, :orderable, [])
     case reducer_is_orderable do
       true ->
