@@ -2,9 +2,11 @@ defmodule Service.Transformer do
   @behaviour Reducer
 
   @domains [:transformer]
+  @orderable false
   @types [:pre_challenge_transform, :refill_challenge_transform]
   def domains, do: @domains
   def types, do: @types
+  def orderable, do: @orderable
 
   alias DB.Event
   alias Reducer.State
