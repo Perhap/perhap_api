@@ -9,9 +9,13 @@ config :api,
 config :logger, :access_log,
   path: System.cwd <> "/log/access.log",
   metadata: [:function, :module],
-  level: :info
+  level: :debug
 
 config :logger, :error_log,
   path: System.cwd <> "/log/error.log",
   metadata: [:function, :module],
   level: :error
+
+config :reducers, :domo_creds,
+  client_secret: "domo_secret",
+  client_id: "domo_id"
