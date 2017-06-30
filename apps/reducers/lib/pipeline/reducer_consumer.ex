@@ -26,17 +26,19 @@ defmodule Reducer.Consumer do
     {:consumer, [reducers: reducers], subscribe_to: [
       {EventCoordinator,
       partition: partition,
-      max_demand: 10,
-      min_demand: 3}]}
+      max_demand: 50,
+      min_demand: 10}]}
   end
 
   # time to reticulate splines
   def handle_events(events, _from, state) do
-    Logger.info("Reducers: #{inspect(self())}, #{length(events)}")
+    Logger.debug("Reducers: #{inspect(self())}, #{length(events)}")
     all_reducers = Keyword.get(state, :reducers)
 
     all_context = RS.reducer_context(events)
     run_results = Enum.map(all_context, fn({reducer_context, reducer_events}) ->
+      reducer_event_ids = Enum.map(reducer_events, &(&1.event_id))
+      Logger.debug("Processing: #{inspect(reducer_event_ids)}")
       _reducer_states = Enum.reduce(all_reducers, Map.new(), fn(reducer, acc) ->
         # Setup
         [target_domain, target_entity] = String.split(reducer_context, unit_separator())
@@ -49,7 +51,7 @@ defmodule Reducer.Consumer do
           true ->
             # Execution
             reducer_state_key = reducer_context <> unit_separator() <> reducer_name
-            result = execute(reducer_state_key, reducer_events, reducer, acc)
+            result = execute(reducer_state_key, reducer_events, reducer, reducer_event_ids, acc)
 
             # Post Processing
             case result do
@@ -58,7 +60,7 @@ defmodule Reducer.Consumer do
                 reducer_state = (result |> Map.fetch!(reducer_state_key))
                 %RS{state_id: reducer_state_key, data: reducer_state.model} |> RS.save
                 Task.Supervisor.async(Perhap.TaskSupervisor, fn ->
-                  process_new_events(reducer_state.new_events)
+                  process_new_events(reducer_event_ids, reducer_state.new_events)
                   :gproc.send({:p, :l, "ws-#{target_domain}-#{target_entity}"}, reducer_state.model)
                 end)
                 result
@@ -70,7 +72,7 @@ defmodule Reducer.Consumer do
     {:noreply, [], state}
   end
 
-  # get information on the broadcaster state
+  # get information on the consumer state
   def handle_call(:state, _from, state) do
     {:reply, state, [], state}
   end
@@ -95,7 +97,7 @@ defmodule Reducer.Consumer do
     end
   end
 
-  defp execute(reducer_state_key, reducer_events, reducer, acc) do
+  defp execute(reducer_state_key, reducer_events, reducer, reducer_event_ids, acc) do
     # Load State
     reducer_state = case RS.find(reducer_state_key) do
       :not_found -> %State{}
@@ -103,7 +105,7 @@ defmodule Reducer.Consumer do
     end
 
     # Ensure not Stale
-    {reducer_events, reducer_state} = case State.stale?(reducer_events, reducer_state) do
+    {reducer_events, reducer_state} = case State.stale?(reducer, reducer_events, reducer_state) do
       true ->
         {domain, entity_id, _} = RS.split_key(reducer_state_key)
         indexed_events = case Event.find_by_entity_domain(entity_id, domain) do
@@ -118,6 +120,9 @@ defmodule Reducer.Consumer do
 
     # Run Reducers
     try do
+      Logger.debug("Invoking Reducer: #{inspect(reducer)},
+        with events: #{inspect(reducer_event_ids)},
+        and state: #{inspect(reducer_state)}")
       Map.put(acc, reducer_state_key, apply(reducer, :call, [reducer_events, reducer_state]))
     rescue
       error ->
@@ -130,15 +135,21 @@ defmodule Reducer.Consumer do
   end
 
   # Save and dispatch new events
-  defp process_new_events(events) when is_list(events) do
+  defp process_new_events(parents, events) when is_list(events) do
     Enum.each(events, fn(event) ->
       case V.valid_event(event) do
         false ->
-          Logger.error("Reducers generated invalid event #{inspect(event)}")
+          Logger.error("Reducers generated invalid event: #{inspect(event)},
+            parents: #{inspect(parents)}")
           :invalid_event
         true ->
+          kv_time = V.extract_datetime(event.event_id)
+          event = %Event{event|parents: parents}
+          event = %Event{event|kv_time: kv_time}
           case Event.save(event) do
             %Event{} = event ->
+              # we assume that any new events are safe to process on the
+              # same partition
               EventCoordinator.async_notify(event)
             _ ->
               :error

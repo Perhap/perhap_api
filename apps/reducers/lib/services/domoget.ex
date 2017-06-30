@@ -9,13 +9,14 @@ defmodule Service.Domo do
   require Logger
 
   @domains [:domo]
+  @orderable false
   @types [:pull]
   def domains, do: @domains
   def types, do: @types
+  def orderable, do: @orderable
 
   def correct_type?(event) do
-    Enum.member?([
-      "pull"], event.type)
+    Enum.member?(["pull"], event.type)
   end
 
   @spec call(list(Event.t), State.t) :: State.t
@@ -95,9 +96,9 @@ defmodule Service.Domo do
       case Donethat.new?(row, hash_state) do
         {true, new_hash_state} ->
           event = make_event(col_heads, type, row, store_ids)
-          case event do
-            :ok -> {events, col_heads, type, new_hash_state, store_ids}
-            _ -> {[event | events], col_heads, type, new_hash_state, store_ids}
+          case is_nil(event) do
+            true -> {events, col_heads, type, new_hash_state, store_ids}
+            false -> {[event | events], col_heads, type, new_hash_state, store_ids}
           end
         {_, new_hash_state} ->
           {events, col_heads, type, new_hash_state, store_ids}
@@ -135,14 +136,16 @@ defmodule Service.Domo do
     entity_id = get_entity_id(meta["STORE"] || meta["Store"], store_ids)
     case is_nil(entity_id) do
       # this occurs when a store id isn't in the store index
-      true -> Logger.warn("Domo get #{type} event with out valid entity_id, store #{inspect(meta["STORE"])} or #{inspect(meta["Store"])}")
-      false ->  %Event{domain: "stats",
-                       meta: meta,
-                       entity_id: entity_id,
-                       event_id: gen_event_id(),
-                       realm: "nike",
-                       remote_ip: "127.0.0.1",
-                       type: type}
+      true ->
+        Logger.warn("#{type} event is for a invalid store: #{inspect(meta["STORE"])} or #{inspect(meta["Store"])}")
+        nil
+      false -> %Event{domain: "stats",
+                      meta: meta,
+                      entity_id: entity_id,
+                      event_id: gen_event_id(),
+                      realm: "nike",
+                      remote_ip: "127.0.0.1",
+                      type: type}
     end
   end
 

@@ -30,3 +30,6 @@ mix.lock
 
 # Ignore ERLN8 Config
 erln8.config
+
+# Ignore Local Config
+config/local.exs

@@ -9,9 +9,11 @@ defmodule Service.Stats do
   alias Reducer.State
 
   @domains [:stats]
+  @orderable false
   @types [:bin_audit, :actuals, :pre_actual, :refill_actual, :pre_challenge, :refill_challenge]
   def domains, do: @domains
   def types, do: @types
+  def orderable, do: @orderable
 
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, %State{} = state) when is_list(events) do
@@ -297,11 +299,18 @@ defmodule Service.Stats do
 
 
   def bin_audit({_type, event}, {period_model, new_events}) do
-    {bin_percentage, _} = Float.parse(event.data["BIN_PERCENTAGE"])
-    {period_model
-    |> Map.put("bin_audit", %{})
-    |> put_in(["bin_audit", "bin_percentage"], bin_percentage)
-    |> put_in(["bin_audit", "bin_score"], bin_audit_score(bin_percentage)), new_events}
+    case Float.parse(event.data["BIN_PERCENTAGE"]) do
+     {bin_percentage, _} ->
+       {period_model
+       |> Map.put("bin_audit", %{})
+       |> put_in(["bin_audit", "bin_percentage"], bin_percentage)
+       |> put_in(["bin_audit", "bin_score"], bin_audit_score(bin_percentage)), new_events}
+     :error ->
+       {period_model
+       |> Map.put("bin_audit", %{})
+       |> put_in(["bin_audit", "bin_percentage"], 0)
+       |> put_in(["bin_audit", "bin_score"], bin_audit_score(0)), new_events}
+     end
   end
 
   def actuals({_type, event}, {period_model, new_events}) do
@@ -311,13 +320,21 @@ defmodule Service.Stats do
     end
   end
 
-  def add_actuals(%{data: %{"Count" => count}} = _event, meta) when count == "" do
+  def add_actuals(%{data: %{"Count" => count}} = _event, meta) when count == nil do
     meta
   end
-  def add_actuals(%{data: %{"Count" => count}} = event, meta) do
-    {count, _} = Float.parse(count)
-    meta
-    |> Map.put(event.event_id, count)
+  def add_actuals(%{data: %{"Count" => count}} = event, meta) when is_binary(count) do
+     case Float.parse(count) do
+      {count, _} ->
+        meta
+        |> Map.put(event.event_id, count)
+      :error ->
+        meta
+      end
+  end
+  def add_actuals(%{data: %{"Count" => count}} = event, meta) when is_number(count) do
+        meta
+        |> Map.put(event.event_id, count)
   end
 
   def sum_actuals(meta)do

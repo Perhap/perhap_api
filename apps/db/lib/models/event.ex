@@ -16,7 +16,8 @@ defmodule DB.Event do
             meta: "",
             remote_ip: "",
             kv: "",
-            kv_time: ""
+            kv_time: "",
+            parents: ""
 
   @type t :: %Event{event_id: String.t}
 

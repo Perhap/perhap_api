@@ -7,9 +7,26 @@ defmodule Reducer.State.Test do
   alias DB.Event
   alias Reducer.State
 
-  test "state staleability" do
+  setup do
     [e1, e2, e3, e4, e5] = [gen_uuidv1(), gen_uuidv1(), gen_uuidv1(), gen_uuidv1(), gen_uuidv1()]
-    [fe1, _, fe3, _, _] = [flip_v1_uuid(e1), flip_v1_uuid(e2), flip_v1_uuid(e3), flip_v1_uuid(e4), flip_v1_uuid(e5)]
+    flipped = [flip_v1_uuid(e1), flip_v1_uuid(e2), flip_v1_uuid(e3), flip_v1_uuid(e4), flip_v1_uuid(e5)]
+    [events: [e1, e2, e3, e4, e5], flipped: flipped]
+  end
+
+  test "reducer orderablity has precident over state staleness", context do
+    [_, e2, e3, e4, _] = context[:events]
+    events = [e2, e3, e4] |> Enum.map(&%Event{event_id: &1})
+
+    # Test any event invalidates empty state
+    assert true == State.stale?(events, %State{})
+
+    # Test reducers may override staleness
+    assert false == State.stale?(Service.PerhapLog, events, %State{})
+  end
+
+  test "state staleability", context do
+    [e1, e2, e3, e4, e5] = context[:events]
+    [fe1, _, fe3, _, _] = context[:flipped]
 
     events = [e2, e3, e4] |> Enum.map(&%Event{event_id: &1})
     state = %State{model: %{"last_played" => fe3}}
