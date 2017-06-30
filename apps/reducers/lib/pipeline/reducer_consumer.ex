@@ -26,8 +26,8 @@ defmodule Reducer.Consumer do
     {:consumer, [reducers: reducers], subscribe_to: [
       {EventCoordinator,
       partition: partition,
-      max_demand: 1,
-      min_demand: 0}]}
+      max_demand: 50,
+      min_demand: 10}]}
   end
 
   # time to reticulate splines
@@ -51,7 +51,7 @@ defmodule Reducer.Consumer do
           true ->
             # Execution
             reducer_state_key = reducer_context <> unit_separator() <> reducer_name
-            result = execute(reducer_state_key, reducer_events, reducer, acc)
+            result = execute(reducer_state_key, reducer_events, reducer, reducer_event_ids, acc)
 
             # Post Processing
             case result do
@@ -97,7 +97,7 @@ defmodule Reducer.Consumer do
     end
   end
 
-  defp execute(reducer_state_key, reducer_events, reducer, acc) do
+  defp execute(reducer_state_key, reducer_events, reducer, reducer_event_ids, acc) do
     # Load State
     reducer_state = case RS.find(reducer_state_key) do
       :not_found -> %State{}
@@ -105,7 +105,7 @@ defmodule Reducer.Consumer do
     end
 
     # Ensure not Stale
-    {reducer_events, reducer_state} = case State.stale?(reducer_events, reducer_state) do
+    {reducer_events, reducer_state} = case State.stale?(reducer, reducer_events, reducer_state) do
       true ->
         {domain, entity_id, _} = RS.split_key(reducer_state_key)
         indexed_events = case Event.find_by_entity_domain(entity_id, domain) do
@@ -120,6 +120,9 @@ defmodule Reducer.Consumer do
 
     # Run Reducers
     try do
+      Logger.debug("Invoking Reducer: #{inspect(reducer)},
+        with events: #{inspect(reducer_event_ids)},
+        and state: #{inspect(reducer_state)}")
       Map.put(acc, reducer_state_key, apply(reducer, :call, [reducer_events, reducer_state]))
     rescue
       error ->

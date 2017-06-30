@@ -6,8 +6,10 @@ defmodule Service.PerhapLog do
   require Logger
 
   @domains [:all]
+  @orderable false
   @types []
   def domains, do: @domains
+  def orderable, do: @orderable
   def types, do: @types
 
   @spec call(list(Event.t), State.t) :: State.t
