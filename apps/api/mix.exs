@@ -20,7 +20,7 @@ defmodule API.Mixfile do
       :cowboy,
       :exometer_core,
       :gproc,
-      :snappy],
+      :observer_cli],
       mod: {API, []}
     ]
   end
@@ -33,10 +33,10 @@ defmodule API.Mixfile do
       {:gun, github: "ninenines/gun", ref: "1.0.0-pre.3", runtime: false},
       {:reducers, in_umbrella: true},
       {:json, "~> 1.0"},
-      {:snappy, github: "fdmanana/snappy-erlang-nif"},
       {:exometer_core, github: "Feuerlabs/exometer_core"},
       {:setup, github: "uwiger/setup", manager: :rebar, override: true},
-      {:gen_stage, "~> 0.11.0"},
+      {:gen_stage, "~> 0.12.0"},
+      {:observer_cli, "~> 1.1.0"},
       {:meck, "~> 0.8.4", runtime: false, override: true}
     ]
   end
