@@ -66,6 +66,8 @@ defmodule Service.Stats do
 
   def get_timestamp({:bin_audit, event}), do: date(event.data["DATE"])
   def get_timestamp({:actuals, event}), do: date(event.data["Week"])
+  def get_timestamp({:pre_actual, event}), do: date(event.data["Week"])
+  def get_timestamp({:refill_actual, event}), do: date(event.data["Week"])
   def get_timestamp({:pre_challenge, event})do
     max = Enum.max_by(event.data["users"], fn(user) -> elem(user, 1)["start_time"] end)
     elem(max, 1)["start_time"]
@@ -320,39 +322,30 @@ defmodule Service.Stats do
     end
   end
 
-  def add_actuals(%{data: %{"Count" => count}} = _event, meta) when count == nil do
+  def add_actuals({type, %{data: %{"Count" => count}}} = _event, meta) when count == nil do
     meta
   end
-  def add_actuals(%{data: %{"Count" => count}} = event, meta) when is_binary(count) do
+  def add_actuals({type, %{data: %{"Count" => count}}} = event, meta) when is_binary(count) do
      case Float.parse(count) do
       {count, _} ->
         meta
-        |> Map.put(event.event_id, count)
+        |> Map.put(to_string(get_timestamp(event)) <> to_string(count), count)
       :error ->
         meta
       end
   end
-  def add_actuals(%{data: %{"Count" => count}} = event, meta) when is_number(count) do
+  def add_actuals({type, %{data: %{"Count" => count}}} = event, meta) when is_number(count) do
         meta
-        |> Map.put(event.event_id, count)
+        |> Map.put(to_string(get_timestamp(event)) <> to_string(count), count)
   end
 
   def sum_actuals(meta)do
     Enum.reduce(meta, 0, fn({_k, score}, acc) -> score + acc end)
   end
 
-  def accuracy(_app_units, actual_units) when actual_units == 0 do
-    {0, 0}
-  end
-
-  def accuracy(_app_units, actual_units) when actual_units == "0" do
-    {0, 0}
-  end
-
-  def accuracy(app_units, actual_units) when is_nil(actual_units) or is_nil(app_units) do
-    {0, 0}
-  end
-
+  def accuracy(_app_units, actual_units) when actual_units == 0 ,do: {0, 0}
+  def accuracy(_app_units, actual_units) when actual_units == "0", do: {0, 0}
+  def accuracy(app_units, actual_units) when is_nil(actual_units) or is_nil(app_units), do: {0, 0}
   def accuracy(app_units, actual_units) when is_number(app_units) and is_number(actual_units) do
     percentage = app_units / actual_units
     score = accuracy_score(percentage)
@@ -374,7 +367,7 @@ defmodule Service.Stats do
   end
 
   def pre_actual({type, event}, {%{"pre" => %{"pre_units" => pre_units}} = period_model, new_events}) do
-    meta = add_actuals(event, period_model["pre"]["actuals_meta"] || %{})
+    meta = add_actuals({type, event}, period_model["pre"]["actuals_meta"] || %{})
     sum =  sum_actuals(meta)
     {percentage, score} = accuracy(pre_units, sum)
 
@@ -388,7 +381,7 @@ defmodule Service.Stats do
   end
 
   def pre_actual({type, event}, {%{"pre" => _pre} = period_model, new_events}) do
-    meta = add_actuals(event, period_model["pre"]["actuals_meta"] || %{})
+    meta = add_actuals({type, event}, period_model["pre"]["actuals_meta"] || %{})
     sum =  sum_actuals(meta)
 
     {period_model
@@ -399,7 +392,7 @@ defmodule Service.Stats do
   end
 
   def pre_actual({type, event}, {period_model, new_events}) do
-    meta = add_actuals(event, period_model["pre"]["actuals_meta"] || %{})
+    meta = add_actuals({type, event}, period_model["pre"]["actuals_meta"] || %{})
     sum =  sum_actuals(meta)
 
     {period_model
@@ -411,7 +404,7 @@ defmodule Service.Stats do
   end
 
   def refill_actual({type, event}, {%{"refill" => %{"refill_units" => refill_units}} = period_model, new_events})  when is_nil(refill_units) != true do
-    meta = add_actuals(event, period_model["refill"]["actuals_meta"] || %{})
+    meta = add_actuals({type, event}, period_model["refill"]["actuals_meta"] || %{})
     sum =  sum_actuals(meta)
     {percentage, score} = accuracy(refill_units, sum)
 
@@ -425,7 +418,7 @@ defmodule Service.Stats do
   end
 
   def refill_actual({type, event}, {%{"refill" => _refill} = period_model, new_events}) do
-    meta = add_actuals(event, period_model["refill"]["actuals_meta"] || %{})
+    meta = add_actuals({type, event}, period_model["refill"]["actuals_meta"] || %{})
     sum =  sum_actuals(meta)
     {percentage, score} = accuracy(period_model["refill"]["refill_units"], sum)
 
@@ -439,7 +432,7 @@ defmodule Service.Stats do
   end
 
   def refill_actual({type, event}, {period_model, new_events}) do
-    meta = add_actuals(event, period_model["refill"]["actuals_meta"] || %{})
+    meta = add_actuals({type, event}, period_model["refill"]["actuals_meta"] || %{})
     sum =  sum_actuals(meta)
 
     {period_model
@@ -449,8 +442,6 @@ defmodule Service.Stats do
     |> calculate_bin_audit({type, event}),
     new_events}
   end
-
-
 
 
 # Calculates bin_audit_score for stores that do not do bin_audits, Clearance stores and Canada stores

@@ -7,6 +7,17 @@ defmodule Service.StatsTest do
 
   setup_all _context do
     {:ok, [
+      unformated_duplicate: %{
+        domain: "stats",
+        entity_id: "uuid-v4",
+        meta: %{
+          "Week" => "06/17/2017",
+          "Metrics" => "Actual Receipts",
+          "Store" => "93242",
+          "Count"=> "1968.0"},
+        event_id: "fb2e57f4-3b3c-11e7-a919-92ebcb67fe33",
+        realm: "nike",
+        type: "actuals"},
       unformated_complete: %Event{
         domain: "stats",
         entity_id: "uuid-v4",
@@ -230,7 +241,22 @@ defmodule Service.StatsTest do
           "actual_units" => 1968.0,
           "accuracy_score" => 0,
           "accuracy_percentage" => 0.007621951219512195,
-          "actuals_meta" => %{"fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968.0}
+          "actuals_meta" => %{"14977152000001968.0" => 1968.0}
+          }},
+      state_after_complete_and_actuals_num: %{
+        "pre" => %{
+          "pre_meta" => %{
+            "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
+            "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
+            "uuid-v4-challenge-complete-338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0}
+            },
+          "pre_percentage" => 0.7200000000000001,
+          "pre_score" => 0,
+          "pre_units" => 15.0,
+          "actual_units" => 1968.0,
+          "accuracy_score" => 0,
+          "accuracy_percentage" => 0.007621951219512195,
+          "actuals_meta" => %{"14977152000001968" => 1968}
           }},
       state_after_complete_and_zero_actuals: %{
         "pre" => %{
@@ -432,7 +458,7 @@ end
   end
 
   test "pre_actual with no begining state", context do
-    assert(Service.Stats.actuals({:actuals, context[:stats_pre_actual_event]}, {%{}, []}) == {%{"pre" => %{"actual_units" => 1968.0, "actuals_meta" => %{"fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968.0}}}, []})
+    assert(Service.Stats.actuals({:actuals, context[:stats_pre_actual_event]}, {%{}, []}) == {%{"pre" => %{"actual_units" => 1968.0, "actuals_meta" => %{"14977152000001968.0" => 1968.0}}}, []})
   end
 
   test "pre_actual with exisiting begining state", context do
@@ -448,11 +474,11 @@ end
   end
 
   test "pre_actual with number instead of string", context do
-    assert(Service.Stats.actuals({:actuals, context[:stats_pre_actual_event_num]}, {context[:state_after_complete], []}) == {context[:state_after_complete_and_actuals], []})
+    assert(Service.Stats.actuals({:actuals, context[:stats_pre_actual_event_num]}, {context[:state_after_complete], []}) == {context[:state_after_complete_and_actuals_num], []})
   end
 
   test "refill_actual with no begining state", context do
-    assert(Service.Stats.actuals({:actuals, context[:stats_refill_actual_event]}, {%{}, []}) == {%{"refill" => %{"actual_units" => 1968.0, "actuals_meta" => %{"fb2ebbdc-3b3c-11e7-a919-92ebcb67fe33" => 1968.0}}}, []})
+    assert(Service.Stats.actuals({:actuals, context[:stats_refill_actual_event]}, {%{}, []}) == {%{"refill" => %{"actual_units" => 1968.0, "actuals_meta" => %{"14977152000001968.0" => 1968.0}}}, []})
   end
 
   test "date" do
@@ -514,7 +540,7 @@ end
             "accuracy_percentage" => 0.007621951219512195,
             "accuracy_score" => 0, "actual_units" => 1968.0,
             "actuals_meta" => %{
-              "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968.0},
+              "14977152000001968.0" => 1968.0},
             "pre_meta" => %{
               "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
               "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
@@ -544,7 +570,32 @@ test "out of season event", context do
           "accuracy_percentage" => 0.007621951219512195,
           "accuracy_score" => 0, "actual_units" => 1968.0,
           "actuals_meta" => %{
-            "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968.0},
+            "14977152000001968.0" => 1968.0},
+          "pre_meta" => %{
+            "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
+            "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
+            "uuid-v4-challenge-complete-338998" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0}},
+          "pre_percentage" => 0.7200000000000001,
+          "pre_score" => 0,
+          "pre_units" => 15.0
+          }
+        }
+      }
+    }, new_events: []})
+end
+
+
+test "duplicate actuals event", context do
+  assert(Service.Stats.call([context[:unformated_complete], context[:unformated_pre_actuals], context[:unformated_duplicate]], %State{model: %{}, new_events: []})== %State{model: %{
+    "last_played" => "11e7-3b3c-fb2eb7f4-a919-92ebcb67fe33",
+    "season" => Season1,
+    "stats" => %{
+      "season1preseason" => %{
+        "pre" => %{
+          "accuracy_percentage" => 0.007621951219512195,
+          "accuracy_score" => 0, "actual_units" => 1968.0,
+          "actuals_meta" => %{
+            "14977152000001968.0" => 1968.0},
           "pre_meta" => %{
             "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
             "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
@@ -577,7 +628,7 @@ test "out of season with begining state", context do
           "accuracy_percentage" => 0.007621951219512195,
           "accuracy_score" => 0, "actual_units" => 1968.0,
           "actuals_meta" => %{
-            "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968.0},
+            "14977152000001968.0" => 1968.0},
           "pre_meta" => %{
             "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
             "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
@@ -597,7 +648,7 @@ test "out of season with begining state", context do
             "accuracy_percentage" => 0.007621951219512195,
             "accuracy_score" => 0, "actual_units" => 1968.0,
             "actuals_meta" => %{
-              "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968.0},
+              "14977152000001968.0" => 1968.0},
             "pre_meta" => %{
               "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
               "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
@@ -675,7 +726,7 @@ period_model = %{
     "accuracy_percentage" => 0.007621951219512195,
     "accuracy_score" => 10, "actual_units" => 1968.0,
     "actuals_meta" => %{
-      "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968.0},
+      "14977152000001968.0" => 1968.0},
     "pre_meta" => %{
       "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
       "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
@@ -688,7 +739,7 @@ period_model = %{
       "accuracy_percentage" => 0.007621951219512195,
       "accuracy_score" => 20, "actual_units" => 1968.0,
       "actuals_meta" => %{
-        "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968.0},
+        "14977152000001968.0" => 1968.0},
       "refill_meta" => %{
         "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
         "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
@@ -703,7 +754,7 @@ period_model = %{
       "accuracy_percentage" => 0.007621951219512195,
       "accuracy_score" => 10, "actual_units" => 1968.0,
       "actuals_meta" => %{
-        "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968.0},
+        "14977152000001968.0" => 1968.0},
       "pre_meta" => %{
         "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
         "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
@@ -716,7 +767,7 @@ period_model = %{
       "accuracy_percentage" => 0.007621951219512195,
       "accuracy_score" => 20, "actual_units" => 1968.0,
       "actuals_meta" => %{
-        "fb2eb7f4-3b3c-11e7-a919-92ebcb67fe33" => 1968.0},
+        "14977152000001968.0" => 1968.0},
       "refill_meta" => %{
         "uuid-v4-challenge-complete-338897" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
         "uuid-v4-challenge-complete-338904" => %{"active_seconds" => 100.0, "actual_units" => 5.0, "percentage" => 0.72, "start_time" => 1497634860000, "status" => "completed", "uph" => 180.0},
