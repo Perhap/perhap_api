@@ -19,3 +19,24 @@ config :logger, :error_log,
 config :reducers, :domo_creds,
   client_secret: "domo_secret",
   client_id: "domo_id"
+
+#
+# Per Node: Cron Scheduler Override
+#
+#config :reducers, Perhap.Scheduler,
+#  global?: true,
+#  jobs: [
+#    [name: "heartbeat", schedule: "* * * * *", task: {Service.Cron, :heartbeat, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}],
+#    [name: "bin_audit_event", schedule: "0 1 * * *", task: {Service.Cron, :bin_audit_event, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}], #every 12 hours
+#    [name: "actuals_event", schedule: "0 0,8,16 * * *", task: {Service.Cron, :actuals_event, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}], # every 4 hours
+#    [name: "seeding", schedule: "59 23 23 7 *", task: {Mix.Tasks.Seeding, :run, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}, timezone: "America/Los_Angeles"], # this will run yearly... on 7/23 at 11:59 pm This is where it needs to be updated for each new season.
+#    [name: "weekly_bracket", schedule: "59 23 * * 0", task: {Mix.Tasks.Bracket, :run, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}, timezone: "America/Los_Angeles"] # bracket runs each week, sunday nights at 11:59 pm only returns results if in tournament play for current season
+#  ]
+
+#config :reducers, Perhap.Scheduler,
+#  global?: true,
+#  jobs: [
+#    [name: "heartbeat", schedule: "* * * * *", task: {Service.Cron, :heartbeat, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}],
+#    [name: "bin_audit_event", schedule: "0 13 * * *", task: {Service.Cron, :bin_audit_event, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}], #every 12 hours
+#    [name: "actuals_event", schedule: "0 4,12,20 * * *", task: {Service.Cron, :actuals_event, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}] # every 4 hours
+#  ]
