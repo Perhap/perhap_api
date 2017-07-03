@@ -9,9 +9,11 @@ defmodule Service.Stats do
   alias Reducer.State
 
   @domains [:stats]
+  @orderable false
   @types [:bin_audit, :actuals, :pre_actual, :refill_actual, :pre_challenge, :refill_challenge]
   def domains, do: @domains
   def types, do: @types
+  def orderable, do: @orderable
 
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, %State{} = state) when is_list(events) do

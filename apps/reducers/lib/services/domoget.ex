@@ -9,13 +9,14 @@ defmodule Service.Domo do
   require Logger
 
   @domains [:domo]
+  @orderable false
   @types [:pull]
   def domains, do: @domains
   def types, do: @types
+  def orderable, do: @orderable
 
   def correct_type?(event) do
-    Enum.member?([
-      "pull"], event.type)
+    Enum.member?(["pull"], event.type)
   end
 
   @spec call(list(Event.t), State.t) :: State.t

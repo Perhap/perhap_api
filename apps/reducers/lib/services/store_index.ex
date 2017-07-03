@@ -8,9 +8,11 @@ defmodule Service.StoreIndex do
   require Logger
 
   @domains [:storeindex]
+  @orderable false
   @types [:replace]
   def domains, do: @domains
   def types, do: @types
+  def orderable, do: @orderable
 
   @spec call(list(Event.t), State.t) :: State.t
   def call(events, %State{} = state) do

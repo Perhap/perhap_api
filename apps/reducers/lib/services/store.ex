@@ -2,9 +2,11 @@ defmodule Service.Store do
   @behaviour Reducer
 
   @domains [:store]
+  @orderable false
   @types [:add, :delete]
   def domains, do: @domains
   def types, do: @types
+  def orderable, do: @orderable
 
   alias DB.Event
   alias Reducer.State
