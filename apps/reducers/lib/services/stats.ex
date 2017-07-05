@@ -72,24 +72,14 @@ defmodule Service.Stats do
     max = Enum.max_by(event.data["users"], fn(user) -> elem(user, 1)["start_time"] end)
     elem(max, 1)["start_time"]
   end
-
   def get_timestamp({:refill_challenge, event})do
     max = Enum.max_by(event.data["users"], fn(user) -> elem(user, 1)["start_time"] end)
     elem(max, 1)["start_time"]
   end
 
-  def date(datestring) when datestring == "" do
-    1494287000000 #this date will be before season1 starts, so it won't get played
-  end
-
-  def date(datestring) when is_nil(datestring) do
-    1494287000000 #this date will be before season1 starts, so it won't get played
-  end
-
-  def date(datestring) when datestring == "0" do
-    1494287000000 #this date will be before season1 starts, so it won't get played
-  end
-
+  def date(datestring) when datestring == "", do: 1494287000000 #this date will be before season1 starts, so it won't get played
+  def date(datestring) when is_nil(datestring), do: 1494287000000 #this date will be before season1 starts, so it won't get played
+  def date(datestring) when datestring == "0", do: 1494287000000 #this date will be before season1 starts, so it won't get played
   def date(datestring) do
     {year, month, day} = case Regex.match?(~r/-/, datestring) do
       true -> [year, month, day] = String.split(datestring, "-")
@@ -108,33 +98,24 @@ defmodule Service.Stats do
     to_string(period)
   end
 
-  def get_period_model(period, _model) when period == "out_of_season" do
-    :out_of_season
-  end
-
+  def get_period_model(period, _model) when period == "out_of_season", do: :out_of_season
   def get_period_model(_period, model) when map_size(model) == 0 do
     model = %{}
     model
   end
-
   def get_period_model(period, model) do
     model["stats"][period] || %{}
   end
-
 
 
   def play({type, event}, {model, new_events}) do
     period = get_timestamp({type, event})
     |> find_period(Application.get_env(:reducers, :current_periods))
     period_model = get_period_model(period, model)
-
     get_new_model({type, event}, {period_model, new_events}, model, period)
   end
 
-  def get_new_model({_type, _event}, {:out_of_season, new_events}, model, _period) do
-    {model, new_events}
-  end
-
+  def get_new_model({_type, _event}, {:out_of_season, new_events}, model, _period), do: {model, new_events}
   def get_new_model({type, event}, {period_model, new_events}, model, period) do
     {new_period_model, additional_events} = apply(Service.Stats, type, [{type, event}, {period_model, new_events}])
     {model
@@ -149,7 +130,6 @@ defmodule Service.Stats do
     Enum.map(event.data["users"], fn ({k, v}) -> {event.data["challenge_id"] <> "-" <> k, v} end)
     |> Enum.into(meta)
   end
-
 
   def count_sum(meta, metric)do
     filtered_scores = Enum.filter(meta, fn({_k, score}) -> score["status"] == "completed" || score["status"] == "editted" end)
@@ -322,9 +302,7 @@ defmodule Service.Stats do
     end
   end
 
-  def add_actuals({type, %{data: %{"Count" => count}}} = _event, meta) when count == nil do
-    meta
-  end
+  def add_actuals({type, %{data: %{"Count" => count}}} = _event, meta) when count == nil, do: meta
   def add_actuals({type, %{data: %{"Count" => count}}} = event, meta) when is_binary(count) do
      case Float.parse(count) do
       {count, _} ->
@@ -405,7 +383,7 @@ defmodule Service.Stats do
 
   def refill_actual({type, event}, {%{"refill" => %{"refill_units" => refill_units}} = period_model, new_events})  when is_nil(refill_units) != true do
     meta = add_actuals({type, event}, period_model["refill"]["actuals_meta"] || %{})
-    sum =  sum_actuals(meta)
+    sum =  sum_refill_actuals(event.data["Store"], meta)
     {percentage, score} = accuracy(refill_units, sum)
 
     {period_model
@@ -419,7 +397,7 @@ defmodule Service.Stats do
 
   def refill_actual({type, event}, {%{"refill" => _refill} = period_model, new_events}) do
     meta = add_actuals({type, event}, period_model["refill"]["actuals_meta"] || %{})
-    sum =  sum_actuals(meta)
+    sum =  sum_refill_actuals(event.data["Store"], meta)
     {percentage, score} = accuracy(period_model["refill"]["refill_units"], sum)
 
     {period_model
@@ -433,7 +411,7 @@ defmodule Service.Stats do
 
   def refill_actual({type, event}, {period_model, new_events}) do
     meta = add_actuals({type, event}, period_model["refill"]["actuals_meta"] || %{})
-    sum =  sum_actuals(meta)
+    sum =  sum_refill_actuals(event.data["Store"], meta)
 
     {period_model
     |> Map.put("refill", %{})
@@ -443,9 +421,20 @@ defmodule Service.Stats do
     new_events}
   end
 
+  #Nike asked to reduce the actuals for NSO concepts to be reduced by 48%, because the dont refill footwear.
+  def sum_refill_actuals(store_number, meta) do
+    nike_stores = [
+      "297", "81", "350", "100053", "60", "120022", "360", "301", "307", "382", "322", "93", "201", "240", "367", "269", "381", "19", "28", "352", "84", "323", "51", "368", "371", "86", "379", "364", "82", "325", "303", "305", "246", "237", "351", "359", "383"]
+    nikeStore? = Enum.member?(nike_stores, store_number)
+    case nikeStore? do
+      true -> sum = sum_actuals(meta)
+              adjustment = sum * 0.48
+              sum - adjustment
+      _ -> sum_actuals(meta)
+    end
+  end
 
 # Calculates bin_audit_score for stores that do not do bin_audits, Clearance stores and Canada stores
-
   def calculate_bin_audit(period_model, {type, event}) do
     calc? = get_store_num({type, event})
     |> needs_bin_audit_calc
