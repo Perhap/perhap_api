@@ -217,6 +217,19 @@ defmodule Service.StatsTest do
       ordered_id: "11e7-3b3c-fb2ebbdc-a919-92ebcb67fe33",
       realm: "nike",
       type: "actuals"},
+    nike_store_refill_actual_event: %{
+      domain: "stats",
+      entity_id: "uuid-v4",
+      data: %{
+        "timestamp" => 1493769600000,
+        "Week" => "06/17/2017",
+        "Metrics" => "Actual Units Sold",
+        "Store" => "297",
+        "Count"=> "1968.0"},
+      event_id: "fb2ebbdc-3b3c-11e7-a919-92ebcb67fe33",
+      ordered_id: "11e7-3b3c-fb2ebbdc-a919-92ebcb67fe33",
+      realm: "nike",
+      type: "actuals"},
     state_after_complete: %{
       "pre" => %{
         "pre_meta" => %{
@@ -479,6 +492,10 @@ end
 
   test "refill_actual with no begining state", context do
     assert(Service.Stats.actuals({:actuals, context[:stats_refill_actual_event]}, {%{}, []}) == {%{"refill" => %{"actual_units" => 1968.0, "actuals_meta" => %{"14977152000001968.0" => 1968.0}}}, []})
+  end
+
+  test "refill_actual for Nike store", context do
+    assert(Service.Stats.actuals({:actuals, context[:nike_store_refill_actual_event]}, {%{}, []}) == {%{"refill" => %{"actual_units" => 1023.36, "actuals_meta" => %{"14977152000001968.0" => 1968.0}}}, []})
   end
 
   test "date" do
