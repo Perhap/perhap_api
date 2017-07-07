@@ -25,11 +25,13 @@ config :reducers, Perhap.Scheduler,
 config :reducers, :domo_creds,
   client_secret: "secret to be filled in",
   client_id: "id to be filled in",
-  bin_audit_dataset: "39367e6a-fb49-4e98-8547-2645eb58140d",
-  actuals_dataset: "cd0192e1-078f-49b4-9116-6a7f36c4b6e2",
+  bin_audit_dataset: "c8a5a4c2-43af-421d-a588-f880e3d713a1",
+  actuals_dataset: "bc96a70b-c7ae-4b2a-bf11-2f0871955bb8",
+  apa_dataset: "a7601eb1-dfd7-41e0-a9b4-65d324ca1629",
   out_going_domain: "stats",
   bin_audit_type: "bin_audit",
-  actuals_type: "actuals"
+  actuals_type: "actuals",
+  apa_type: "challenge"
 
 
 

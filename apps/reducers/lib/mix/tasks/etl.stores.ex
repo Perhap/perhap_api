@@ -11,7 +11,7 @@ defmodule Mix.Tasks.Etl.Stores do
     DB.Reducer.State.key(e_ctx, "stats")
   end
 
-  def run(:delete) do
+  def run(["delete"]) do
     Application.ensure_all_started(:db)
     IO.puts ("MIX ENV: #{Mix.env}; #{inspect(self())}")
     service = "storeindex"
@@ -34,7 +34,7 @@ defmodule Mix.Tasks.Etl.Stores do
   end
 
 
-  def run(:transform, module, func) do
+  def run([transform, module, func]) do
     Application.ensure_all_started(:db)
     IO.puts ("MIX ENV: #{Mix.env}; #{inspect(self())}")
     # Other Interesting Keys
