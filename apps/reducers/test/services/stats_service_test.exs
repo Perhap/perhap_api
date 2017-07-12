@@ -2,7 +2,6 @@ defmodule Service.StatsTest do
   use ExUnit.Case
   doctest Service.Stats
 
-  alias DB.Event
   alias Reducer.State
 
   setup_all _context do
@@ -13,8 +12,9 @@ defmodule Service.StatsTest do
         event_id: "9c49b546-6336-11e7-bbc6-4de700000259",
         kv: "dev_events/9c49b546-6336-11e7-bbc6-4de700000259",
         kv_time: "2017-07-07T17=>06=>25.954951Z",
-        meta: [
-          %{ "Goal"=> "150", "Store Name"=> "Commerce", "UPH"=> "14.0", "UPH Standard"=> "Factory EAS", "athlete_id"=> "11232", "challenge_id"=> "1039", "challenge_type"=> "footwear", "coach_edit"=> "0", "complete_minutes"=> "24.0", "complete_units"=> "76.0", "dimension"=> "Factory", "district"=> "FS21", "finish_date"=> "2017-06-17", "finish_datetime"=> "2017-06-17T15=>11=>09", "full_name"=> "Audrey Ray", "goal_minutes"=> "30.4", "goal_units"=> "76", "issue_capacity"=> "0", "issue_other"=> "0", "issue_pulled"=> "0", "issue_space"=> "0", "issue_vas"=> "0", "six_digit_login"=> "011232", "small_photo"=> "\\N", "start_date"=> "2017-06-17", "start_datetime"=> "2017-06-17T09=>46=>59", "store_id"=> "2", "team_challenge"=> "0", "territory"=> "Southeast" },
+        meta: %{"store" => "2",
+        "data" =>
+          [%{ "Goal"=> "150", "Store Name"=> "Commerce", "UPH"=> "14.0", "UPH Standard"=> "Factory EAS", "athlete_id"=> "11232", "challenge_id"=> "1039", "challenge_type"=> "footwear", "coach_edit"=> "0", "complete_minutes"=> "24.0", "complete_units"=> "76.0", "dimension"=> "Factory", "district"=> "FS21", "finish_date"=> "2017-06-17", "finish_datetime"=> "2017-06-17T15=>11=>09", "full_name"=> "Audrey Ray", "goal_minutes"=> "30.4", "goal_units"=> "76", "issue_capacity"=> "0", "issue_other"=> "0", "issue_pulled"=> "0", "issue_space"=> "0", "issue_vas"=> "0", "six_digit_login"=> "011232", "small_photo"=> "\\N", "start_date"=> "2017-06-17", "start_datetime"=> "2017-06-17T09=>46=>59", "store_id"=> "2", "team_challenge"=> "0", "territory"=> "Southeast" },
           %{ "Goal"=> "125", "Store Name"=> "Commerce", "UPH"=> "111.0", "UPH Standard"=> "Factory EAS", "athlete_id"=> "71156", "challenge_id"=> "1080", "challenge_type"=> "cph", "coach_edit"=> "0", "complete_minutes"=> "29.0", "complete_units"=> "111.0", "dimension"=> "Factory", "district"=> "FS21", "finish_date"=> "2017-06-27", "finish_datetime"=> "2017-06-27T11=>23=>05", "full_name"=> "William Price", "goal_minutes"=> "48.96", "goal_units"=> "102", "issue_capacity"=> "0", "issue_other"=> "0", "issue_pulled"=> "0", "issue_space"=> "0", "issue_vas"=> "0", "six_digit_login"=> "071156", "small_photo"=> "\\N", "start_date"=> "2017-06-27", "start_datetime"=> "2017-06-27T10=>53=>12", "store_id"=> "2", "team_challenge"=> "1", "territory"=> "Southeast" },
           %{ "Goal"=> "90", "Store Name"=> "Commerce", "UPH"=> "54.0", "UPH Standard"=> "Factory EAS", "athlete_id"=> "120688", "challenge_id"=> "1026", "challenge_type"=> "apparel", "coach_edit"=> "0", "complete_minutes"=> "57.0", "complete_units"=> "52.0", "dimension"=> "Factory", "district"=> "FS21", "finish_date"=> "2017-06-05", "finish_datetime"=> "2017-06-05T10=>08=>22", "full_name"=> "Stephanie Hendrick", "goal_minutes"=> "34.67", "goal_units"=> "52", "issue_capacity"=> "0", "issue_other"=> "0", "issue_pulled"=> "1", "issue_space"=> "0", "issue_vas"=> "0", "six_digit_login"=> "120688", "small_photo"=> "\\N", "start_date"=> "2017-06-05", "start_datetime"=> "2017-06-05T09=>11=>10", "store_id"=> "2", "team_challenge"=> "0", "territory"=> "Southeast" },
           %{ "Goal"=> "150", "Store Name"=> "Commerce", "UPH"=> "72.0", "UPH Standard"=> "Factory EAS", "athlete_id"=> "120688", "challenge_id"=> "1029", "challenge_type"=> "footwear", "coach_edit"=> "0", "complete_minutes"=> "49.0", "complete_units"=> "60.0", "dimension"=> "Factory", "district"=> "FS21", "finish_date"=> "2017-06-06", "finish_datetime"=> "2017-06-06T08=>57=>04", "full_name"=> "Stephanie Hendrick", "goal_minutes"=> "24.0", "goal_units"=> "60", "issue_capacity"=> "0", "issue_other"=> "0", "issue_pulled"=> "1", "issue_space"=> "0", "issue_vas"=> "0", "six_digit_login"=> "120688", "small_photo"=> "\\N", "start_date"=> "2017-06-06", "start_datetime"=> "2017-06-06T08=>07=>36", "store_id"=> "2", "team_challenge"=> "0", "territory"=> "Southeast" },
@@ -105,7 +105,7 @@ defmodule Service.StatsTest do
           %{ "Goal"=> "150", "Store Name"=> "Commerce", "UPH"=> "2.0", "UPH Standard"=> "Factory EAS", "athlete_id"=> "356847", "challenge_id"=> "1095", "challenge_type"=> "footwear", "coach_edit"=> "0", "complete_minutes"=> "51.0", "complete_units"=> "150.0", "dimension"=> "Factory", "district"=> "FS21", "finish_date"=> "2017-07-07", "finish_datetime"=> "2017-07-07T03=>27=>22", "full_name"=> "Derrick Williams", "goal_minutes"=> "60.0", "goal_units"=> "150", "issue_capacity"=> "0", "issue_other"=> "0", "issue_pulled"=> "0", "issue_space"=> "0", "issue_vas"=> "0", "six_digit_login"=> "367328", "small_photo"=> "\\N", "start_date"=> "2017-07-04", "start_datetime"=> "2017-07-04T04=>35=>38", "store_id"=> "2", "team_challenge"=> "0", "territory"=> "Southeast" },
           %{ "Goal"=> "250", "Store Name"=> "Commerce", "UPH"=> "322.0", "UPH Standard"=> "Factory EAS", "athlete_id"=> "357297", "challenge_id"=> "1034", "challenge_type"=> "equipment", "coach_edit"=> "0", "complete_minutes"=> "46.0", "complete_units"=> "250.0", "dimension"=> "Factory", "district"=> "FS21", "finish_date"=> "2017-06-07", "finish_datetime"=> "2017-06-07T16=>56=>48", "full_name"=> "Marie Perez", "goal_minutes"=> "60.0", "goal_units"=> "250", "issue_capacity"=> "0", "issue_other"=> "0", "issue_pulled"=> "0", "issue_space"=> "0", "issue_vas"=> "0", "six_digit_login"=> "370034", "small_photo"=> "\\N", "start_date"=> "2017-06-07", "start_datetime"=> "2017-06-07T16=>10=>17", "store_id"=> "2", "team_challenge"=> "0", "territory"=> "Southeast" },
           %{ "Goal"=> "100", "Store Name"=> "Commerce", "UPH"=> "58.0", "UPH Standard"=> "Factory EAS", "athlete_id"=> "358702", "challenge_id"=> "1102", "challenge_type"=> "product refill", "coach_edit"=> "0", "complete_minutes"=> "1.0", "complete_units"=> "60.0", "dimension"=> "Factory", "district"=> "FS21", "finish_date"=> "2017-07-06", "finish_datetime"=> "2017-07-06T04=>38=>18", "full_name"=> "Brittany Tran", "goal_minutes"=> "36.0", "goal_units"=> "60", "issue_capacity"=> "0", "issue_other"=> "0", "issue_pulled"=> "0", "issue_space"=> "0", "issue_vas"=> "0", "six_digit_login"=> "373519", "small_photo"=> "\\N", "start_date"=> "2017-07-06", "start_datetime"=> "2017-07-06T03=>37=>15", "store_id"=> "2", "team_challenge"=> "0", "territory"=> "Southeast"}
-        ],
+        ]},
         parents: "",
         realm: "nike",
         remote_ip: "127.0.0.1",
@@ -117,7 +117,7 @@ defmodule Service.StatsTest do
         event_id: "5a0c95a6-6334-11e7-92f2-4de700000259",
         kv: "dev_events/5a0c95a6-6334-11e7-92f2-4de700000259",
         kv_time: "2017-07-07T16=>50=>15.831287Z",
-        meta: [
+        meta: %{"store" => "2", "data"=>[
           %{"Count"=> "400", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-02" },
           %{"Count"=> "534", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-02" },
           %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-03" },
@@ -159,8 +159,8 @@ defmodule Service.StatsTest do
           %{"Count"=> "1315", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-21" },
           %{"Count"=> "271", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-21" },
           %{"Count"=> "1114", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-22" },
-          %{"Count"=> "308", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-22" },
-          %{"Count"=> " 914.00", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-23" },
+          %{"Count"=> "#####", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-22" },
+          %{"Count"=> "914.00", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-23" },
           %{"Count"=> "623", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-23" },
           %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-24" },
           %{"Count"=> "1029", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-24" },
@@ -188,7 +188,173 @@ defmodule Service.StatsTest do
           %{"Count"=> "292", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-07-05" },
           %{"Count"=> "2514", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-07-06" },
           %{"Count"=> "889", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-07-06" }
-        ],
+        ]},
+        parents: "",
+        realm: "nike",
+        remote_ip: "127.0.0.1",
+        type: "actuals"
+      },
+      actuals_per_store_need_bin: %DB.Event{
+        domain: "stats",
+        entity_id: "81bc429d-d055-4002-a64f-59e1af501236",
+        event_id: "5a0c95a6-6334-11e7-92f2-4de700000259",
+        kv: "dev_events/5a0c95a6-6334-11e7-92f2-4de700000259",
+        kv_time: "2017-07-07T16=>50=>15.831287Z",
+        meta: %{"store" => "4", "data"=>[
+          %{"Count"=> "400", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-02" },
+          %{"Count"=> "534", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-02" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-03" },
+          %{"Count"=> "822", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-03" },
+          %{"Count"=> "1", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-04" },
+          %{"Count"=> "776", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-04" },
+          %{"Count"=> "1495", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-05" },
+          %{"Count"=> "463", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-05" },
+          %{"Count"=> "754", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-06" },
+          %{"Count"=> "416", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-06" },
+          %{"Count"=> "197", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-07" },
+          %{"Count"=> "393", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-07" },
+          %{"Count"=> "367", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-08" },
+          %{"Count"=> "486", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-08" },
+          %{"Count"=> "186", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-09" },
+          %{"Count"=> "1003", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-09" },
+          %{"Count"=> "35", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-10" },
+          %{"Count"=> "1086", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-10" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-11" },
+          %{"Count"=> "1042", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-11" },
+          %{"Count"=> "151", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-12" },
+          %{"Count"=> "546", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-12" },
+          %{"Count"=> "25", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-13" },
+          %{"Count"=> "574", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-13" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-14" },
+          %{"Count"=> "535", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-14" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-15" },
+          %{"Count"=> "584", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-15" },
+          %{"Count"=> "3088", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-16" },
+          %{"Count"=> "730", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-16" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-17" },
+          %{"Count"=> "1184", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-17" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-18" },
+          %{"Count"=> "1027", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-18" },
+          %{"Count"=> "1165", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-19" },
+          %{"Count"=> "326", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-19" },
+          %{"Count"=> "780", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-20" },
+          %{"Count"=> "392", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-20" },
+          %{"Count"=> "1315", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-21" },
+          %{"Count"=> "271", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-21" },
+          %{"Count"=> "1114", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-22" },
+          %{"Count"=> "#####", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-22" },
+          %{"Count"=> "914.00", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-23" },
+          %{"Count"=> "623", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-23" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-24" },
+          %{"Count"=> "1029", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-24" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-25" },
+          %{"Count"=> "1041", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-25" },
+          %{"Count"=> "1391", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-26" },
+          %{"Count"=> "1342", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-27" },
+          %{"Count"=> "765", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-28" },
+          %{"Count"=> "280", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-26" },
+          %{"Count"=> "273", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-27" },
+          %{"Count"=> "306", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-28" },
+          %{"Count"=> "1259", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-29" },
+          %{"Count"=> "329", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-29" },
+          %{"Count"=> "1833", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-06-30" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-07-01" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-07-02" },
+          %{"Count"=> "2995", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-07-03" },
+          %{"Count"=> "649", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-06-30" },
+          %{"Count"=> "1082", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-07-01" },
+          %{"Count"=> "995", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-07-02" },
+          %{"Count"=> "806", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-07-03" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-07-04" },
+          %{"Count"=> "2223", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-07-05" },
+          %{"Count"=> "684", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-07-04" },
+          %{"Count"=> "292", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-07-05" },
+          %{"Count"=> "2514", "Metrics"=> "Actual Receipts", "Store"=> "2", "Week"=> "2017-07-06" },
+          %{"Count"=> "889", "Metrics"=> "Actual Units Sold", "Store"=> "2", "Week"=> "2017-07-06" }
+        ]},
+        parents: "",
+        realm: "nike",
+        remote_ip: "127.0.0.1",
+        type: "actuals"
+      },
+      reduced_actuals_per_store: %DB.Event{
+        domain: "stats",
+        entity_id: "81bc429d-d055-4002-a64f-59e1af501236",
+        event_id: "5a0c95a6-6334-11e7-92f2-4de700000259",
+        kv: "dev_events/5a0c95a6-6334-11e7-92f2-4de700000259",
+        kv_time: "2017-07-07T16=>50=>15.831287Z",
+        meta: %{"store" => "297", "data"=>[
+          %{"Count"=> "400", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-02" },
+          %{"Count"=> "534", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-02" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-03" },
+          %{"Count"=> "822", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-03" },
+          %{"Count"=> "1", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-04" },
+          %{"Count"=> "776", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-04" },
+          %{"Count"=> "1495", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-05" },
+          %{"Count"=> "463", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-05" },
+          %{"Count"=> "754", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-06" },
+          %{"Count"=> "416", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-06" },
+          %{"Count"=> "197", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-07" },
+          %{"Count"=> "393", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-07" },
+          %{"Count"=> "367", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-08" },
+          %{"Count"=> "486", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-08" },
+          %{"Count"=> "186", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-09" },
+          %{"Count"=> "1003", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-09" },
+          %{"Count"=> "35", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-10" },
+          %{"Count"=> "1086", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-10" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-11" },
+          %{"Count"=> "1042", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-11" },
+          %{"Count"=> "151", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-12" },
+          %{"Count"=> "546", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-12" },
+          %{"Count"=> "25", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-13" },
+          %{"Count"=> "574", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-13" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-14" },
+          %{"Count"=> "535", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-14" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-15" },
+          %{"Count"=> "584", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-15" },
+          %{"Count"=> "3088", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-16" },
+          %{"Count"=> "730", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-16" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-17" },
+          %{"Count"=> "1184", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-17" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-18" },
+          %{"Count"=> "1027", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-18" },
+          %{"Count"=> "1165", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-19" },
+          %{"Count"=> "326", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-19" },
+          %{"Count"=> "780", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-20" },
+          %{"Count"=> "392", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-20" },
+          %{"Count"=> "1315", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-21" },
+          %{"Count"=> "271", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-21" },
+          %{"Count"=> "1114", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-22" },
+          %{"Count"=> "#####", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-22" },
+          %{"Count"=> "914.00", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-23" },
+          %{"Count"=> "623", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-23" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-24" },
+          %{"Count"=> "1029", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-24" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-25" },
+          %{"Count"=> "1041", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-25" },
+          %{"Count"=> "1391", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-26" },
+          %{"Count"=> "1342", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-27" },
+          %{"Count"=> "765", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-28" },
+          %{"Count"=> "280", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-26" },
+          %{"Count"=> "273", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-27" },
+          %{"Count"=> "306", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-28" },
+          %{"Count"=> "1259", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-29" },
+          %{"Count"=> "329", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-29" },
+          %{"Count"=> "1833", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-06-30" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-07-01" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-07-02" },
+          %{"Count"=> "2995", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-07-03" },
+          %{"Count"=> "649", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-06-30" },
+          %{"Count"=> "1082", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-07-01" },
+          %{"Count"=> "995", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-07-02" },
+          %{"Count"=> "806", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-07-03" },
+          %{"Count"=> "\\N", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-07-04" },
+          %{"Count"=> "2223", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-07-05" },
+          %{"Count"=> "684", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-07-04" },
+          %{"Count"=> "292", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-07-05" },
+          %{"Count"=> "2514", "Metrics"=> "Actual Receipts", "Store"=> "297", "Week"=> "2017-07-06" },
+          %{"Count"=> "889", "Metrics"=> "Actual Units Sold", "Store"=> "297", "Week"=> "2017-07-06" }
+        ]},
         parents: "",
         realm: "nike",
         remote_ip: "127.0.0.1",
@@ -198,7 +364,7 @@ defmodule Service.StatsTest do
        event_id: "13cbdab4-6331-11e7-80ab-4de700000259",
        kv: "dev_events/13cbdab4-6331-11e7-80ab-4de700000259",
        kv_time: "2017-07-07T16:26:49.476370Z",
-       meta: [%{"BIN_COUNT_TOTAL" => "0", "BIN_PERCENTAGE" => "0.0", "DATE" => "\\N",
+       meta: %{"store" => "2", "data" => [%{"BIN_COUNT_TOTAL" => "0", "BIN_PERCENTAGE" => "0.0", "DATE" => "\\N",
           "Dimension" => "Factory", "District" => "FS21",
           "NO_OF_AUDITS_PERFORMED" => "0", "PASSED_BIN_COUNT" => "0", "STORE" => "2",
           "Store Name" => "Commerce", "Territory" => "Southeast",
@@ -329,141 +495,114 @@ defmodule Service.StatsTest do
           "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "15", "STORE" => "2",
           "Store Name" => "Commerce", "Territory" => "Southeast",
           "UPH Standard" => "Factory EAS", "_BATCH_ID_" => "20",
-          "_BATCH_LAST_RUN_" => "2017-07-05T21:07:49", "store_id" => "2"}],
+          "_BATCH_LAST_RUN_" => "2017-07-05T21:07:49", "store_id" => "2"}]},
        parents: "", realm: "nike", remote_ip: "127.0.0.1", type: "bin_audit"},
+    model_after_actuals: %{
+      season1preseason: %{"refill" => %{"actual_units" => 2211.0}},
+      season1week1: %{"pre" => %{"actual_units" => 5288.0}, "refill" => %{"actual_units" => 2641.0}},
+      season1week2: %{"pre" => %{"actual_units" => 6590.0}, "refill" => %{"actual_units" => 3960.0}},
+      season1week3: %{"pre" => %{"actual_units" => 7732.0}, "refill" => %{"actual_units" => 3666.0}}},
+    model_after_challenge: %{
+      season1preseason: %{"pre" => %{"pre_percentage" => 0.7383333333333334, "pre_score" => 0, "units" => 568.0}},
+      season1week1: %{
+         "pre" => %{"pre_percentage" => 0.9774814814814816, "pre_score" => 5, "units" => 1770.0},
+         "refill" => %{"refill_percentage" => 2.645, "refill_score" => 15, "units" => 190.0}},
+      season1week2: %{
+         "pre" => %{"pre_percentage" => 1.4424444444444444, "pre_score" => 15, "units" => 791.0},
+         "refill" => %{"refill_percentage" => 1.6199999999999999, "refill_score" => 15, "units" => 788.0}},
+      season1week3: %{
+         "pre" => %{"pre_percentage" => 0.8463703703703704, "pre_score" => 0, "units" => 2013.0},
+         "refill" => %{"refill_percentage" => 1.1475, "refill_score" => 10, "units" => 280.0}}},
+    model_after_bins: %{
+      season1week1: %{"bin_audit" => %{"bin_percentage" => 65.0, "bin_score" => 0}},
+      season1week2: %{"bin_audit" => %{"bin_percentage" => 75.0, "bin_score" => 0}}},
+    model_after_all: %{
+      season1preseason: %{
+        "pre" => %{"pre_percentage" => 0.7383333333333334, "pre_score" => 0, "units" => 568.0},
+        "refill" => %{"actual_units" => 2211.0}},
+      season1week1: %{
+        "pre" => %{"pre_percentage" => 0.9774814814814816, "pre_score" => 5, "units" => 1770.0, "actual_units" => 5288.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.3347201210287443},
+        "refill" => %{"refill_percentage" => 2.645, "refill_score" => 15, "units" => 190.0, "actual_units" => 2641.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.07194244604316546},
+        "bin_audit" => %{"bin_percentage" => 65.0, "bin_score" => 0}},
+      season1week2: %{
+        "pre" => %{"pre_percentage" => 1.4424444444444444, "pre_score" => 15, "units" => 791.0, "actual_units" => 6590.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.12003034901365706},
+        "refill" => %{"refill_percentage" => 1.6199999999999999, "refill_score" => 15, "units" => 788.0, "actual_units" => 3960.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.198989898989899},
+        "bin_audit" => %{"bin_percentage" => 75.0, "bin_score" => 0}},
+      season1week3: %{
+        "refill" => %{"actual_units" => 3666.0, "refill_percentage" => 1.1475, "refill_score" => 10, "units" => 280.0, "accuracy_score" => 0, "accuracy_percentage" => 0.07637752318603383},
+        "pre" => %{"actual_units" => 7732.0, "pre_percentage" => 0.8463703703703704, "pre_score" => 0, "units" => 2013.0, "accuracy_score" => 0, "accuracy_percentage" => 0.26034661148473875}}
 
+    },
+      model_after_all_reduced: %{
+        season1preseason: %{
+          "pre" => %{"pre_percentage" => 0.7383333333333334, "pre_score" => 0, "units" => 568.0},
+          "refill" => %{"actual_units" => 1149.72}},
+        season1week1: %{
+          "pre" => %{"pre_percentage" => 0.9774814814814816, "pre_score" => 5, "units" => 1770.0, "actual_units" => 5288.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.3347201210287443},
+          "refill" => %{"refill_percentage" => 2.645, "refill_score" => 15, "units" => 190.0, "actual_units" => 1373.3200000000002,  "accuracy_score" => 0, "accuracy_percentage" => 0.1383508577753182},
+          "bin_audit" => %{"bin_percentage" => 65.0, "bin_score" => 0}},
+        season1week2: %{
+          "pre" => %{"pre_percentage" => 1.4424444444444444, "pre_score" => 15, "units" => 791.0, "actual_units" => 6590.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.12003034901365706},
+          "refill" => %{"refill_percentage" => 1.6199999999999999, "refill_score" => 15, "units" => 788.0, "actual_units" => 2059.2000000000003,  "accuracy_score" => 0, "accuracy_percentage" => 0.38267288267288263},
+          "bin_audit" => %{"bin_percentage" => 75.0, "bin_score" => 0}},
+        season1week3: %{
+          "refill" => %{"actual_units" => 1906.32, "refill_percentage" => 1.1475, "refill_score" => 10, "units" => 280.0, "accuracy_score" => 0, "accuracy_percentage" => 0.14687985228083428},
+          "pre" => %{"actual_units" => 7732.0, "pre_percentage" => 0.8463703703703704, "pre_score" => 0, "units" => 2013.0, "accuracy_score" => 0, "accuracy_percentage" => 0.26034661148473875}}
+
+      },
+
+      model_after_calc_bin: %{
+        season1preseason: %{
+          "pre" => %{"pre_percentage" => 0.7383333333333334, "pre_score" => 0, "units" => 568.0},
+          "refill" => %{"actual_units" => 2211.0},
+          "bin_audit" => %{"bin_percentage" => 0.0, "bin_score" => 0}},
+        season1week1: %{
+          "pre" => %{"pre_percentage" => 0.9774814814814816, "pre_score" => 5, "units" => 1770.0, "actual_units" => 5288.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.3347201210287443},
+          "refill" => %{"refill_percentage" => 2.645, "refill_score" => 15, "units" => 190.0, "actual_units" => 2641.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.07194244604316546},
+          "bin_audit" => %{"bin_percentage" => 28.57142857142857, "bin_score" => 0}},
+        season1week2: %{
+          "pre" => %{"pre_percentage" => 1.4424444444444444, "pre_score" => 15, "units" => 791.0, "actual_units" => 6590.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.12003034901365706},
+          "refill" => %{"refill_percentage" => 1.6199999999999999, "refill_score" => 15, "units" => 788.0, "actual_units" => 3960.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.198989898989899},
+          "bin_audit" => %{"bin_percentage" => 3000/70, "bin_score" => 0}},
+        season1week3: %{
+          "refill" => %{"actual_units" => 3666.0, "refill_percentage" => 1.1475, "refill_score" => 10, "units" => 280.0, "accuracy_score" => 0, "accuracy_percentage" => 0.07637752318603383},
+          "pre" => %{"actual_units" => 7732.0, "pre_percentage" => 0.8463703703703704, "pre_score" => 0, "units" => 2013.0, "accuracy_score" => 0, "accuracy_percentage" => 0.26034661148473875},
+          "bin_audit" => %{"bin_percentage" => 14.285714285714285, "bin_score" => 0}}
+
+      },
         ]}
     end
 
+    test "play with actuals event", context do
+      assert(Service.Stats.stats_reducer_recursive([context[:actuals_per_store]], %{}) == context[:model_after_actuals])
+    end
 
+    test "call on actuals event", context do
+      assert(
+      Service.Stats.call(
+      [context[:actuals_per_store]], %State{ model: %{}, new_events: [] } )
+      == %State{model: context[:model_after_actuals], new_events: []})
+    end
 
+    test "call on challenge event", context do
+      assert(Service.Stats.call([context[:apa_event]], %State{model: %{}, new_events: []})==%State{model: context[:model_after_challenge], new_events: []})
+    end
 
+    test "call on bin audit event", context do
+      assert(Service.Stats.call([context[:bin_audit_per_store]], %State{model: %{}, new_events: []})== %State{model: context[:model_after_bins], new_events: []})
+    end
 
+    test "call all events", context do
+      assert(Service.Stats.call([context[:bin_audit_per_store], context[:apa_event], context[:actuals_per_store]], %State{model: %{}, new_events: []})==%State{model: context[:model_after_all], new_events: []})
+    end
 
+    test "call with reduced actuals store", context do
+      assert(Service.Stats.call([context[:bin_audit_per_store], context[:apa_event], context[:reduced_actuals_per_store]], %State{model: %{}, new_events: []})==%State{model: context[:model_after_all_reduced], new_events: []})
+    end
 
+    test "call with needs a bin calc", context do
+      assert(Service.Stats.call([context[:apa_event], context[:actuals_per_store_need_bin]], %State{model: %{}, new_events: []})==%State{model: context[:model_after_calc_bin], new_events: []})
+    end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#   test "points 89" do
-#     assert(Service.Stats.percentage_score(0.89) == 0)
-#   end
-#
-#   test "points 90" do
-#     assert(Service.Stats.percentage_score(0.9) == 5)
-#   end
-#
-#   test "points 100" do
-#     assert(Service.Stats.percentage_score(1.0) == 10)
-#   end
-#
-#   test "points 120" do
-#     assert(Service.Stats.percentage_score(1.2) == 15)
-#   end
-#
-#
-#   test "date" do
-#     assert(Service.Stats.date("5/30/2017") == 1496160000000)
-#   end
-#
-#   test "get_timestamp", context do
-#     assert(Service.Stats.get_timestamp({:pre_challenge, context[:stats_delete_event]})==1497634860000)
-#   end
-#
-#   test "get timestamp bin_audit", context do
-#     assert(Service.Stats.get_timestamp({:bin_audit, context[:stats_bin_audit_event]}) == 1497715200000)
-#   end
-#
-#   test "get timestamp actual", context do
-#     assert(Service.Stats.get_timestamp({:actuals, context[:stats_pre_actual_event]}) == 1497715200000)
-#   end
-#
-#   test "find_period" do
-#     assert(Service.Stats.find_period(1497855700000, Season1periods)== "season1week1")
-#   end
-#
-#   test "get_period_model" do
-#     assert(Service.Stats.get_period_model("season1week5",
-#     %{
-#       "store_id" => 567,
-#       "season" => 1,
-#       "stats" => %{
-#         "season1week4" => %{"pre" => "somedata"},
-#         "season1week5" => %{"pre" => "somedifferentdata"}
-#       }
-#       }) == %{"pre" => "somedifferentdata"})
-#   end
-#
-#   test "get_period_model no match" do
-#     assert(Service.Stats.get_period_model("season1week2",
-#     %{
-#       "store_id" => 567,
-#       "season" => 1,
-#       "stats" => %{
-#         "season1week4" => %{"pre" => "somedata"},
-#         "season1week5" => %{"pre" => "somedifferentdata"}
-#       }
-#       }) == %{})
-#   end
-#
-#
-#
-# test " get timestamp and find period", context do
-#   assert(Service.Stats.get_timestamp(context[:event_from_perhap])
-#   |> Service.Stats.find_period(Application.get_env(:reducers, :current_periods))== "season1preseason")
-# end
-#
-# test "date 2017-05-06" do
-#   assert(Service.Stats.date("2017-05-06")== 1494086400000)
-# end
-#
-# test "date 0" do
-#   assert(Service.Stats.date("0")== 1494287000000)
-# end
-#
-# test "date 05/23/2017" do
-#   assert(Service.Stats.date("05/23/2017")== 1495555200000)
-# end
-#
-# test "get store id" do
-#   event = %{
-#     domain: "stats",
-#     entity_id: "e38de111-d823-4345-a509-61b9a23ac7d0",
-#     event_id: "0d6af038-4f4f-11e7-8ca9-abb700000255",
-#     kv: "prodevents/0d6af038-4f4f-11e7-8ca9-abb700000255",
-#     kv_time: "",
-#     data: %{
-#       "Count"=> "",
-#       "Metrics"=> "Actual Receipts",
-#       "Store"=> "100049",
-#       "Week"=> "2017-06-07"
-#     },
-#     realm: "nike",
-#     remote_ip: "127.0.0.1",
-#     type: "actuals"
-#   }
-#
-#   assert(Service.Stats.get_store_num({:pre_actual, event})==100049)
-# end
-#
 
 end

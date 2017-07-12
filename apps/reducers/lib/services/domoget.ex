@@ -57,7 +57,7 @@ defmodule Service.Domo do
     dataset
     |> String.split("\n")
     |> List.delete_at(-1)
-    |> CSV.decode!(headers: true)
+    |> CSV.decode!(headers: true, strip_fields: true)
     |> Enum.group_by(fn (x) -> x[field_name] end)
   end
 
@@ -68,13 +68,13 @@ defmodule Service.Domo do
         Logger.warn("#{type} event is for a invalid store: #{store_num}")
         nil
       false ->
-        {_, data} =Poison.encode(chunk)
+        {_, data} =Poison.encode(%{"data" => chunk, "store" => store_num})
         event_id = gen_uuidv1()
 
         url = Application.get_env(:reducers, :perhap_base_url) <> "/v1/event/nike/stats/#{entity_id}/#{type}/#{event_id}"
 
         case HTTPoison.post(url, data, ["Content-Type": "application/json"], []) do
-          {:ok, %HTTPoison.Response{status_code: 204, body: body}} ->
+          {:ok, %HTTPoison.Response{status_code: 204 }} ->
             :ok
           {:ok, %HTTPoison.Response{status_code: code}} ->
             Logger.warn("upload #{type} event from domo error, status_code#{code}")

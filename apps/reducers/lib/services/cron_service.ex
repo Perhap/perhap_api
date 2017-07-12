@@ -43,6 +43,6 @@ defmodule Service.Cron do
   end
 
   def heartbeat() do
-    Logger.info("Cron: Heartbeat")
+    Logger.debug("Cron: Heartbeat")
   end
 end
