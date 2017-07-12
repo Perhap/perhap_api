@@ -76,9 +76,9 @@ defmodule Mix.Tasks.InitStores do
 
       # deactivate old stores
       # Logger.info("Map: #{inspect(oldMaps)}")
-      oldMaps
-        |> Enum.filter_map(fn map -> map.entity_id end,
-                           fn map -> genDeleteStoreEvent(map.entity_id) |> sendEvent end)
+      # oldMaps
+      #   |> Enum.filter_map(fn map -> map.entity_id end,
+      #                      fn map -> genDeleteStoreEvent(map.entity_id) |> sendEvent end)
 
       # remake store index
       genStoreIndexEvent(newEntIds, newHashes) |> sendIndex
@@ -87,7 +87,7 @@ defmodule Mix.Tasks.InitStores do
 
   def hashParse(row_string) do
     [[storenum, associated_storenum, name, concept, subconcept, terr, distnum, distname] | _] =
-      CSV.decode([row_string]) |> Enum.to_list
+      CSV.decode!([row_string]) |> Enum.to_list
     %{storenum: storenum,
       id_storenum:
         if associated_storenum == "" do nil
