@@ -16,9 +16,9 @@ config :quantum,
 config :reducers, Perhap.Scheduler,
   jobs: [
     [name: "heartbeat", schedule: "* * * * *", task: {Service.Cron, :heartbeat, []}],
-    [name: "bin_audit_get", schedule: "0 */12 * * *", task: {Service.Cron, :bin_audit_event, []}], #every 12 hours
-    [name: "actuals_get", schedule: "0 */4 * * *", task: {Service.Cron, :actuals_event, []}], # every 4 hours
-    [name: "apa_get", schedule: "0 * * * *", task: {Service.Cron, :actuals_event, []}], # every hour
+    [name: "bin_audit_get", schedule: "0 */12 * * *", task: {Service.Cron, :bin_audit_get, []}], #every 12 hours
+    [name: "actuals_get", schedule: "0 */4 * * *", task: {Service.Cron, :actuals_get, []}], # every 4 hours
+    [name: "apa_get", schedule: "0 * * * *", task: {Service.Cron, :apa_get, []}], # every hour
     [name: "seeding", schedule: "59 23 23 7 *", task: {Mix.Tasks.Seeding, :run, []}, timezone: "America/Los_Angeles"], # this will run yearly... on 7/23 at 11:59 pm This is where it needs to be updated for each new season.
     [name: "weekly_bracket", schedule: "59 23 * * 0", task: {Mix.Tasks.Bracket, :run, []}, timezone: "America/Los_Angeles"] # bracket runs each week, sunday nights at 11:59 pm only returns results if in tournament play for current season
   ]

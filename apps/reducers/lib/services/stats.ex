@@ -98,7 +98,7 @@ defmodule Service.Stats do
     timestamp = date(row[date_field])
     {period, _data} = season_periods
     |>  Enum.find({:out_of_season, "data"}, fn {_period, %{:start_time => start_time, :end_time => end_time}} -> timestamp >= start_time and timestamp <= end_time end)
-    period
+    to_string(period)
   end
 
   def merge_models(model, new_model)do
@@ -218,9 +218,8 @@ defmodule Service.Stats do
     def calc_accuracy(%{"actual_units" => actual_units, "units" => app_units} = model)do
       case app_units do
         0 -> model
-        _ ->
-          Map.put(model, "accuracy_percentage", app_units/actual_units)
-          |> Map.put("accuracy_score", accuracy_score(app_units/actual_units))
+        _ -> Map.put(model, "accuracy_percentage", app_units / actual_units)
+            |> Map.put("accuracy_score", accuracy_score(app_units / actual_units))
       end
     end
     def calc_accuracy(model), do: model
