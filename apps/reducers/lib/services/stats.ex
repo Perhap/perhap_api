@@ -216,8 +216,9 @@ defmodule Service.Stats do
     end
 
     def calc_accuracy(%{"actual_units" => actual_units, "units" => app_units} = model)do
-      case app_units do
+      case actual_units do
         0 -> model
+        0.0 -> model
         _ -> Map.put(model, "accuracy_percentage", app_units / actual_units)
             |> Map.put("accuracy_score", accuracy_score(app_units / actual_units))
       end
