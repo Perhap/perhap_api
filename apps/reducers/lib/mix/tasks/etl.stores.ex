@@ -68,6 +68,10 @@ defmodule Mix.Tasks.Etl.Stores do
     end
   end
 
+  # simple transform function which justs lists state
+  # a real function would inspect and mutate the model
+  #
+  # calling function will mutate state with whatever map is returned.
   @spec log_state(map(), String.t) :: map() | nil
   def log_state(model, num)do
     IO.puts "Store num #{num} and #{inspect(model)}"
