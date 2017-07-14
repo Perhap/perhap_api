@@ -74,12 +74,6 @@ defmodule Mix.Tasks.InitStores do
     %{oldMaps: _oldMaps, newHashes: newHashes, newEntIds: newEntIds} =
       Enum.reduce(newIdTuples, acc0, fn item, acc -> diffFold(&sendEvent/1, item, acc) end)
 
-      # deactivate old stores
-      # Logger.info("Map: #{inspect(oldMaps)}")
-      # oldMaps
-      #   |> Enum.filter_map(fn map -> map.entity_id end,
-      #                      fn map -> genDeleteStoreEvent(map.entity_id) |> sendEvent end)
-
       # remake store index
       genStoreIndexEvent(newEntIds, newHashes) |> sendIndex
 
@@ -140,14 +134,6 @@ defmodule Mix.Tasks.InitStores do
     end
   end
 
-
-#  defp genDeleteStoreEvent(entity_id) do
-#    %{ url: "event/nike/store/" <>
-#           "100077bd-5b34-41ac-b37b-62adbf86c1a5" <>
-#           "/delete/" <> gen_uuidv1(),
-#        data: %{entity_id: entity_id}
-#     }
-#  end
 
   defp genAddStoreEvent(entity_id, row_data) do
     %{url: "event/nike/store/" <> entity_id <>
