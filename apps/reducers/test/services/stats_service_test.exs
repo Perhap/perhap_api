@@ -498,73 +498,73 @@ defmodule Service.StatsTest do
           "_BATCH_LAST_RUN_" => "2017-07-05T21:07:49", "store_id" => "2"}]},
        parents: "", realm: "nike", remote_ip: "127.0.0.1", type: "bin_audit"},
     model_after_actuals: %{
-      season1preseason: %{"refill" => %{"actual_units" => 2211.0}},
-      season1week1: %{"pre" => %{"actual_units" => 5288.0}, "refill" => %{"actual_units" => 2641.0}},
-      season1week2: %{"pre" => %{"actual_units" => 6590.0}, "refill" => %{"actual_units" => 3960.0}},
-      season1week3: %{"pre" => %{"actual_units" => 7732.0}, "refill" => %{"actual_units" => 3666.0}}},
+      "season1preseason" => %{"refill" => %{"actual_units" => 2211.0}},
+      "season1week1" => %{"pre" => %{"actual_units" => 5288.0}, "refill" => %{"actual_units" => 2641.0}},
+      "season1week2" => %{"pre" => %{"actual_units" => 6590.0}, "refill" => %{"actual_units" => 3960.0}},
+      "season1week3" => %{"pre" => %{"actual_units" => 7732.0}, "refill" => %{"actual_units" => 3666.0}}},
     model_after_challenge: %{
-      season1preseason: %{"pre" => %{"pre_percentage" => 0.7383333333333334, "pre_score" => 0, "units" => 568.0}},
-      season1week1: %{
+      "season1preseason" => %{"pre" => %{"pre_percentage" => 0.7383333333333334, "pre_score" => 0, "units" => 568.0}},
+      "season1week1" => %{
          "pre" => %{"pre_percentage" => 0.9774814814814816, "pre_score" => 5, "units" => 1770.0},
          "refill" => %{"refill_percentage" => 2.645, "refill_score" => 15, "units" => 190.0}},
-      season1week2: %{
+      "season1week2" => %{
          "pre" => %{"pre_percentage" => 1.4424444444444444, "pre_score" => 15, "units" => 791.0},
          "refill" => %{"refill_percentage" => 1.6199999999999999, "refill_score" => 15, "units" => 788.0}},
-      season1week3: %{
+      "season1week3" => %{
          "pre" => %{"pre_percentage" => 0.8463703703703704, "pre_score" => 0, "units" => 2013.0},
          "refill" => %{"refill_percentage" => 1.1475, "refill_score" => 10, "units" => 280.0}}},
     model_after_bins: %{
-      season1week1: %{"bin_audit" => %{"bin_percentage" => 65.0, "bin_score" => 0}},
-      season1week2: %{"bin_audit" => %{"bin_percentage" => 75.0, "bin_score" => 0}}},
+      "season1week1" => %{"bin_audit" => %{"bin_percentage" => 65.0, "bin_score" => 0}},
+      "season1week2" => %{"bin_audit" => %{"bin_percentage" => 75.0, "bin_score" => 0}}},
     model_after_all: %{
-      season1preseason: %{
+      "season1preseason" => %{
         "pre" => %{"pre_percentage" => 0.7383333333333334, "pre_score" => 0, "units" => 568.0},
         "refill" => %{"actual_units" => 2211.0}},
-      season1week1: %{
+      "season1week1" => %{
         "pre" => %{"pre_percentage" => 0.9774814814814816, "pre_score" => 5, "units" => 1770.0, "actual_units" => 5288.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.3347201210287443},
         "refill" => %{"refill_percentage" => 2.645, "refill_score" => 15, "units" => 190.0, "actual_units" => 2641.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.07194244604316546},
         "bin_audit" => %{"bin_percentage" => 65.0, "bin_score" => 0}},
-      season1week2: %{
+      "season1week2" => %{
         "pre" => %{"pre_percentage" => 1.4424444444444444, "pre_score" => 15, "units" => 791.0, "actual_units" => 6590.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.12003034901365706},
         "refill" => %{"refill_percentage" => 1.6199999999999999, "refill_score" => 15, "units" => 788.0, "actual_units" => 3960.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.198989898989899},
         "bin_audit" => %{"bin_percentage" => 75.0, "bin_score" => 0}},
-      season1week3: %{
+      "season1week3" => %{
         "refill" => %{"actual_units" => 3666.0, "refill_percentage" => 1.1475, "refill_score" => 10, "units" => 280.0, "accuracy_score" => 0, "accuracy_percentage" => 0.07637752318603383},
         "pre" => %{"actual_units" => 7732.0, "pre_percentage" => 0.8463703703703704, "pre_score" => 0, "units" => 2013.0, "accuracy_score" => 0, "accuracy_percentage" => 0.26034661148473875}}
 
     },
       model_after_all_reduced: %{
-        season1preseason: %{
+        "season1preseason" => %{
           "pre" => %{"pre_percentage" => 0.7383333333333334, "pre_score" => 0, "units" => 568.0},
           "refill" => %{"actual_units" => 1149.72}},
-        season1week1: %{
+        "season1week1" => %{
           "pre" => %{"pre_percentage" => 0.9774814814814816, "pre_score" => 5, "units" => 1770.0, "actual_units" => 5288.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.3347201210287443},
           "refill" => %{"refill_percentage" => 2.645, "refill_score" => 15, "units" => 190.0, "actual_units" => 1373.3200000000002,  "accuracy_score" => 0, "accuracy_percentage" => 0.1383508577753182},
           "bin_audit" => %{"bin_percentage" => 65.0, "bin_score" => 0}},
-        season1week2: %{
+        "season1week2" => %{
           "pre" => %{"pre_percentage" => 1.4424444444444444, "pre_score" => 15, "units" => 791.0, "actual_units" => 6590.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.12003034901365706},
           "refill" => %{"refill_percentage" => 1.6199999999999999, "refill_score" => 15, "units" => 788.0, "actual_units" => 2059.2000000000003,  "accuracy_score" => 0, "accuracy_percentage" => 0.38267288267288263},
           "bin_audit" => %{"bin_percentage" => 75.0, "bin_score" => 0}},
-        season1week3: %{
+        "season1week3" => %{
           "refill" => %{"actual_units" => 1906.32, "refill_percentage" => 1.1475, "refill_score" => 10, "units" => 280.0, "accuracy_score" => 0, "accuracy_percentage" => 0.14687985228083428},
           "pre" => %{"actual_units" => 7732.0, "pre_percentage" => 0.8463703703703704, "pre_score" => 0, "units" => 2013.0, "accuracy_score" => 0, "accuracy_percentage" => 0.26034661148473875}}
 
       },
 
       model_after_calc_bin: %{
-        season1preseason: %{
+        "season1preseason" => %{
           "pre" => %{"pre_percentage" => 0.7383333333333334, "pre_score" => 0, "units" => 568.0},
           "refill" => %{"actual_units" => 2211.0},
           "bin_audit" => %{"bin_percentage" => 0.0, "bin_score" => 0}},
-        season1week1: %{
+        "season1week1" => %{
           "pre" => %{"pre_percentage" => 0.9774814814814816, "pre_score" => 5, "units" => 1770.0, "actual_units" => 5288.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.3347201210287443},
           "refill" => %{"refill_percentage" => 2.645, "refill_score" => 15, "units" => 190.0, "actual_units" => 2641.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.07194244604316546},
           "bin_audit" => %{"bin_percentage" => 28.57142857142857, "bin_score" => 0}},
-        season1week2: %{
+        "season1week2" => %{
           "pre" => %{"pre_percentage" => 1.4424444444444444, "pre_score" => 15, "units" => 791.0, "actual_units" => 6590.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.12003034901365706},
           "refill" => %{"refill_percentage" => 1.6199999999999999, "refill_score" => 15, "units" => 788.0, "actual_units" => 3960.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.198989898989899},
           "bin_audit" => %{"bin_percentage" => 3000/70, "bin_score" => 0}},
-        season1week3: %{
+        "season1week3" => %{
           "refill" => %{"actual_units" => 3666.0, "refill_percentage" => 1.1475, "refill_score" => 10, "units" => 280.0, "accuracy_score" => 0, "accuracy_percentage" => 0.07637752318603383},
           "pre" => %{"actual_units" => 7732.0, "pre_percentage" => 0.8463703703703704, "pre_score" => 0, "units" => 2013.0, "accuracy_score" => 0, "accuracy_percentage" => 0.26034661148473875},
           "bin_audit" => %{"bin_percentage" => 14.285714285714285, "bin_score" => 0}}

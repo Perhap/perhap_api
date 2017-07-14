@@ -1,5 +1,4 @@
 defmodule Service.Cron do
-  import Reducer.Utils, only: [gen_uuidv1: 0]
 
   require Logger
 

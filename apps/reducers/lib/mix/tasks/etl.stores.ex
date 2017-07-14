@@ -34,7 +34,7 @@ defmodule Mix.Tasks.Etl.Stores do
   end
 
 
-  def run([transform, module, func]) do
+  def run([_transform, module, func]) do
     Application.ensure_all_started(:db)
     IO.puts ("MIX ENV: #{Mix.env}; #{inspect(self())}")
     # Other Interesting Keys
