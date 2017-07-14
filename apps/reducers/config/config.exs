@@ -16,8 +16,9 @@ config :quantum,
 config :reducers, Perhap.Scheduler,
   jobs: [
     [name: "heartbeat", schedule: "* * * * *", task: {Service.Cron, :heartbeat, []}],
-    [name: "bin_audit_event", schedule: "0 */12 * * *", task: {Service.Cron, :bin_audit_event, []}], #every 12 hours
-    [name: "actuals_event", schedule: "0 */4 * * *", task: {Service.Cron, :actuals_event, []}], # every 4 hours
+    [name: "bin_audit_get", schedule: "0 */12 * * *", task: {Service.Cron, :bin_audit_get, []}], #every 12 hours
+    [name: "actuals_get", schedule: "0 */4 * * *", task: {Service.Cron, :actuals_get, []}], # every 4 hours
+    [name: "apa_get", schedule: "0 * * * *", task: {Service.Cron, :apa_get, []}], # every hour
     [name: "seeding", schedule: "59 23 23 7 *", task: {Mix.Tasks.Seeding, :run, []}, timezone: "America/Los_Angeles"], # this will run yearly... on 7/23 at 11:59 pm This is where it needs to be updated for each new season.
     [name: "weekly_bracket", schedule: "59 23 * * 0", task: {Mix.Tasks.Bracket, :run, []}, timezone: "America/Los_Angeles"] # bracket runs each week, sunday nights at 11:59 pm only returns results if in tournament play for current season
   ]
@@ -25,11 +26,13 @@ config :reducers, Perhap.Scheduler,
 config :reducers, :domo_creds,
   client_secret: "secret to be filled in",
   client_id: "id to be filled in",
-  bin_audit_dataset: "39367e6a-fb49-4e98-8547-2645eb58140d",
-  actuals_dataset: "cd0192e1-078f-49b4-9116-6a7f36c4b6e2",
+  bin_audit_dataset: "c8a5a4c2-43af-421d-a588-f880e3d713a1",
+  actuals_dataset: "bc96a70b-c7ae-4b2a-bf11-2f0871955bb8",
+  apa_dataset: "a7601eb1-dfd7-41e0-a9b4-65d324ca1629",
   out_going_domain: "stats",
   bin_audit_type: "bin_audit",
-  actuals_type: "actuals"
+  actuals_type: "actuals",
+  apa_type: "challenge"
 
 
 
