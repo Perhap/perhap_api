@@ -16,6 +16,7 @@ defmodule Service.Domo do
     |> chunk_by_store(field_name)
     |> reduce_size(type)
     |> consolidate_shared_stores(type)
+    |> filter_data(type)
     |> Enum.each(fn {store_num, chunk} ->
       send_store_chunk(store_num, get_entity_id(store_num, store_ids), chunk, type) end)
 
@@ -73,9 +74,99 @@ defmodule Service.Domo do
     |> merge_two_stores(type, "19", "297")
     |> merge_two_stores(type, "59", "298")
     |> merge_three_stores(type, "88", "299", "96")
-
-
   end
+
+  def filter_data(dataset, type) do
+    Enum.map(dataset, fn{store, data} ->
+      {store, data_prep(data, String.to_existing_atom(type))} end
+      )
+  end
+
+
+
+    def data_prep(meta, :bin_audit)do
+      meta
+      |> remove_nulls("DATE")
+      |> filter_on_date("DATE")
+      |> sort_by_time_period("DATE")
+    end
+
+    def data_prep(meta, :challenge)do
+      meta
+      |> filter_on_date("start_date")
+      |> sort_by_time_period("start_date")
+    end
+
+    def data_prep(meta, :actuals)do
+      meta
+      |> remove_nulls("Count")
+      |> Enum.reject(fn (row) -> String.contains?(row["Count"], "#")  end)
+      |> filter_on_date("Week")
+      |> sort_by_time_period("Week")
+    end
+
+    def remove_nulls(data_list, field_name) do
+      Enum.reject(data_list, fn (row) -> row[field_name]== "\\N" end)
+    end
+
+    def filter_on_date(data_list, date_field_name)do
+      time_periods = Application.get_env(:reducers, Application.get_env(:reducers, :current_periods))
+      {_start_name, start_times} = hd(time_periods)
+      start_time = start_times.start_time
+
+      {_end_name, end_times} = List.last(time_periods)
+      end_time = end_times.end_time
+
+      Enum.filter(data_list, fn (row) -> date(row[date_field_name]) > start_time end)
+      |> Enum.filter(fn (row) -> date(row[date_field_name]) < end_time end)
+    end
+
+
+
+
+    def sort_by_time_period(filtered_meta, date_field) do
+      time_periods = Application.get_env(:reducers, Application.get_env(:reducers, :current_periods))
+      filtered_meta
+      |> Enum.group_by(fn(row)-> find_period(row, time_periods, date_field) end)
+    end
+
+    def find_period(row, season_periods, date_field) do
+      timestamp = date(row[date_field])
+      {period, _data} = season_periods
+      |>  Enum.find({:out_of_season, "data"}, fn {_period, %{:start_time => start_time, :end_time => end_time}} -> timestamp >= start_time and timestamp <= end_time end)
+      to_string(period)
+    end
+
+
+  def get_timestamp({:bin_audit, event}), do: date(event.data["DATE"])
+  def get_timestamp({:actuals, event}), do: date(event.data["Week"])
+  def get_timestamp({:pre_actual, event}), do: date(event.data["Week"])
+  def get_timestamp({:refill_actual, event}), do: date(event.data["Week"])
+  def get_timestamp({:pre_challenge, event})do
+    max = Enum.max_by(event.data["users"], fn(user) -> elem(user, 1)["start_time"] end)
+    elem(max, 1)["start_time"]
+  end
+  def get_timestamp({:refill_challenge, event})do
+    max = Enum.max_by(event.data["users"], fn(user) -> elem(user, 1)["start_time"] end)
+    elem(max, 1)["start_time"]
+  end
+
+  def date(datestring) when datestring == "", do: 1494287000000 #this date will be before season1 starts, so it won't get played
+  def date(datestring) when is_nil(datestring), do: 1494287000000 #this date will be before season1 starts, so it won't get played
+  def date(datestring) when datestring == "0", do: 1494287000000 #this date will be before season1 starts, so it won't get played
+  def date(datestring) do
+    {year, month, day} = case Regex.match?(~r/-/, datestring) do
+      true -> [year, month, day] = String.split(datestring, "-")
+      {year, month, day}
+      false ->[month, day, year] = String.split(datestring, "/")
+      {year, month, day}
+    end
+    seconds = Timex.to_datetime({{String.to_integer(year), String.to_integer(month), String.to_integer(day)}, {16, 0, 0}})
+    |> Timex.to_unix()
+    seconds * 1000
+  end
+
+
 
   def merge_two_stores(dataset, _type, store_1, store_2) when is_list(dataset) do
     {store_1, store_1_data} = List.keyfind(dataset, store_1, 0)
