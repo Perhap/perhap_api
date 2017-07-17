@@ -2,126 +2,351 @@ defmodule ServiceDomoTest do
   use ExUnit.Case
   doctest Service.Domo
 
-  alias DB.Event
+  test "splits csv string into chunks by store"do
 
-  def strip(event)do
-     Map.put(event, :event_id, "")
-  end
+    bin_audit_data_sample = "STORE,DATE,NO_OF_AUDITS_PERFORMED,PASSED_BIN_COUNT,BIN_COUNT_TOTAL,BIN_PERCENTAGE,_BATCH_ID_,_BATCH_LAST_RUN_,Store Name,Dimension,Territory,UPH Standard,District,store_id\n19,\\N,0,0,0,0.0,1,2017-01-18T22:21:04,Nike Company Store,Nike Store,Inline,NCS,NS01,19\n19,2017-01-23,1,19,20,95.0,2,2017-01-30T22:39:54,Nike Company Store,Nike Store,Inline,NCS,NS01,19\n51,\\N,0,0,0,0.0,1,2017-01-18T22:21:04,Airport,Nike Store,Inline,Nike  Store,NS01,51\n51,2017-02-21,2,36,38,94.7368421,5,2017-02-27T22:19:09,Airport,Nike Store,Inline,Nike Store,NS01,51\n51,2017-03-04,2,22,23,95.6521739,6,2017-03-08T17:15:47,Airport,Nike Store,Inline,Nike Store,NS01,51\n82,2017-06-17,1,18,20,90.0,18,2017-06-19T16:28:32,Seattle,Nike Store,Inline,Nike  Store,NS01,86\n86,2017-06-13,2,21,35,60.0,18,2017-06-19T16:28:32,San Francisco,Nike Store,Inline,Nike  Store,NS01,86\n237,2016-12-26,1,14,17,82.3529411,1,2017-01-18T22:21:04,Union Street,Nike Store,Inline,Nike Store,NS01,237\n237,2017-01-22,1,17,17,100.0,2,2017-01-30T22:39:54,Union Street,Nike Store,Inline,Nike Store,NS01,237\n305,\\N,0,0,0,0.0,6,2017-03-08T17:15:47,Stanford,Nike Store,Inline,Nike Store,NS01,305\n305,2017-04-21,2,17,22,77.2727272,11,2017-04-24T22:08:31,Stanford,Nike Store,Inline,Nike Store,NS01,305\n351,\\N,0,0,0,0.0,6,2017-03-08T17:15:47,University Village,Nike Store,Inline,Nike Store,NS01,351\n351,2017-03-09,1,12,18,66.6666666,7,2017-03-13T18:10:26,University Village,Nike Store,Inline,Nike Store,NS01,351\n351,2017-06-10,1,16,18,88.8888888,17,2017-06-13T19:30:13,University Village,Nike Store,Inline,Nike Store,NS01,351\n351,2017-06-17,1,14,18,77.7777777,18,2017-06-19T16:28:32,University Village,Nike Store,Inline,Nike Store,NS01,351\n360,\\N,0,0,0,0.0,1,2017-01-18T22:21:04,Eugene,Nike Store,Inline,Nike  Store,NS01,360\n360,2017-02-17,1,19,20,95.0,4,2017-02-21T18:21:43,Eugene,Nike Store,Inline,Nike Store,NS01,360\n360,2017-02-20,1,20,20,100.0,5,2017-02-27T22:19:09,Eugene,Nike Store,Inline,Nike Store,NS01,360\n368,2017-02-22,1,16,20,80.0,5,2017-02-27T22:19:09,Portland,Nike Store,Inline,Nike Store,NS01,368\n368,2017-02-23,1,16,20,80.0,5,2017-02-27T22:19:09,Portland,Nike Store,Inline,Nike Store,NS01,368\n93,2016-12-25,1,19,20,95.0,1,2017-01-18T22:21:04,Las Vegas,Nike Store,Inline,Nike Store,NS02,93\n93,2017-01-22,3,21,22,95.4545454,2,2017-01-30T22:39:54,Las Vegas,Nike Store,Inline,Nike Store,NS02,93\n246,2017-06-17,1,13,20,65.0,18,2017-06-19T16:28:32,The Grove,Nike Store,Inline,Nike Store,NS02,246\n246,2017-06-23,2,14,21,66.6666666,19,2017-06-26T18:05:05,The Grove,Nike Store,Inline,Nike Store,NS02,301\n301,2017-04-17,1,13,13,100.0,11,2017-04-24T22:08:31,Fashion Island,Nike Store,Inline,Nike Store,NS02,301\n301,2017-06-30,1,12,13,92.3076923,20,2017-07-05T21:07:49,Fashion Island,Nike Store,Inline,Nike Store,NS02,301\n303,\\N,0,0,0,0.0,1,2017-01-18T22:21:04,South Coast Plaza,Nike Store,Inline,Nike Store,NS02,303\n"
 
-  def uuid_stripper({events, col_heads, type, hash_state, store_ids}) do
-    stripped = Enum.map(events, fn(event) -> strip(event) end)
-    {stripped, col_heads, type, hash_state, store_ids}
-  end
-
-  # body = "1,2,3,4\na,b,c,d\nd,c,b,a\nw,x,y,z"
-  test "hash file and build event with empty state" do
-    state = %{}
-    store_ids = %{
-      "93242"=> "517539dc-f3e0-47b0-9f1e-559df39eaeda",
-      "3"=> "48b76a2c-ead3-48e9-acf8-2d87adbc17b1"
+    actual = Service.Domo.chunk_by_store(bin_audit_data_sample, "STORE")
+    expected = %{
+      "19" => [
+        %{"BIN_COUNT_TOTAL" => "0", "BIN_PERCENTAGE" => "0.0", "DATE" => "\\N", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "0", "PASSED_BIN_COUNT" => "0", "STORE" => "19", "Store Name" => "Nike Company Store",
+          "Territory" => "Inline", "UPH Standard" => "NCS", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04", "store_id" => "19"},
+        %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "95.0", "DATE" => "2017-01-23", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "19", "STORE" => "19", "Store Name" => "Nike Company Store",
+          "Territory" => "Inline", "UPH Standard" => "NCS", "_BATCH_ID_" => "2", "_BATCH_LAST_RUN_" => "2017-01-30T22:39:54", "store_id" => "19"}
+      ],
+      "237" => [
+        %{"BIN_COUNT_TOTAL" => "17", "BIN_PERCENTAGE" => "82.3529411","DATE" => "2016-12-26", "Dimension" => "Nike Store", "District" => "NS01",
+         "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "14", "STORE" => "237", "Store Name" => "Union Street",
+         "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04", "store_id" => "237"},
+       %{"BIN_COUNT_TOTAL" => "17", "BIN_PERCENTAGE" => "100.0", "DATE" => "2017-01-22", "Dimension" => "Nike Store", "District" => "NS01",
+         "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "17", "STORE" => "237", "Store Name" => "Union Street",
+         "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "2", "_BATCH_LAST_RUN_" => "2017-01-30T22:39:54", "store_id" => "237"}
+      ],
+      "246" => [
+        %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "65.0", "DATE" => "2017-06-17", "Dimension" => "Nike Store", "District" => "NS02",
+          "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "13", "STORE" => "246", "Store Name" => "The Grove",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "18", "_BATCH_LAST_RUN_" => "2017-06-19T16:28:32", "store_id" => "246"},
+       %{"BIN_COUNT_TOTAL" => "21", "BIN_PERCENTAGE" => "66.6666666", "DATE" => "2017-06-23", "Dimension" => "Nike Store", "District" => "NS02",
+        "NO_OF_AUDITS_PERFORMED" => "2", "PASSED_BIN_COUNT" => "14", "STORE" => "246", "Store Name" => "The Grove",
+        "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "19", "_BATCH_LAST_RUN_" => "2017-06-26T18:05:05", "store_id" => "301"}
+      ],
+      "301" => [
+        %{"BIN_COUNT_TOTAL" => "13", "BIN_PERCENTAGE" => "100.0","DATE" => "2017-04-17", "Dimension" => "Nike Store", "District" => "NS02",
+          "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "13", "STORE" => "301", "Store Name" => "Fashion Island",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "11", "_BATCH_LAST_RUN_" => "2017-04-24T22:08:31", "store_id" => "301"},
+       %{"BIN_COUNT_TOTAL" => "13", "BIN_PERCENTAGE" => "92.3076923", "DATE" => "2017-06-30", "Dimension" => "Nike Store", "District" => "NS02",
+         "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "12", "STORE" => "301", "Store Name" => "Fashion Island",
+         "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "20", "_BATCH_LAST_RUN_" => "2017-07-05T21:07:49", "store_id" => "301"}
+      ],
+      "303" => [
+        %{"BIN_COUNT_TOTAL" => "0", "BIN_PERCENTAGE" => "0.0", "DATE" => "\\N", "Dimension" => "Nike Store", "District" => "NS02",
+        "NO_OF_AUDITS_PERFORMED" => "0", "PASSED_BIN_COUNT" => "0", "STORE" => "303", "Store Name" => "South Coast Plaza",
+        "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04", "store_id" => "303"}
+      ],
+      "305" => [
+        %{"BIN_COUNT_TOTAL" => "0", "BIN_PERCENTAGE" => "0.0", "DATE" => "\\N", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "0", "PASSED_BIN_COUNT" => "0", "STORE" => "305", "Store Name" => "Stanford",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "6", "_BATCH_LAST_RUN_" => "2017-03-08T17:15:47", "store_id" => "305"},
+        %{"BIN_COUNT_TOTAL" => "22", "BIN_PERCENTAGE" => "77.2727272", "DATE" => "2017-04-21", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "2", "PASSED_BIN_COUNT" => "17", "STORE" => "305", "Store Name" => "Stanford",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "11", "_BATCH_LAST_RUN_" => "2017-04-24T22:08:31", "store_id" => "305"}
+      ],
+      "351" => [
+        %{"BIN_COUNT_TOTAL" => "0", "BIN_PERCENTAGE" => "0.0", "DATE" => "\\N", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "0", "PASSED_BIN_COUNT" => "0", "STORE" => "351", "Store Name" => "University Village",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "6", "_BATCH_LAST_RUN_" => "2017-03-08T17:15:47", "store_id" => "351"},
+        %{"BIN_COUNT_TOTAL" => "18", "BIN_PERCENTAGE" => "66.6666666", "DATE" => "2017-03-09", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "12", "STORE" => "351", "Store Name" => "University Village",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "7", "_BATCH_LAST_RUN_" => "2017-03-13T18:10:26", "store_id" => "351"},
+        %{"BIN_COUNT_TOTAL" => "18", "BIN_PERCENTAGE" => "88.8888888", "DATE" => "2017-06-10", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "16", "STORE" => "351", "Store Name" => "University Village",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "17", "_BATCH_LAST_RUN_" => "2017-06-13T19:30:13", "store_id" => "351"},
+        %{"BIN_COUNT_TOTAL" => "18", "BIN_PERCENTAGE" => "77.7777777", "DATE" => "2017-06-17", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "14", "STORE" => "351", "Store Name" => "University Village",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "18", "_BATCH_LAST_RUN_" => "2017-06-19T16:28:32", "store_id" => "351"}
+      ],
+      "360" => [
+        %{"BIN_COUNT_TOTAL" => "0", "BIN_PERCENTAGE" => "0.0", "DATE" => "\\N", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "0", "PASSED_BIN_COUNT" => "0", "STORE" => "360", "Store Name" => "Eugene",
+          "Territory" => "Inline", "UPH Standard" => "Nike  Store", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04", "store_id" => "360"},
+        %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "95.0", "DATE" => "2017-02-17", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "19", "STORE" => "360", "Store Name" => "Eugene",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "4", "_BATCH_LAST_RUN_" => "2017-02-21T18:21:43", "store_id" => "360"},
+        %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "100.0", "DATE" => "2017-02-20", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "20", "STORE" => "360", "Store Name" => "Eugene",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "5", "_BATCH_LAST_RUN_" => "2017-02-27T22:19:09", "store_id" => "360"}
+      ],
+      "368" => [
+        %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "80.0", "DATE" => "2017-02-22", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "16", "STORE" => "368", "Store Name" => "Portland",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "5", "_BATCH_LAST_RUN_" => "2017-02-27T22:19:09", "store_id" => "368"},
+        %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "80.0", "DATE" => "2017-02-23", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "16", "STORE" => "368", "Store Name" => "Portland",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "5", "_BATCH_LAST_RUN_" => "2017-02-27T22:19:09", "store_id" => "368"}
+      ],
+      "51" => [
+        %{"BIN_COUNT_TOTAL" => "0", "BIN_PERCENTAGE" => "0.0", "DATE" => "\\N", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "0", "PASSED_BIN_COUNT" => "0", "STORE" => "51", "Store Name" => "Airport",
+          "Territory" => "Inline", "UPH Standard" => "Nike  Store", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04", "store_id" => "51"},
+        %{"BIN_COUNT_TOTAL" => "38", "BIN_PERCENTAGE" => "94.7368421", "DATE" => "2017-02-21", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "2", "PASSED_BIN_COUNT" => "36", "STORE" => "51", "Store Name" => "Airport",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "5", "_BATCH_LAST_RUN_" => "2017-02-27T22:19:09", "store_id" => "51"},
+        %{"BIN_COUNT_TOTAL" => "23", "BIN_PERCENTAGE" => "95.6521739", "DATE" => "2017-03-04", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "2", "PASSED_BIN_COUNT" => "22", "STORE" => "51", "Store Name" => "Airport",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "6", "_BATCH_LAST_RUN_" => "2017-03-08T17:15:47", "store_id" => "51"}
+      ],
+      "82" => [
+        %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "90.0", "DATE" => "2017-06-17", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "18", "STORE" => "82", "Store Name" => "Seattle",
+          "Territory" => "Inline", "UPH Standard" => "Nike  Store", "_BATCH_ID_" => "18", "_BATCH_LAST_RUN_" => "2017-06-19T16:28:32", "store_id" => "86"}
+      ],
+      "86" => [
+        %{"BIN_COUNT_TOTAL" => "35", "BIN_PERCENTAGE" => "60.0", "DATE" => "2017-06-13", "Dimension" => "Nike Store", "District" => "NS01",
+          "NO_OF_AUDITS_PERFORMED" => "2", "PASSED_BIN_COUNT" => "21", "STORE" => "86", "Store Name" => "San Francisco",
+          "Territory" => "Inline", "UPH Standard" => "Nike  Store", "_BATCH_ID_" => "18", "_BATCH_LAST_RUN_" => "2017-06-19T16:28:32", "store_id" => "86"}
+      ],
+      "93" => [
+        %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "95.0", "DATE" => "2016-12-25", "Dimension" => "Nike Store", "District" => "NS02",
+          "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "19", "STORE" => "93", "Store Name" => "Las Vegas",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04", "store_id" => "93"},
+        %{"BIN_COUNT_TOTAL" => "22", "BIN_PERCENTAGE" => "95.4545454", "DATE" => "2017-01-22", "Dimension" => "Nike Store", "District" => "NS02",
+          "NO_OF_AUDITS_PERFORMED" => "3", "PASSED_BIN_COUNT" => "21", "STORE" => "93", "Store Name" => "Las Vegas",
+          "Territory" => "Inline", "UPH Standard" => "Nike Store", "_BATCH_ID_" => "2", "_BATCH_LAST_RUN_" => "2017-01-30T22:39:54", "store_id" => "93"}
+      ]
     }
-    type = "bin_audits"
-    body = "STORE,DATE,NO_OF_AUDITS_PERFORMED,PASSED_BIN_COUNT,BIN_COUNT_TOTAL,BIN_PERCENTAGE,_BATCH_ID_,_BATCH_LAST_RUN_\n\"3\",\"12/30/2016\",\"1\",\"20\",\"20\",\"100\",\"1\",\"2017-01-18T22:21:04\"\n\"93242\",\"12/30/2016\",\"1\",\"13\",\"20\",\"65\",\"1\",\"2017-01-18T22:21:04\"\n"
-    expected = {[
-      %Event{domain: "stats", event_id: "", kv: "", kv_time: "", realm: "nike", remote_ip: "127.0.0.1", type: "bin_audits", entity_id: "517539dc-f3e0-47b0-9f1e-559df39eaeda", meta: %{"BIN_COUNT_TOTAL" => "20", "DATE" => "12/30/2016", "NO_OF_AUDITS_PERFORMED" => "1", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04", "BIN_PERCENTAGE" => "65", "PASSED_BIN_COUNT" => "13", "STORE" => "93242"}},
-      %Event{domain: "stats", event_id: "", kv: "", kv_time: "", realm: "nike", remote_ip: "127.0.0.1", type: "bin_audits", entity_id: "48b76a2c-ead3-48e9-acf8-2d87adbc17b1", meta: %{"BIN_COUNT_TOTAL" => "20", "BIN_PERCENTAGE" => "100", "DATE" => "12/30/2016", "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "20", "_BATCH_ID_" => "1", "_BATCH_LAST_RUN_" => "2017-01-18T22:21:04", "STORE" => "3"}}], "STORE,DATE,NO_OF_AUDITS_PERFORMED,PASSED_BIN_COUNT,BIN_COUNT_TOTAL,BIN_PERCENTAGE,_BATCH_ID_,_BATCH_LAST_RUN_",
-      "bin_audits",
-      %HashState{missing: [], hashes: ["2EDBBE95C4BD4C691856ADE5A5863929CA2E8912", "9C9398B1526825551ECA416C24AFFE851E959441"], lines: ["\"93242\",\"12/30/2016\",\"1\",\"13\",\"20\",\"65\",\"1\",\"2017-01-18T22:21:04\"", "\"3\",\"12/30/2016\",\"1\",\"20\",\"20\",\"100\",\"1\",\"2017-01-18T22:21:04\""]},
-      %{"3" => "48b76a2c-ead3-48e9-acf8-2d87adbc17b1", "93242" => "517539dc-f3e0-47b0-9f1e-559df39eaeda"}}
-    assert Service.Domo.hash_file(body, state, type, store_ids) |> uuid_stripper == expected
-  end
+
+    assert(actual == expected)
+end
 
 
-  test "hash file and build event with non-empty state" do
-      state = %{"last_played" => "1234", "hash_state" => [
-        "CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
-        "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
-        "3DCDA24350A7219C75A34CB4F0079978D4B63E95"
-        ],
-        }
-      type = "actuals"
-      store_ids = %{
-        "1"=> "517539dc-f3e0-47b0-9f1e-559df39eaeda",
-        "3"=> "48b76a2c-ead3-48e9-acf8-2d87adbc17b1"
-      }
-      body = "STORE,2,3,4\na,b,c,d\nd,c,b,a\nw,x,y,z\nz,y,x,w"
-      expected = {[],
-                "STORE,2,3,4",
-                "actuals",
-                %HashState{hashes: ["973534CEA1CB3C8502A5599CCFCBC2A103DC0A21",
-                "CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
-                "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
-                "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                          lines: ["z,y,x,w", "w,x,y,z", "d,c,b,a", "a,b,c,d"], missing: []},
-                          %{"1" => "517539dc-f3e0-47b0-9f1e-559df39eaeda", "3" => "48b76a2c-ead3-48e9-acf8-2d87adbc17b1"}}
+test "data-Prep apa" do
+  meta =
+    [%{"Goal" => "150", "UPH" => "14.0", "challenge_type" => "footwear", "complete_units" => "76.0", "start_date" => "2017-06-17", "store_id" => "2"}, %{"Goal" => "125", "UPH" => "111.0", "challenge_type" => "cph", "complete_units" => "111.0", "start_date" => "2017-06-27", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "54.0", "challenge_type" => "apparel", "complete_units" => "52.0", "start_date" => "2017-06-05", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "72.0", "challenge_type" => "footwear", "complete_units" => "60.0", "start_date" => "2017-06-06", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "55.0", "challenge_type" => "apparel", "complete_units" => "75.0", "start_date" => "2017-06-19", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "84.0", "challenge_type" => "footwear", "complete_units" => "70.0", "start_date" => "2017-06-20", "store_id" => "2"}, %{"Goal" => "250", "UPH" => "207.0", "challenge_type" => "equipment", "complete_units" => "53.0", "start_date" => "2017-06-21", "store_id" => "2"}, %{"Goal" => "125", "UPH" => "107.0", "challenge_type" => "cph", "complete_units" => "42.0", "start_date" => "2017-06-21", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "99.0", "challenge_type" => "apparel", "complete_units" => "125.0", "start_date" => "2017-06-21", "store_id" => "2"}, %{"Goal" => "125", "UPH" => "105.0", "challenge_type" => "cph", "complete_units" => "101.0", "start_date" => "2017-06-22", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "264.0", "challenge_type" => "footwear", "complete_units" => "163.0", "start_date" => "2017-06-23", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "59.0", "challenge_type" => "apparel", "complete_units" => "90.0", "start_date" => "2017-06-23", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "117.0", "challenge_type" => "product refill", "complete_units" => "75.0", "start_date" => "2017-06-26", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "269.0", "challenge_type" => "footwear", "complete_units" => "115.0", "start_date" => "2017-06-26", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "131.0", "challenge_type" => "product refill", "complete_units" => "55.0", "start_date" => "2017-06-27", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "137.0", "challenge_type" => "footwear", "complete_units" => "60.0", "start_date" => "2017-06-27", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "91.0", "challenge_type" => "apparel", "complete_units" => "25.0", "start_date" => "2017-06-27", "store_id" => "2"}, %{"Goal" => "125", "UPH" => "184.0", "challenge_type" => "cph", "complete_units" => "13.0", "start_date" => "2017-06-27", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "114.0", "challenge_type" => "apparel", "complete_units" => "50.0", "start_date" => "2017-06-27", "store_id" => "2"}, %{"Goal" => "125", "UPH" => "111.0", "challenge_type" => "cph", "complete_units" => "111.0", "start_date" => "2017-06-27", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "1.0", "challenge_type" => "apparel", "complete_units" => "90.0", "start_date" => "2017-07-04", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "130.0", "challenge_type" => "footwear", "complete_units" => "150.0", "start_date" => "2017-07-07", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "112.0", "challenge_type" => "footwear", "complete_units" => "100.0", "start_date" => "2017-07-07", "store_id" => "2"}, %{"Goal" => "125", "UPH" => "107.0", "challenge_type" => "cph", "complete_units" => "42.0", "start_date" => "2017-06-21", "store_id" => "2"}, %{"Goal" => "125", "UPH" => "105.0", "challenge_type" => "cph", "complete_units" => "101.0", "start_date" => "2017-06-22", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "121.0", "challenge_type" => "apparel", "complete_units" => "90.0", "start_date" => "2017-07-05", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "64.0", "challenge_type" => "footwear", "complete_units" => "86.0", "start_date" => "2017-07-07", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "260.0", "challenge_type" => "product refill", "complete_units" => "90.0", "start_date" => "2017-06-21", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "150.0", "challenge_type" => "footwear", "complete_units" => "270.0", "start_date" => "2017-06-18", "store_id" => "2"}, %{"Goal" => "250", "UPH" => "420.0", "challenge_type" => "equipment", "complete_units" => "72.0", "start_date" => "2017-06-18", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "310.0", "challenge_type" => "footwear", "complete_units" => "96.0", "start_date" => "2017-06-20", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "125.0", "challenge_type" => "footwear", "complete_units" => "84.0", "start_date" => "2017-06-20", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "175.0", "challenge_type" => "footwear", "complete_units" => "72.0", "start_date" => "2017-06-20", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "183.0", "challenge_type" => "footwear", "complete_units" => "96.0", "start_date" => "2017-06-20", "store_id" => "2"}, %{"Goal" => "125", "UPH" => "242.0", "challenge_type" => "cph", "complete_units" => "16.0", "start_date" => "2017-06-22", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "173.0", "challenge_type" => "footwear", "complete_units" => "227.0", "start_date" => "2017-06-23", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "222.0", "challenge_type" => "apparel", "complete_units" => "75.0", "start_date" => "2017-07-02", "store_id" => "2"}, %{"Goal" => "250", "UPH" => "283.0", "challenge_type" => "equipment", "complete_units" => "282.0", "start_date" => "2017-07-02", "store_id" => "2"}, %{"Goal" => "250", "UPH" => "2.0", "challenge_type" => "equipment", "complete_units" => "250.0", "start_date" => "2017-07-02", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "30.0", "challenge_type" => "footwear", "complete_units" => "100.0", "start_date" => "2017-07-06", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "143.0", "challenge_type" => "apparel", "complete_units" => "90.0", "start_date" => "2017-06-04", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "124.0", "challenge_type" => "product refill", "complete_units" => "150.0", "start_date" => "2017-06-04", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "168.0", "challenge_type" => "apparel", "complete_units" => "90.0", "start_date" => "2017-06-04", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "269.0", "challenge_type" => "product refill", "complete_units" => "100.0", "start_date" => "2017-06-21", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "88.0", "challenge_type" => "product refill", "complete_units" => "100.0", "start_date" => "2017-06-02", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "54.0", "challenge_type" => "apparel", "complete_units" => "60.0", "start_date" => "2017-07-05", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "74.0", "challenge_type" => "product refill", "complete_units" => "100.0", "start_date" => "2017-06-07", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "198.0", "challenge_type" => "product refill", "complete_units" => "80.0", "start_date" => "2017-06-05", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "98.0", "challenge_type" => "footwear", "complete_units" => "78.0", "start_date" => "2017-06-07", "store_id" => "2"}, %{"Goal" => "250", "UPH" => "188.0", "challenge_type" => "equipment", "complete_units" => "110.0", "start_date" => "2017-06-07", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "76.0", "challenge_type" => "apparel", "complete_units" => "30.0", "start_date" => "2017-06-08", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "91.0", "challenge_type" => "apparel", "complete_units" => "67.0", "start_date" => "2017-06-08", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "61.0", "challenge_type" => "footwear", "complete_units" => "136.0", "start_date" => "2017-06-19", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "94.0", "challenge_type" => "footwear", "complete_units" => "140.0", "start_date" => "2017-06-21", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "70.0", "challenge_type" => "footwear", "complete_units" => "68.0", "start_date" => "2017-06-22", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "261.0", "challenge_type" => "product refill", "complete_units" => "267.0", "start_date" => "2017-07-01", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "100.0", "challenge_type" => "apparel", "complete_units" => "90.0", "start_date" => "2017-07-05", "store_id" => "2"}, %{"Goal" => "125", "UPH" => "83.0", "challenge_type" => "cph", "complete_units" => "108.0", "start_date" => "2017-07-05", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "181.0", "challenge_type" => "footwear", "complete_units" => "150.0", "start_date" => "2017-07-06", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "184.0", "challenge_type" => "footwear", "complete_units" => "68.0", "start_date" => "2017-06-02", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "118.0", "challenge_type" => "footwear", "complete_units" => "157.0", "start_date" => "2017-06-02", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "361.0", "challenge_type" => "apparel", "complete_units" => "35.0", "start_date" => "2017-06-04", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "102.0", "challenge_type" => "footwear", "complete_units" => "103.0", "start_date" => "2017-06-06", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "120.0", "challenge_type" => "apparel", "complete_units" => "122.0", "start_date" => "2017-06-08", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "136.0", "challenge_type" => "footwear", "complete_units" => "50.0", "start_date" => "2017-06-21", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "101.0", "challenge_type" => "footwear", "complete_units" => "72.0", "start_date" => "2017-06-21", "store_id" => "2"}, %{"Goal" => "125", "UPH" => "107.0", "challenge_type" => "cph", "complete_units" => "42.0", "start_date" => "2017-06-21", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "227.0", "challenge_type" => "footwear", "complete_units" => "75.0", "start_date" => "2017-06-22", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "78.0", "challenge_type" => "apparel", "complete_units" => "90.0", "start_date" => "2017-06-26", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "156.0", "challenge_type" => "apparel", "complete_units" => "54.0", "start_date" => "2017-06-26", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "82.0", "challenge_type" => "footwear", "complete_units" => "87.0", "start_date" => "2017-06-27", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "115.0", "challenge_type" => "footwear", "complete_units" => "116.0", "start_date" => "2017-06-27", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "464.0", "challenge_type" => "footwear", "complete_units" => "107.0", "start_date" => "2017-06-27", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "365.0", "challenge_type" => "footwear", "complete_units" => "87.0", "start_date" => "2017-06-27", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "1.0", "challenge_type" => "product refill", "complete_units" => "100.0", "start_date" => "2017-06-02", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "90.0", "challenge_type" => "apparel", "complete_units" => "90.0", "start_date" => "2017-06-06", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "110.0", "challenge_type" => "product refill", "complete_units" => "100.0", "start_date" => "2017-06-11", "store_id" => "2"}, %{"Goal" => "125", "UPH" => "105.0", "challenge_type" => "cph", "complete_units" => "101.0", "start_date" => "2017-06-22", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "175.0", "challenge_type" => "product refill", "complete_units" => "263.0", "start_date" => "2017-06-25", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "126.0", "challenge_type" => "product refill", "complete_units" => "128.0", "start_date" => "2017-06-25", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "136.0", "challenge_type" => "product refill", "complete_units" => "23.0", "start_date" => "2017-07-03", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "156.0", "challenge_type" => "product refill", "complete_units" => "37.0", "start_date" => "2017-07-03", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "66.0", "challenge_type" => "apparel", "complete_units" => "40.0", "start_date" => "2017-06-05", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "157.0", "challenge_type" => "footwear", "complete_units" => "78.0", "start_date" => "2017-06-23", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "111.0", "challenge_type" => "footwear", "complete_units" => "90.0", "start_date" => "2017-07-05", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "109.0", "challenge_type" => "product refill", "complete_units" => "160.0", "start_date" => "2017-07-03", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "27.0", "challenge_type" => "footwear", "complete_units" => "150.0", "start_date" => "2017-06-17", "store_id" => "2"}, %{"Goal" => "90", "UPH" => "164.0", "challenge_type" => "apparel", "complete_units" => "250.0", "start_date" => "2017-07-02", "store_id" => "2"}, %{"Goal" => "150", "UPH" => "2.0", "challenge_type" => "footwear", "complete_units" => "150.0", "start_date" => "2017-07-04", "store_id" => "2"}, %{"Goal" => "250", "UPH" => "322.0", "challenge_type" => "equipment", "complete_units" => "250.0", "start_date" => "2017-06-07", "store_id" => "2"}, %{"Goal" => "100", "UPH" => "58.0", "challenge_type" => "product refill", "complete_units" => "60.0", "start_date" => "2017-07-06", "store_id" => "2"}
+  ]
 
-      assert Service.Domo.hash_file(body, state, type, store_ids)  == expected
-    end
+  expected = %{"season1preseason" => [%{"Goal" => "150", "UPH" => "14.0",
+                 "challenge_type" => "footwear", "complete_units" => "76.0",
+                 "start_date" => "2017-06-17", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "150.0",
+                 "challenge_type" => "footwear", "complete_units" => "270.0",
+                 "start_date" => "2017-06-18", "store_id" => "2"},
+               %{"Goal" => "250", "UPH" => "420.0",
+                 "challenge_type" => "equipment", "complete_units" => "72.0",
+                 "start_date" => "2017-06-18", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "27.0",
+                 "challenge_type" => "footwear", "complete_units" => "150.0",
+                 "start_date" => "2017-06-17", "store_id" => "2"}],
+              "season1week1" => [%{"Goal" => "90", "UPH" => "55.0",
+                 "challenge_type" => "apparel", "complete_units" => "75.0",
+                 "start_date" => "2017-06-19", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "84.0",
+                 "challenge_type" => "footwear", "complete_units" => "70.0",
+                 "start_date" => "2017-06-20", "store_id" => "2"},
+               %{"Goal" => "250", "UPH" => "207.0",
+                 "challenge_type" => "equipment", "complete_units" => "53.0",
+                 "start_date" => "2017-06-21", "store_id" => "2"},
+               %{"Goal" => "125", "UPH" => "107.0", "challenge_type" => "cph",
+                 "complete_units" => "42.0", "start_date" => "2017-06-21",
+                 "store_id" => "2"},
+               %{"Goal" => "90", "UPH" => "99.0", "challenge_type" => "apparel",
+                 "complete_units" => "125.0", "start_date" => "2017-06-21",
+                 "store_id" => "2"},
+               %{"Goal" => "125", "UPH" => "105.0", "challenge_type" => "cph",
+                 "complete_units" => "101.0", "start_date" => "2017-06-22",
+                 "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "264.0",
+                 "challenge_type" => "footwear", "complete_units" => "163.0",
+                 "start_date" => "2017-06-23", "store_id" => "2"},
+               %{"Goal" => "90", "UPH" => "59.0", "challenge_type" => "apparel",
+                 "complete_units" => "90.0", "start_date" => "2017-06-23",
+                 "store_id" => "2"},
+               %{"Goal" => "125", "UPH" => "107.0", "challenge_type" => "cph",
+                 "complete_units" => "42.0", "start_date" => "2017-06-21",
+                 "store_id" => "2"},
+               %{"Goal" => "125", "UPH" => "105.0", "challenge_type" => "cph",
+                 "complete_units" => "101.0", "start_date" => "2017-06-22",
+                 "store_id" => "2"},
+               %{"Goal" => "100", "UPH" => "260.0",
+                 "challenge_type" => "product refill",
+                 "complete_units" => "90.0", "start_date" => "2017-06-21",
+                 "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "310.0",
+                 "challenge_type" => "footwear", "complete_units" => "96.0",
+                 "start_date" => "2017-06-20", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "125.0",
+                 "challenge_type" => "footwear", "complete_units" => "84.0",
+                 "start_date" => "2017-06-20", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "175.0",
+                 "challenge_type" => "footwear", "complete_units" => "72.0",
+                 "start_date" => "2017-06-20", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "183.0",
+                 "challenge_type" => "footwear", "complete_units" => "96.0",
+                 "start_date" => "2017-06-20", "store_id" => "2"},
+               %{"Goal" => "125", "UPH" => "242.0", "challenge_type" => "cph",
+                 "complete_units" => "16.0", "start_date" => "2017-06-22",
+                 "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "173.0",
+                 "challenge_type" => "footwear", "complete_units" => "227.0",
+                 "start_date" => "2017-06-23", "store_id" => "2"},
+               %{"Goal" => "100", "UPH" => "269.0",
+                 "challenge_type" => "product refill",
+                 "complete_units" => "100.0", "start_date" => "2017-06-21",
+                 "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "61.0",
+                 "challenge_type" => "footwear", "complete_units" => "136.0",
+                 "start_date" => "2017-06-19", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "94.0",
+                 "challenge_type" => "footwear", "complete_units" => "140.0",
+                 "start_date" => "2017-06-21", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "70.0",
+                 "challenge_type" => "footwear", "complete_units" => "68.0",
+                 "start_date" => "2017-06-22", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "136.0",
+                 "challenge_type" => "footwear", "complete_units" => "50.0",
+                 "start_date" => "2017-06-21", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "101.0",
+                 "challenge_type" => "footwear", "complete_units" => "72.0",
+                 "start_date" => "2017-06-21", "store_id" => "2"},
+               %{"Goal" => "125", "UPH" => "107.0", "challenge_type" => "cph",
+                 "complete_units" => "42.0", "start_date" => "2017-06-21",
+                 "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "227.0",
+                 "challenge_type" => "footwear", "complete_units" => "75.0",
+                 "start_date" => "2017-06-22", "store_id" => "2"},
+               %{"Goal" => "125", "UPH" => "105.0", "challenge_type" => "cph",
+                 "complete_units" => "101.0", "start_date" => "2017-06-22",
+                 "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "157.0",
+                 "challenge_type" => "footwear", "complete_units" => "78.0",
+                 "start_date" => "2017-06-23", "store_id" => "2"}],
+              "season1week2" => [%{"Goal" => "125", "UPH" => "111.0",
+                 "challenge_type" => "cph", "complete_units" => "111.0",
+                 "start_date" => "2017-06-27", "store_id" => "2"},
+               %{"Goal" => "100", "UPH" => "117.0",
+                 "challenge_type" => "product refill",
+                 "complete_units" => "75.0", "start_date" => "2017-06-26",
+                 "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "269.0",
+                 "challenge_type" => "footwear", "complete_units" => "115.0",
+                 "start_date" => "2017-06-26", "store_id" => "2"},
+               %{"Goal" => "100", "UPH" => "131.0",
+                 "challenge_type" => "product refill",
+                 "complete_units" => "55.0", "start_date" => "2017-06-27",
+                 "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "137.0",
+                 "challenge_type" => "footwear", "complete_units" => "60.0",
+                 "start_date" => "2017-06-27", "store_id" => "2"},
+               %{"Goal" => "90", "UPH" => "91.0", "challenge_type" => "apparel",
+                 "complete_units" => "25.0", "start_date" => "2017-06-27",
+                 "store_id" => "2"},
+               %{"Goal" => "125", "UPH" => "184.0", "challenge_type" => "cph",
+                 "complete_units" => "13.0", "start_date" => "2017-06-27",
+                 "store_id" => "2"},
+               %{"Goal" => "90", "UPH" => "114.0",
+                 "challenge_type" => "apparel", "complete_units" => "50.0",
+                 "start_date" => "2017-06-27", "store_id" => "2"},
+               %{"Goal" => "125", "UPH" => "111.0", "challenge_type" => "cph",
+                 "complete_units" => "111.0", "start_date" => "2017-06-27",
+                 "store_id" => "2"},
+               %{"Goal" => "100", "UPH" => "261.0",
+                 "challenge_type" => "product refill",
+                 "complete_units" => "267.0", "start_date" => "2017-07-01",
+                 "store_id" => "2"},
+               %{"Goal" => "90", "UPH" => "78.0", "challenge_type" => "apparel",
+                 "complete_units" => "90.0", "start_date" => "2017-06-26",
+                 "store_id" => "2"},
+               %{"Goal" => "90", "UPH" => "156.0",
+                 "challenge_type" => "apparel", "complete_units" => "54.0",
+                 "start_date" => "2017-06-26", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "82.0",
+                 "challenge_type" => "footwear", "complete_units" => "87.0",
+                 "start_date" => "2017-06-27", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "115.0",
+                 "challenge_type" => "footwear", "complete_units" => "116.0",
+                 "start_date" => "2017-06-27", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "464.0",
+                 "challenge_type" => "footwear", "complete_units" => "107.0",
+                 "start_date" => "2017-06-27", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "365.0",
+                 "challenge_type" => "footwear", "complete_units" => "87.0",
+                 "start_date" => "2017-06-27", "store_id" => "2"},
+               %{"Goal" => "100", "UPH" => "175.0",
+                 "challenge_type" => "product refill",
+                 "complete_units" => "263.0", "start_date" => "2017-06-25",
+                 "store_id" => "2"},
+               %{"Goal" => "100", "UPH" => "126.0",
+                 "challenge_type" => "product refill",
+                 "complete_units" => "128.0", "start_date" => "2017-06-25",
+                 "store_id" => "2"}],
+              "season1week3" => [%{"Goal" => "90", "UPH" => "1.0",
+                 "challenge_type" => "apparel", "complete_units" => "90.0",
+                 "start_date" => "2017-07-04", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "130.0",
+                 "challenge_type" => "footwear", "complete_units" => "150.0",
+                 "start_date" => "2017-07-07", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "112.0",
+                 "challenge_type" => "footwear", "complete_units" => "100.0",
+                 "start_date" => "2017-07-07", "store_id" => "2"},
+               %{"Goal" => "90", "UPH" => "121.0",
+                 "challenge_type" => "apparel", "complete_units" => "90.0",
+                 "start_date" => "2017-07-05", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "64.0",
+                 "challenge_type" => "footwear", "complete_units" => "86.0",
+                 "start_date" => "2017-07-07", "store_id" => "2"},
+               %{"Goal" => "90", "UPH" => "222.0",
+                 "challenge_type" => "apparel", "complete_units" => "75.0",
+                 "start_date" => "2017-07-02", "store_id" => "2"},
+               %{"Goal" => "250", "UPH" => "283.0",
+                 "challenge_type" => "equipment", "complete_units" => "282.0",
+                 "start_date" => "2017-07-02", "store_id" => "2"},
+               %{"Goal" => "250", "UPH" => "2.0",
+                 "challenge_type" => "equipment", "complete_units" => "250.0",
+                 "start_date" => "2017-07-02", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "30.0",
+                 "challenge_type" => "footwear", "complete_units" => "100.0",
+                 "start_date" => "2017-07-06", "store_id" => "2"},
+               %{"Goal" => "90", "UPH" => "54.0", "challenge_type" => "apparel",
+                 "complete_units" => "60.0", "start_date" => "2017-07-05",
+                 "store_id" => "2"},
+               %{"Goal" => "90", "UPH" => "100.0",
+                 "challenge_type" => "apparel", "complete_units" => "90.0",
+                 "start_date" => "2017-07-05", "store_id" => "2"},
+               %{"Goal" => "125", "UPH" => "83.0", "challenge_type" => "cph",
+                 "complete_units" => "108.0", "start_date" => "2017-07-05",
+                 "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "181.0",
+                 "challenge_type" => "footwear", "complete_units" => "150.0",
+                 "start_date" => "2017-07-06", "store_id" => "2"},
+               %{"Goal" => "100", "UPH" => "136.0",
+                 "challenge_type" => "product refill",
+                 "complete_units" => "23.0", "start_date" => "2017-07-03",
+                 "store_id" => "2"},
+               %{"Goal" => "100", "UPH" => "156.0",
+                 "challenge_type" => "product refill",
+                 "complete_units" => "37.0", "start_date" => "2017-07-03",
+                 "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "111.0",
+                 "challenge_type" => "footwear", "complete_units" => "90.0",
+                 "start_date" => "2017-07-05", "store_id" => "2"},
+               %{"Goal" => "100", "UPH" => "109.0",
+                 "challenge_type" => "product refill",
+                 "complete_units" => "160.0", "start_date" => "2017-07-03",
+                 "store_id" => "2"},
+               %{"Goal" => "90", "UPH" => "164.0",
+                 "challenge_type" => "apparel", "complete_units" => "250.0",
+                 "start_date" => "2017-07-02", "store_id" => "2"},
+               %{"Goal" => "150", "UPH" => "2.0",
+                 "challenge_type" => "footwear", "complete_units" => "150.0",
+                 "start_date" => "2017-07-04", "store_id" => "2"},
+               %{"Goal" => "100", "UPH" => "58.0",
+                 "challenge_type" => "product refill",
+                 "complete_units" => "60.0", "start_date" => "2017-07-06",
+                 "store_id" => "2"}]}
 
-  test "build a meta map" do
-    col_heads = "1,2,3,4"
-    row = "a,b,c,d"
-    assert Service.Domo.build_meta_map(col_heads, row) == %{"1" => "a", "2" => "b", "3" => "c", "4" => "d"}
-  end
-
-  test "is_empty? returns given hash state" do
-    model = %{"last_played" => "1234", "hash_state"=> ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
-                                                                   "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
-                                                                   "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                                                        }
-    expected = %HashState{hashes: ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
-                                   "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
-                                   "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                          lines: [], missing: []}
-
-    assert Service.Domo.is_empty?(model) == expected
-  end
-
-  test "is_empty? returns empty hash state if given empty map" do
-    model = %{}
-    expected = %HashState{hashes: [], lines: [], missing: []}
-    assert Service.Domo.is_empty?(model) == expected
-  end
-
-  test "return model and events" do
-    store_ids = %{
-      "93242"=> "517539dc-f3e0-47b0-9f1e-559df39eaeda",
-      "3"=> "48b76a2c-ead3-48e9-acf8-2d87adbc17b1"
-    }
-    last_played = 'bbdfb95c-3fee-11e7-a4cc-c5b7000000f1'
-    new_events = [%{domain: "stats", entity_id: "w", event_id: "",
-                    meta: %{"1" => "w", "2" => "x", "3" => "y", "4" => "z"},
-                    realm: "nike", type: "bin_audits"},
-                  %{domain: "stats", entity_id: "d", event_id: "",
-                    meta: %{"1" => "d", "2" => "c", "3" => "b", "4" => "a"},
-                    realm: "nike", type: "bin_audits"},
-                  %{domain: "stats", entity_id: "a", event_id: "",
-                    meta: %{"1" => "a", "2" => "b", "3" => "c", "4" => "d"},
-                    realm: "nike", type: "bin_audits"}]
-    col_heads = "\"Store\",2,3,4"
-    type = "bin_audits"
-    hash_state = %HashState{hashes: ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
-                                     "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
-                                     "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                            lines: [], missing: []}
-
-    expected = {%{hash_state: ["CC22CA3EC5D35ABD75B4C07D1C2894FE8A1EDC29",
-                                                           "A144EC353DB30592E97C80BFC6A3A2E617CE65B3",
-                                                           "3DCDA24350A7219C75A34CB4F0079978D4B63E95"],
-                          last_played: 'bbdfb95c-3fee-11e7-a4cc-c5b7000000f1'},
-                [%{domain: "stats", entity_id: "w", event_id: "",
-                    meta: %{"1" => "w", "2" => "x", "3" => "y", "4" => "z"},
-                    realm: "nike", type: "bin_audits"},
-                %{domain: "stats", entity_id: "d", event_id: "",
-                    meta: %{"1" => "d", "2" => "c", "3" => "b", "4" => "a"},
-                    realm: "nike", type: "bin_audits"},
-                %{domain: "stats", entity_id: "a", event_id: "",
-                    meta: %{"1" => "a", "2" => "b", "3" => "c", "4" => "d"},
-                    realm: "nike", type: "bin_audits"}]}
-
-
-    assert Service.Domo.return_model_and_events({new_events, col_heads, type, hash_state, store_ids}, last_played) == expected
-  end
+  assert(Service.Domo.data_prep(meta, :challenge) == expected)
+end
 
 
 end

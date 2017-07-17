@@ -52,7 +52,7 @@ defmodule Mix.Tasks.Seeding do
     case response do
       {:ok, %HTTPoison.Response{status_code: 200, body: data}} ->
         {:ok, decoded_data} = Poison.decode(data)
-        {score, accuracy} = calculate_score(decoded_data["stats"])
+        {score, accuracy} = calculate_score(decoded_data)
 
         Map.put(store, "accuracy_score", accuracy)
         |> Map.put("score", score)

@@ -35,7 +35,7 @@ defmodule API.Mixfile do
       {:json, "~> 1.0"},
       {:exometer_core, github: "Feuerlabs/exometer_core"},
       {:setup, github: "uwiger/setup", manager: :rebar, override: true},
-      {:gen_stage, "~> 0.12.0"},
+      {:gen_stage, "~> 0.12.1"},
       {:observer_cli, "~> 1.1.0"},
       {:meck, "~> 0.8.4", runtime: false, override: true}
     ]
