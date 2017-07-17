@@ -24,7 +24,7 @@ defmodule Mix.Tasks.Bracket do
     case response do
       {:ok, %HTTPoison.Response{status_code: 200, body: data}} ->
         {:ok, decoded_data} = Poison.decode(data)
-        {score, accuracy} = total_week(decoded_data["stats"][week])
+        {score, accuracy} = total_week(decoded_data[week])
         Map.put(store, week <> "accuracy_score", accuracy)
         |> Map.put(week <> "score", score)
       {:ok, %HTTPoison.Response{status_code: code}} ->
@@ -68,7 +68,7 @@ defmodule Mix.Tasks.Bracket do
     bracket = get_bracket_maps()
     season = get_season()
     case bracket do
-      :ok -> Logger.error("no bracket available")
+      :ok -> Logger.warn("no bracket available")
       _ -> determine_winners(bracket, season)
         |> save_bracket()
     end
