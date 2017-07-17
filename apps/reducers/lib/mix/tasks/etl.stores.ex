@@ -3,80 +3,85 @@ defmodule Mix.Tasks.Etl.Stores do
   @shortdoc "Transform Store Data"
   @preferred_cli_env :dev
 
-  require Logger
+  alias DB.Common
   alias DB.Reducer.State
 
-  def get_store_key(entity_id) do
-    e_ctx = DB.Common.event_context(%{entity_id: entity_id, domain: "stats"})
-    DB.Reducer.State.key(e_ctx, "stats")
-  end
-
-  def run(["delete"]) do
+  def run(argv) do
     Application.ensure_all_started(:db)
     IO.puts ("MIX ENV: #{Mix.env}; #{inspect(self())}")
-    service = "storeindex"
-    entity_id = "100077bd-5b34-41ac-b37b-62adbf86c1a5"
-    e_ctx = DB.Common.event_context(%{entity_id: entity_id, domain: service})
-    state_key = DB.Reducer.State.key(e_ctx, service)
-
-    # store_index
-    _stores = case DB.Reducer.State.find(state_key) do
-      :not_found -> :done
-      state ->
-        state.model.data["stores"] |>
-          Enum.each(fn {_store_num, entity_id} ->
-            # for each store, delete stats
-            store_key = get_store_key(entity_id)
-            apply(__MODULE__, :delete_store_stats, [store_key])
-          end)
+    {options, _, _} = OptionParser.parse(argv)
+    case options do
+      [delete: true] -> execute(:delete)
+      [transform: transform_fun] ->
+        function = String.to_atom(transform_fun)
+        has_function = __MODULE__.module_info |> Keyword.get(:exports) |> Keyword.has_key?(function)
+        case has_function do
+          false -> IO.puts "Invalid Transform Function, (try log_state)"
+          true -> execute(:transform, function)
+        end
+      _ -> IO.puts "Invalid Operation, (try --delete or --transform)"
     end
-
+    IO.puts "All Done"
   end
 
+  defp get_store_key(entity_id) do
+    e_ctx = Common.event_context(%{entity_id: entity_id, domain: "stats"})
+    State.key(e_ctx, "stats")
+  end
 
-  def run([_transform, module, func]) do
-    Application.ensure_all_started(:db)
-    IO.puts ("MIX ENV: #{Mix.env}; #{inspect(self())}")
-    # Other Interesting Keys
-    # service = "domo"
-    # entity_id = "ea43de77-366f-4758-a8cc-f27bf9f622b9"
-    # entity_id = "9f3f1763-d2e8-45cd-8e5c-89ff038a95f5"
+  defp lookup_store_index() do
     service = "storeindex"
     entity_id = "100077bd-5b34-41ac-b37b-62adbf86c1a5"
-    e_ctx = DB.Common.event_context(%{entity_id: entity_id, domain: service})
-    state_key = DB.Reducer.State.key(e_ctx, service)
+    e_ctx = Common.event_context(%{entity_id: entity_id, domain: service})
+    State.key(e_ctx, service)
+  end
 
-    # store_index
-    _stores = case DB.Reducer.State.find(state_key) do
+  defp execute(operation, transform_fun \\ nil) do
+    state_key = lookup_store_index()
+
+    case State.find(state_key) do
       :not_found -> :done
       state ->
         state.model.data["stores"] |>
           Enum.each(fn {store_num, entity_id} ->
-            # for each store, do a function
             store_key = get_store_key(entity_id)
-            apply(__MODULE__, :transform, [store_key, store_num, module, func])
+            case operation do
+              :delete -> delete_store_stats(store_key)
+              :transform -> transform(store_key, store_num, transform_fun)
+              _ -> :invalid_operation
+            end
           end)
     end
   end
 
-  # transforms stores state, then saves results
-  def transform(store_key, store_num, module, transformer)do
-    _stores = case DB.Reducer.State.find(store_key) do
-      :not_found -> :done
+  defp transform(store_key, store_num, function) when is_atom(function) do
+    case State.find(store_key) do
+      :not_found -> :ok
       state ->
-        new_state = apply(module, transformer, [state.model.data, store_num])
-        DB.Reducer.State.save( %State{state_id: store_key, data: new_state})
-        Logger.debug("saved updated state for store #{store_num}")
+        case apply(__MODULE__, function, [state.model.data, store_num]) do
+          nil -> :ok
+          new_state ->
+            State.save( %State{state_id: store_key, data: new_state})
+            IO.puts ("saved updated state for store #{store_num}")
+            :ok
+        end
     end
   end
 
+  # simple transform function which justs lists state
+  # a real function would inspect and mutate the model
+  #
+  # calling function will mutate state with whatever map is returned.
+  @spec log_state(map(), String.t) :: map() | nil
   def log_state(model, num)do
-    Logger.debug("Store num #{num} and #{inspect(model)}")
+    IO.puts "Store num #{num} and #{inspect(model)}"
+    nil
   end
 
-  def delete_store_stats(store_key)do
-    DB.Reducer.State.delete(store_key)
-    Logger.info("Deleted: stats/#{store_key}")
+  defp delete_store_stats(store_key)do
+    State.delete(store_key)
+    IO.puts ("Deleted: stats/#{store_key}")
+    :ok
   end
 
 end
