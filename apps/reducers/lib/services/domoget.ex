@@ -14,6 +14,7 @@ defmodule Service.Domo do
 
     domo_dataset(dataset_id, client_id, client_secret)
     |> chunk_by_store(field_name)
+    |> reduce_size(type)
     |> Enum.each(fn {store_num, chunk} ->
       send_store_chunk(store_num, get_entity_id(store_num, store_ids), chunk, type) end)
 
@@ -52,6 +53,20 @@ defmodule Service.Domo do
         :error
     end
   end
+
+  def reduce_size(dataset, type) do
+    case type do
+      "challenge" ->
+        dataset
+        |> Enum.map(fn {store, data} ->
+          {store, Enum.map(data, fn(challenge) ->
+             Map.take(challenge, ["Goal", "UPH", "challenge_type", "complete_units", "start_date", "start_datetime", "store_id"]) end)}
+        end)
+      _ -> dataset
+    end
+  end
+
+
 
   def chunk_by_store(dataset, field_name)do
     dataset
