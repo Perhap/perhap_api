@@ -33,6 +33,7 @@ defmodule Service.Stats do
     apply(__MODULE__, type, [model, data])
     |> accuracy()
     |> calc_sub_bin_audit(store_num)
+    |> total()
   end
 
   def correct_type?(event) do
@@ -240,9 +241,6 @@ defmodule Service.Stats do
       end
     end
 
-
-
-
   def percentage_score(percent) do
     cond do
       percent >= 1.20 -> 15
@@ -273,5 +271,28 @@ defmodule Service.Stats do
       true -> 0
     end
   end
+
+
+    def total(model)do
+      Map.new(model
+      |> Enum.map(fn {period, data} ->
+          {period,  calc_total(data) } end))
+    end
+
+    def calc_total(weekly_model)do
+      Map.put(weekly_model, "weekly_total", total_week(weekly_model))
+    end
+
+
+    def total_week(week_stats) do
+      bin_score = get_score(week_stats, "bin_audit", "bin_score")
+      pre_score = get_score(week_stats, "pre", "pre_score")
+      pre_accuracy = get_score(week_stats, "pre", "accuracy_score")
+      refill_score = get_score(week_stats, "refill", "refill_score")
+      refill_accuracy = get_score(week_stats, "refill", "accuracy_score")
+      bin_score + pre_score + pre_accuracy + refill_score + refill_accuracy
+    end
+
+
 
 end
