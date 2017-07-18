@@ -193,10 +193,6 @@ defmodule Service.Stats do
      Map.drop(model, ["count"])
     end
 
-
-
-
-
   # Calculates bin_audit_score for stores that do not do bin_audits, Clearance stores and Canada stores
     def calc_sub_bin_audit(model, store_num) do
       case needs_bin_audit_calc(store_num) do
@@ -276,7 +272,7 @@ defmodule Service.Stats do
     def total(model)do
       Map.new(model
       |> Enum.map(fn {period, data} ->
-          {period,  calc_total(data) } end))
+          {period,  calc_total(dat) } end))
     end
 
     def calc_total(weekly_model)do

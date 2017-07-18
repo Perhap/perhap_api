@@ -63,12 +63,6 @@ defmodule Mix.Tasks.Seeding do
     end
   end
 
-  # # generates test data
-  # def request_store_stats(store) do
-  #   Map.put(store, "accuracy_score", :rand.uniform(10))
-  #   |> Map.put("score", :rand.uniform(70))
-  # end
-
   def run(_args \\ []) do
     Application.ensure_all_started(:db)
     stats = get_store_stats_pipeline()

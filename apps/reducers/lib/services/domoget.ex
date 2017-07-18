@@ -189,7 +189,6 @@ defmodule Service.Domo do
         store_1_data ++ store_2_data ++ store_3_data
     end
 
-
     Map.drop(dataset, [store_1, store_2, store_3])
     |> Map.put(store_1, new_store_data)
   end
