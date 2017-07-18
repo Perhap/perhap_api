@@ -272,7 +272,7 @@ defmodule Service.Stats do
     def total(model)do
       Map.new(model
       |> Enum.map(fn {period, data} ->
-          {period,  calc_total(dat) } end))
+          {period,  calc_total(data) } end))
     end
 
     def calc_total(weekly_model)do

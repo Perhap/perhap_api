@@ -486,7 +486,16 @@ defmodule Service.StatsTest do
                  "Territory" => "Southeast", "UPH Standard" => "Factory EAS",
                  "_BATCH_ID_" => "19",
                  "_BATCH_LAST_RUN_" => "2017-06-26T18:05:05",
-                 "store_id" => "2"}],
+                 "store_id" => "2"},
+                 %{"BIN_COUNT_TOTAL" => "20",
+                           "BIN_PERCENTAGE" => "100.0", "DATE" => "2017-06-21",
+                           "Dimension" => "Factory", "District" => "FS21",
+                           "NO_OF_AUDITS_PERFORMED" => "1", "PASSED_BIN_COUNT" => "13",
+                           "STORE" => "2", "Store Name" => "Commerce",
+                           "Territory" => "Southeast", "UPH Standard" => "Factory EAS",
+                           "_BATCH_ID_" => "19",
+                           "_BATCH_LAST_RUN_" => "2017-06-26T18:05:05",
+                           "store_id" => "2"}],
               "season1week2" => [%{"BIN_COUNT_TOTAL" => "20",
                  "BIN_PERCENTAGE" => "75.0", "DATE" => "2017-06-27",
                  "Dimension" => "Factory", "District" => "FS21",
@@ -514,7 +523,7 @@ defmodule Service.StatsTest do
          "pre" => %{"pre_percentage" => 0.8463703703703704, "pre_score" => 0, "units" => 2013.0},
          "refill" => %{"refill_percentage" => 1.1475, "refill_score" => 10, "units" => 280.0}, "weekly_total" => 10 }},
     model_after_bins: %{
-      "season1week1" => %{"bin_audit" => %{"bin_percentage" => 65.0, "bin_score" => 0}, "weekly_total" => 0},
+      "season1week1" => %{"bin_audit" => %{"bin_percentage" => 82.5, "bin_score" => 5}, "weekly_total" => 5},
       "season1week2" => %{"bin_audit" => %{"bin_percentage" => 75.0, "bin_score" => 0}, "weekly_total" => 0}},
     model_after_all: %{
       "season1preseason" => %{
@@ -523,7 +532,7 @@ defmodule Service.StatsTest do
       "season1week1" => %{
         "pre" => %{"pre_percentage" => 0.9774814814814816, "pre_score" => 5, "units" => 1770.0, "actual_units" => 5288.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.3347201210287443},
         "refill" => %{"refill_percentage" => 2.645, "refill_score" => 15, "units" => 190.0, "actual_units" => 2641.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.07194244604316546},
-        "bin_audit" => %{"bin_percentage" => 65.0, "bin_score" => 0}, "weekly_total" => 20},
+        "bin_audit" => %{"bin_percentage" => 82.5, "bin_score" => 5}, "weekly_total" => 25},
       "season1week2" => %{
         "pre" => %{"pre_percentage" => 1.4424444444444444, "pre_score" => 15, "units" => 791.0, "actual_units" => 6590.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.12003034901365706},
         "refill" => %{"refill_percentage" => 1.6199999999999999, "refill_score" => 15, "units" => 788.0, "actual_units" => 3960.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.198989898989899},
@@ -540,7 +549,7 @@ defmodule Service.StatsTest do
         "season1week1" => %{
           "pre" => %{"pre_percentage" => 0.9774814814814816, "pre_score" => 5, "units" => 1770.0, "actual_units" => 5288.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.3347201210287443},
           "refill" => %{"refill_percentage" => 2.645, "refill_score" => 15, "units" => 190.0, "actual_units" => 1373.3200000000002,  "accuracy_score" => 0, "accuracy_percentage" => 0.1383508577753182},
-          "bin_audit" => %{"bin_percentage" => 65.0, "bin_score" => 0} , "weekly_total" => 20},
+          "bin_audit" => %{"bin_percentage" => 82.5, "bin_score" => 5}, "weekly_total" => 25},
         "season1week2" => %{
           "pre" => %{"pre_percentage" => 1.4424444444444444, "pre_score" => 15, "units" => 791.0, "actual_units" => 6590.0,  "accuracy_score" => 0, "accuracy_percentage" => 0.12003034901365706},
           "refill" => %{"refill_percentage" => 1.6199999999999999, "refill_score" => 15, "units" => 788.0, "actual_units" => 2059.2000000000003,  "accuracy_score" => 0, "accuracy_percentage" => 0.38267288267288263},
