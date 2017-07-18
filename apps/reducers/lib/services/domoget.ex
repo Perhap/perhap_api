@@ -14,7 +14,6 @@ defmodule Service.Domo do
 
     domo_dataset(dataset_id, client_id, client_secret)
     |> chunk_by_store(field_name)
-    |> reduce_size(type)
     |> consolidate_shared_stores(type)
     |> filter_data(type)
     |> Enum.each(fn {store_num, chunk} ->
@@ -56,18 +55,6 @@ defmodule Service.Domo do
     end
   end
 
-  def reduce_size(dataset, type) do
-    case type do
-      "challenge" ->
-        dataset
-        |> Enum.map(fn {store, data} ->
-          {store, Enum.map(data, fn(challenge) ->
-             Map.take(challenge, ["Goal", "UPH", "challenge_type", "complete_units", "start_date", "store_id"]) end)}
-        end)
-      _ -> dataset
-    end
-  end
-
 
   def consolidate_shared_stores(dataset, type) do
     dataset
@@ -81,8 +68,6 @@ defmodule Service.Domo do
       {store, data_prep(data, String.to_existing_atom(type))} end
       )
   end
-
-
 
     def data_prep(meta, :bin_audit)do
       meta
@@ -121,9 +106,6 @@ defmodule Service.Domo do
       |> Enum.filter(fn (row) -> date(row[date_field_name]) < end_time end)
     end
 
-
-
-
     def sort_by_time_period(filtered_meta, date_field) do
       time_periods = Application.get_env(:reducers, Application.get_env(:reducers, :current_periods))
       filtered_meta
@@ -138,19 +120,8 @@ defmodule Service.Domo do
     end
 
 
-  def get_timestamp({:bin_audit, event}), do: date(event.data["DATE"])
-  def get_timestamp({:actuals, event}), do: date(event.data["Week"])
-  def get_timestamp({:pre_actual, event}), do: date(event.data["Week"])
-  def get_timestamp({:refill_actual, event}), do: date(event.data["Week"])
-  def get_timestamp({:pre_challenge, event})do
-    max = Enum.max_by(event.data["users"], fn(user) -> elem(user, 1)["start_time"] end)
-    elem(max, 1)["start_time"]
-  end
-  def get_timestamp({:refill_challenge, event})do
-    max = Enum.max_by(event.data["users"], fn(user) -> elem(user, 1)["start_time"] end)
-    elem(max, 1)["start_time"]
-  end
 
+    # Date functions enable sorting into the correct periods. these functions get a timestamp used to compare to timestamps in the season periods. When the date string come in as an empty string, nil or a 0, this assigns a timestamp out of the range of the season so that it wont get played.
   def date(datestring) when datestring == "", do: 1494287000000 #this date will be before season1 starts, so it won't get played
   def date(datestring) when is_nil(datestring), do: 1494287000000 #this date will be before season1 starts, so it won't get played
   def date(datestring) when datestring == "0", do: 1494287000000 #this date will be before season1 starts, so it won't get played

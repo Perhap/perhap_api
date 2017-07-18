@@ -30,8 +30,6 @@ defmodule Service.Stats do
     data = event.meta["data"]
     store_num = event.meta["store"]
     type = String.to_existing_atom(event.type)
-    # preped_data = data_prep(data, type)
-    # apply(__MODULE__, type, [model, preped_data])
     apply(__MODULE__, type, [model, data])
     |> accuracy()
     |> calc_sub_bin_audit(store_num)
