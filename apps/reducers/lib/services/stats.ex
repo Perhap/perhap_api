@@ -185,7 +185,7 @@ defmodule Service.Stats do
          {bin_percentage, _} ->
            acc
            |> Map.put("count", acc["count"] + 1)
-           |> Map.put("bin_percentage", bin_percentage + acc["bin_percentage"])
+           |> Map.put("bin_percentage", (bin_percentage + acc["bin_percentage"])/ (acc["count"] + 1))
            |> Map.put("bin_score", bin_audit_score((bin_percentage + acc["bin_percentage"])/ (acc["count"] + 1)))
          _ -> acc
        end
