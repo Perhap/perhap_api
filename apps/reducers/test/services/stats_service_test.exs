@@ -605,6 +605,10 @@ defmodule Service.StatsTest do
       assert(Service.Stats.call([context[:bin_audit_per_store], context[:apa_event], context[:actuals_per_store]], %State{model: %{}, new_events: []})==%State{model: context[:model_after_all], new_events: []})
     end
 
+      test "call all events but with begining state", context do
+        assert(Service.Stats.call([context[:apa_event], context[:actuals_per_store]], %State{model: context[:model_after_bins], new_events: []})==%State{model: context[:model_after_all], new_events: []})
+      end
+
     test "call with reduced actuals store", context do
       assert(Service.Stats.call([context[:bin_audit_per_store], context[:apa_event], context[:reduced_actuals_per_store]], %State{model: %{}, new_events: []})==%State{model: context[:model_after_all_reduced], new_events: []})
     end

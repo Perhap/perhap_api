@@ -14,7 +14,7 @@ defmodule Service.Domo do
 
     domo_dataset(dataset_id, client_id, client_secret)
     |> chunk_by_store(field_name)
-    |> consolidate_shared_stores(type)
+    |> consolidate_shared_stores()
     |> filter_data(type)
     |> Enum.each(fn {store_num, chunk} ->
       send_store_chunk(store_num, get_entity_id(store_num, store_ids), chunk, type) end)
@@ -56,11 +56,12 @@ defmodule Service.Domo do
   end
 
 
-  def consolidate_shared_stores(dataset, type) do
+  def consolidate_shared_stores(dataset) do
     dataset
-    |> merge_two_stores(type, "19", "297")
-    |> merge_two_stores(type, "59", "298")
-    |> merge_three_stores(type, "88", "299", "96")
+    |> merge_two_stores("19", "297")
+    |> merge_two_stores("59", "298")
+    |> merge_two_stores("88", "299")
+    |> merge_two_stores("88", "96")
   end
 
   def filter_data(dataset, type) do
@@ -139,58 +140,13 @@ defmodule Service.Domo do
 
 
 
-  def merge_two_stores(dataset, _type, store_1, store_2) when is_list(dataset) do
-    {store_1, store_1_data} = List.keyfind(dataset, store_1, 0)
-    {store_2 ,store_2_data} = List.keyfind(dataset, store_2, 0)
 
-    new_store_data = {store_1, store_1_data ++ store_2_data}
+  def merge_two_stores(dataset, store_1, store_2) do
+    store_1_data = dataset[store_1] || []
+    store_2_data = dataset[store_2] || []
 
-    new_dataset = List.keydelete(dataset, store_1, 0)
-    |> List.keydelete(store_2, 0)
-
-    [new_store_data | new_dataset]
-  end
-
-  def merge_two_stores(dataset, type,  store_1, store_2) do
-    case type do
-      "bin_audit" -> dataset
-      _ ->
-        store_1_data = dataset[store_1]
-        store_2_data = dataset[store_2]
-
-        Map.drop(dataset, [store_1, store_2])
-        |> Map.put(store_1, store_1_data ++ store_2_data )
-    end
-  end
-
-  def merge_three_stores(dataset, _type, store_1, store_2, store_3) when is_list(dataset) do
-    {store_1, store_1_data} = List.keyfind(dataset, store_1, 0)
-    {store_2 ,store_2_data} = List.keyfind(dataset, store_2, 0)
-    {store_3 ,store_3_data} = List.keyfind(dataset, store_3, 0)
-
-    new_store_data = {store_1, store_1_data ++ store_2_data ++ store_3_data}
-
-    new_dataset = List.keydelete(dataset, store_1, 0)
-    |> List.keydelete(store_2, 0)
-    |> List.keydelete(store_3, 0)
-
-    [new_store_data | new_dataset]
-  end
-
-  def merge_three_stores(dataset, type, store_1, store_2, store_3) do
-    store_1_data = dataset[store_1]
-    store_2_data = dataset[store_2]
-    store_3_data = dataset[store_3]
-
-    new_store_data = case type do
-      "bin_audit" ->
-        store_1_data ++ store_3_data
-      _ ->
-        store_1_data ++ store_2_data ++ store_3_data
-    end
-
-    Map.drop(dataset, [store_1, store_2, store_3])
-    |> Map.put(store_1, new_store_data)
+    Map.drop(dataset, [store_1, store_2])
+    |> Map.put(store_1, store_1_data ++ store_2_data )
   end
 
 
