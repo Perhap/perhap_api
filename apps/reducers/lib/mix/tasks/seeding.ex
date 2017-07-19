@@ -52,7 +52,7 @@ defmodule Mix.Tasks.Seeding do
     case response do
       {:ok, %HTTPoison.Response{status_code: 200, body: data}} ->
         {:ok, decoded_data} = Poison.decode(data)
-        {score, accuracy} = calculate_score(decoded_data["stats"])
+        {score, accuracy} = calculate_score(decoded_data)
 
         Map.put(store, "accuracy_score", accuracy)
         |> Map.put("score", score)
@@ -62,12 +62,6 @@ defmodule Mix.Tasks.Seeding do
         Logger.error("couldn't get store #{inspect(store["entity_id"])} stats with error #{reason}")
     end
   end
-
-  # # generates test data
-  # def request_store_stats(store) do
-  #   Map.put(store, "accuracy_score", :rand.uniform(10))
-  #   |> Map.put("score", :rand.uniform(70))
-  # end
 
   def run(_args \\ []) do
     Application.ensure_all_started(:db)
