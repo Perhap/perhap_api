@@ -582,6 +582,62 @@ defmodule Service.StatsTest do
         ]}
     end
 
+    test "bin_audit_averaging works correctly" do
+      bin_audit_list = [
+        %{
+          "BIN_COUNT_TOTAL"=>"20",
+          "BIN_PERCENTAGE"=>"95.0",
+          "DATE"=>"2017-06-27",
+          "Dimension"=>"Factory",
+          "District"=>"FS19",
+          "NO_OF_AUDITS_PERFORMED"=>"1",
+          "PASSED_BIN_COUNT"=>"19",
+          "STORE"=>"67",
+          "Store Name"=>"Estero",
+          "Territory"=>"Southeast",
+          "UPH Standard"=>"Factory EAS",
+          "_BATCH_ID_"=>"20",
+          "_BATCH_LAST_RUN_"=>"2017-07-05T21:07:49",
+          "store_id"=>"67"
+        },
+        %{
+          "BIN_COUNT_TOTAL"=>"40",
+          "BIN_PERCENTAGE"=>"97.5",
+          "DATE"=>"2017-06-29",
+          "Dimension"=>"Factory",
+          "District"=>"FS19",
+          "NO_OF_AUDITS_PERFORMED"=>"2",
+          "PASSED_BIN_COUNT"=>"39",
+          "STORE"=>"67",
+          "Store Name"=>"Estero",
+          "Territory"=>"Southeast",
+          "UPH Standard"=>"Factory EAS",
+          "_BATCH_ID_"=>"20",
+          "_BATCH_LAST_RUN_"=>"2017-07-05T21:07:49",
+          "store_id"=>"67"
+        },
+        %{
+          "BIN_COUNT_TOTAL"=>"36",
+          "BIN_PERCENTAGE"=>"100.0",
+          "DATE"=>"2017-07-01",
+          "Dimension"=>"Factory",
+          "District"=>"FS19",
+          "NO_OF_AUDITS_PERFORMED"=>"2",
+          "PASSED_BIN_COUNT"=>"36",
+          "STORE"=>"67",
+          "Store Name"=>"Estero",
+          "Territory"=>"Southeast",
+          "UPH Standard"=>"Factory EAS",
+          "_BATCH_ID_"=>"20",
+          "_BATCH_LAST_RUN_"=>"2017-07-05T21:07:49",
+          "store_id"=>"67"
+        }
+      ]
+
+
+      assert(Service.Stats.calc_bin_audit(bin_audit_list) == %{"bin_percentage" => 97.5, "bin_score" => 10})
+    end
+
     test "play with actuals event", context do
       assert(Service.Stats.stats_reducer_recursive([context[:actuals_per_store]], %{}) == context[:model_after_actuals])
     end
