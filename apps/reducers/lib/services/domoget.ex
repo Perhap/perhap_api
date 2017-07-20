@@ -172,6 +172,7 @@ defmodule Service.Domo do
 
         case HTTPoison.post(url, data, ["Content-Type": "application/json"], []) do
           {:ok, %HTTPoison.Response{status_code: 204 }} ->
+            Logger.debug("sent #{type} event #{event_id} for store #{store_num}")
             :ok
           {:ok, %HTTPoison.Response{status_code: code}} ->
             Logger.warn("upload #{type} event from domo error, status_code#{code}")

@@ -180,17 +180,18 @@ defmodule Service.Stats do
     end
 
     def calc_bin_audit(lines)do
-      model = Enum.reduce(lines, %{"bin_percentage" => 0, "bin_score" => 0, "count" => 0}, fn (line, acc) ->
+      model = Enum.reduce(lines, %{"count" => 0, "sum" => 0}, fn (line, acc) ->
        case Float.parse(line["BIN_PERCENTAGE"]) do
          {bin_percentage, _} ->
            acc
            |> Map.put("count", acc["count"] + 1)
-           |> Map.put("bin_percentage", (bin_percentage + acc["bin_percentage"])/ (acc["count"] + 1))
-           |> Map.put("bin_score", bin_audit_score((bin_percentage + acc["bin_percentage"])/ (acc["count"] + 1)))
+           |> Map.put("sum", (bin_percentage + acc["sum"]))
          _ -> acc
        end
      end)
-     Map.drop(model, ["count"])
+     Map.put(model, "bin_percentage", model["sum"]/ model["count"])
+     |> Map.put("bin_score", bin_audit_score(model["sum"]/ model["count"]))
+     |> Map.drop(["count", "sum"])
     end
 
   # Calculates bin_audit_score for stores that do not do bin_audits, Clearance stores and Canada stores
