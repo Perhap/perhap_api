@@ -185,7 +185,7 @@ defmodule Mix.Tasks.Seeding do
     {Enum.map(district_map,
     fn
       {"West Canada", stores} -> {"West Canada",
-        Enum.filter(stores, fn(store) -> Enum.member?([120034], store["number"]) end)
+        Enum.filter(stores, fn(store) -> Enum.member?([120034, 120032], store["number"]) end)
         |> max_by_a_then_b("accuracy_score", "score", &<=/2, &>=/2)
         }
       {district, stores} -> {district, max_by_a_then_b(stores, "accuracy_score", "score", &<=/2, &>=/2)}
