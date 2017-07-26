@@ -13,7 +13,7 @@ defmodule Mix.Tasks.Bracket do
     _bracket_map = case state do
       :error -> Logger.info("couldn't get bracket list")
       :not_found -> Logger.info("couldn't get bracket list")
-      _ -> state.model.data["bracket"]
+      _ -> state.model.data
     end
   end
 
@@ -85,7 +85,7 @@ defmodule Mix.Tasks.Bracket do
         |> Enum.map(fn(set) -> max_by_a_then_b(set, week_num <> "accuracy_score", week_num <> "score", &<=/2, &>=/2) end)
         Map.put(bracket, season <> week_name, weekly_winners)
     end
-    %{"bracket" => bracket}
+    bracket
   end
 
   def save_bracket(bracket_map) do
