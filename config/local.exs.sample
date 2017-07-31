@@ -27,9 +27,9 @@ config :reducers, :domo_creds,
 #  global?: true,
 #  jobs: [
 #    [name: "heartbeat", schedule: "* * * * *", task: {Service.Cron, :heartbeat, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}],
-#    [name: "bin_audit_get", schedule: "0 1,13 * * *", task: {Service.Cron, :bin_audit_get, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}], #every 12 hours
+#    [name: "bin_audit_get", schedule: "0 7/19 * * *", task: {Service.Cron, :bin_audit_get, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}], #every 12 hours at 11 PST
 #    [name: "actuals_get", schedule: "0 */4 * * *", task: {Service.Cron, :actuals_get, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}], # every 4 hours
 #    [name: "apa_get", schedule: "0 * * * *", task: {Service.Cron, :apa_get, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}], # every hour
-#    [name: "seeding", schedule: "59 23 23 7 *", task: {Mix.Tasks.Seeding, :run, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}, timezone: "America/Los_Angeles"], # this will run yearly... on 7/23 at 11:59 pm This is where it needs to be updated for each new season.
-#    [name: "weekly_bracket", schedule: "59 23 * * 0", task: {Mix.Tasks.Bracket, :run, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}, timezone: "America/Los_Angeles"] # bracket runs each week, sunday nights at 11:59 pm only returns results if in tournament play for current season
+#    [name: "seeding", schedule: "59 11 24 7 *", task: {Mix.Tasks.Seeding, :run, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}, timezone: "America/Los_Angeles"], # this will run yearly... on 7/24 at 11:59 am This is where it needs to be updated for each new season.
+#    [name: "weekly_bracket", schedule: "59 11 * * 1", task: {Mix.Tasks.Bracket, :run, []}, run_strategy: {Quantum.RunStrategy.Random, :cluster}, timezone: "America/Los_Angeles"] # bracket runs each week, mondays at 11:59 am only returns results if in tournament play for current season
 #  ]
