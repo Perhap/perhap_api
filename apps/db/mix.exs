@@ -20,7 +20,6 @@ defmodule DB.Mixfile do
         :logger,
         :tzdata,
         :riak],
-        #:phoenix_pubsub],
         # mod: {DB, []}
     ]
   end
@@ -29,10 +28,8 @@ defmodule DB.Mixfile do
     [
       {:tzdata, "~> 0.5.12"},
       {:geocalc, "~> 0.5.4"},
-      {:riak, "~> 1.1.4"},
+      {:riak, "~> 1.1.6"},
       {:timex, "~> 3.1"},
-      # {:tzdata, "== 0.1.8", override: true},
-      # {:phoenix_pubsub, "~> 1.0"},
       {:uuid, github: "okeuday/uuid"}
     ]
   end
