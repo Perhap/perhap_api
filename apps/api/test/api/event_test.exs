@@ -26,12 +26,14 @@ defmodule EventTest do
   end
 
   test "lookup events by entity_id", context do
-    e = context[:event]
-    DB.Event.save(e)
-    %{status: status, headers: _, body: body} = get("/v1/events/#{e.domain}/#{e.entity_id}")
-    assert status == 200
-    assert (JSON.decode!(body) |> List.first) == e.event_id
-    DB.Event.delete(e.event_id)
+    wait_until fn ->
+      e = context[:event]
+      DB.Event.save(e)
+      %{status: status, headers: _, body: body} = get("/v1/events/#{e.domain}/#{e.entity_id}")
+      assert status == 200
+      assert (JSON.decode!(body) |> List.first) == e.event_id
+      DB.Event.delete(e.event_id)
+    end
   end
 
 end
